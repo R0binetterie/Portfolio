@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Robin Bonfill — Maker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,400&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=Syne:wght@400;700;800&family=Kalam:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e0e0d;
+    --bg2: #111111;
+    --border: #2a2a27;
+    --accent: #c8f542;
+    --accent2: #f5a623;
+    --text: #ece8de;
+    --muted: #9a9689;
+    --card: #141413;
+    --paper: #b6ab8b;
+    --paper-line: #4d6d8c;
+    --paper-ink: #201d17;
+    --paper-red: #9c3e37;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.25rem 3rem;
+    border-bottom: 1px solid var(--border);
+    background: rgba(14,14,13,0.92);
+    backdrop-filter: blur(14px);
+  }
+  .nav-logo {
+    font-family: 'Syne', sans-serif; font-weight: 800;
+    font-size: 15px; letter-spacing: 0.05em;
+    color: var(--accent); text-decoration: none;
+  }
+  .nav-links { display: flex; gap: 2rem; align-items: center; }
+  .nav-link {
+    font-size: 14px; color: var(--muted);
+    text-decoration: none; transition: color 0.2s;
+  }
+  .nav-link:hover { color: var(--text); }
+
+  /* ── HERO ── */
+  .hero {
+    padding: 160px 3rem 100px;
+    max-width: 1400px; margin: 0 auto;
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 4rem; align-items: center;
+    border-bottom: 1px solid var(--border);
+  }
+  .hero-eyebrow {
+    font-size: 14px; color: var(--muted);
+    margin-bottom: 1.25rem;
+  }
+  .hero-name {
+    font-family: 'Syne', sans-serif; font-weight: 800;
+    font-size: clamp(48px, 6vw, 88px);
+    line-height: 0.93; letter-spacing: -0.03em;
+    color: var(--text); margin-bottom: 2rem;
+  }
+  .hero-name em {
+    font-style: normal; color: var(--text);
+    display: block;
+  }
+  .hero-bio {
+    font-size: 17px; color: #c4c0b4;
+    line-height: 1.7; max-width: 480px; margin-bottom: 2rem;
+  }
+  .now {
+    max-width: 480px; padding: 1.1rem 1.25rem;
+    display: flex; gap: 1.25rem; align-items: center;
+    border-left: 2px solid var(--accent2);
+    background: rgba(245,166,35,0.06);
+  }
+  .now-logo { width: 96px; height: 96px; flex-shrink: 0; border: 1px solid var(--border); display: block; }
+  .now-label { font-size: 13px; color: var(--accent2); margin-bottom: .25rem; font-weight: 500; }
+  .now p { font-size: 15px; color: var(--text); line-height: 1.6; }
+  .now p span { color: var(--muted); }
+
+  /* Stats côté droit */
+  .hero-right {
+    display: flex; flex-direction: column; gap: 0;
+    border-left: 1px solid var(--border);
+    padding-left: 4rem;
+  }
+  .hero-photo {
+    position: relative; border: 1px solid var(--border); overflow: hidden;
+    aspect-ratio: 4/5; margin-bottom: 2rem;
+  }
+  .hero-photo img {
+    width: 100%; height: 100%; object-fit: cover; display: block;
+    filter: brightness(0.75) saturate(0.85);
+  }
+  .hero-photo::after {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse at center, transparent 45%, rgba(0,0,0,0.55) 100%);
+  }
+  .hero-photo::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: var(--border); z-index: 2;
+  }
+  .stat-row {
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--border);
+    display: grid; grid-template-columns: 110px 1fr; gap: 1rem; align-items: baseline;
+  }
+  .stat-row:first-child { border-top: 1px solid var(--border); }
+  .stat-num {
+    font-family: 'Syne', sans-serif; font-weight: 800;
+    font-size: 20px; color: var(--text); line-height: 1;
+    letter-spacing: -0.01em;
+  }
+  .stat-label {
+    font-size: 14px; color: var(--muted);
+  }
+
+
+  /* ── THÈME TECHNIQUE : trame de plan + cartouche ── */
+  body { position: relative; }
+  .hero-grid {
+    position: absolute; top: 0; left: 0; right: 0; height: 110vh; z-index: 0; pointer-events: none;
+    background-image:
+      linear-gradient(rgba(236,232,222,.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(236,232,222,.045) 1px, transparent 1px),
+      linear-gradient(rgba(236,232,222,.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(236,232,222,.02) 1px, transparent 1px);
+    background-size: 120px 120px, 120px 120px, 24px 24px, 24px 24px;
+    -webkit-mask-image: linear-gradient(to bottom, #000 40%, transparent);
+            mask-image: linear-gradient(to bottom, #000 40%, transparent);
+  }
+  .hero { position: relative; z-index: 1; }
+  .cartouche {
+    display: grid; grid-template-columns: 90px 1fr;
+    border: 1px solid #5a584f; font-family: 'DM Mono', monospace; font-size: 12.5px;
+    margin-top: 0;
+  }
+  .cartouche > div { padding: .65rem .85rem; border-bottom: 1px solid #3a3935; }
+  .cartouche > div:nth-last-child(-n+2) { border-bottom: 0; }
+  .c-k { color: var(--muted); border-right: 1px solid #3a3935; background: rgba(236,232,222,.03); }
+  .c-v { color: var(--text); }
+  .c-v small { display: block; color: var(--muted); font-size: 11.5px; margin-top: 2px; }
+  .hero-photo { margin-bottom: 0; border-bottom: 0; }
+
+  /* ── OUTILS — arc au scroll ── */
+  .tools-wrap{ height:400vh; position:relative; }
+  .tools-sticky{
+    position:sticky; top:0; height:100vh; overflow:hidden;
+  }
+  .tools-label{
+    position:absolute; top:3rem; left:3rem; z-index:5;
+    font-family:'Syne',sans-serif; font-weight:700; font-size:22px;
+    letter-spacing:-.01em; color:var(--text);
+  }
+  #arcCanvas{ position:absolute; inset:0; z-index:1; }
+  .tools-stage{ position:absolute; inset:0; z-index:2; }
+  .tool-card{
+    position:absolute; top:0; left:0;
+    width:300px; height:380px; margin:-190px 0 0 -150px;
+    background:var(--card); border:1px solid var(--border); border-radius:3px;
+    padding:1.75rem; display:flex; flex-direction:column; justify-content:space-between;
+    will-change:transform, opacity;
+  }
+  .tool-card.focus{ border-color:var(--accent); }
+  .tool-image-wrap{width:190px;height:190px;margin:.5rem auto 0;display:flex;align-items:center;justify-content:center;background:#0d0d0d;border:1px solid var(--border);border-radius:6px;padding:18px}
+  .tool-card.focus .tool-image-wrap{border-color:var(--accent)}
+  .tool-image-wrap img{max-width:100%;max-height:100%;object-fit:contain;display:block}
+    .tool-name{font-family:'Syne',sans-serif;font-weight:800;font-size:19px;margin-top:.85rem}
+  .tool-desc{font-size:13px;color:var(--muted);line-height:1.6;margin-top:.6rem}
+
+  /* ── BREAK PAPIER — citation open-source ── */
+  .paper-break{ position:relative; background:var(--bg); width:100%; }
+  .cap, .paper-panel{
+    background-color:var(--paper);
+    background-image:
+      repeating-linear-gradient(var(--paper) 0 23px, var(--paper-line) 23px 24px),
+      repeating-linear-gradient(90deg, var(--paper) 0 23px, rgba(77,109,140,0.4) 23px 24px);
+  }
+  .cap{ height:160px; position:relative; width:100%; }
+  .cap::before{
+    content:''; position:absolute; inset:0;
+    background:linear-gradient(to bottom,
+      rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.34) 45%, rgba(0,0,0,0) 100%);
+  }
+  .cap::after{
+    content:''; position:absolute; top:0; bottom:0; left:64px; width:1px;
+    background:var(--paper-red); opacity:0.6;
+  }
+  .cap-top{ margin-bottom:-1px; }
+  .cap-bottom{ margin-top:-1px; transform:scaleY(-1); }
+  .paper-panel{ position:relative; padding:4rem 3rem 5rem; }
+  .paper-panel::before{
+    content:''; position:absolute; top:0; bottom:0; left:64px; width:1px;
+    background:var(--paper-red); opacity:0.6; z-index:1;
+  }
+  .quote-wrap{
+    position:relative; z-index:2; max-width:760px; margin:0 auto; text-align:center;
+  }
+  .quote-mark{
+    font-family:'Kalam', cursive; font-size:64px; color:var(--paper-red);
+    opacity:0.55; line-height:1; margin-bottom:-1rem;
+  }
+  .quote-text{
+    font-family:'Kalam', cursive; font-weight:700; color:var(--paper-ink);
+    font-size:clamp(24px,3.4vw,38px); line-height:1.5; letter-spacing:.005em;
+    transform:rotate(-0.4deg);
+  }
+  .quote-caption{
+    margin-top:2rem; font-family:'DM Sans',sans-serif; font-size:14px;
+    color:var(--paper-ink); opacity:0.7;
+  }
+  .quote-caption b{ color:var(--paper-red); font-weight:500; }
+
+  /* ── PROJETS ── */
+  .projects-section {
+    max-width: 1400px; margin: 0 auto;
+    padding: 5rem 3rem;
+  }
+  .projects-header {
+    display: flex; align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 3rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .projects-title {
+    font-family: 'Syne', sans-serif; font-weight: 800;
+    font-size: 32px; letter-spacing: -0.02em;
+    color: var(--text);
+  }
+  .projects-count {
+    font-size: 14px; color: var(--muted);
+  }
+
+  /* ── GRILLE PROJETS ── */
+  .projects-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--border);
+  }
+
+  /* Carte projet */
+  .project-card {
+    background: var(--card);
+    text-decoration: none; color: inherit;
+    display: flex; flex-direction: column;
+    padding: 2.5rem;
+    position: relative; overflow: hidden;
+    transition: background 0.25s;
+    min-height: 320px;
+  }
+  .project-card:hover { background: #181818; }
+  .project-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 2px; background: var(--border);
+    transition: background 0.3s;
+  }
+  .project-card:hover::before { background: var(--muted); }
+
+  /* Featured card — occupe toute la largeur */
+  .project-card.featured {
+    grid-column: 1 / -1;
+    flex-direction: row; gap: 4rem;
+    min-height: 280px;
+  }
+  .project-card.featured::before { background: var(--muted); }
+  .project-card:last-child:nth-child(odd) { grid-column: 1 / -1; }
+  /* Carte Parabole : étiquettes bleues, comme la page du projet */
+  .project-card.featured::before { background: #8fd3ff; }
+  .project-card.featured .card-tag.lit { color: #8fd3ff; }
+  .project-card.featured .card-status.active::before { background: #8fd3ff; }
+  .project-card.featured:hover .card-arrow { color: #8fd3ff; }
+
+
+  .project-card.placeholder {
+    cursor: default;
+    opacity: 0.4;
+  }
+  .project-card.placeholder:hover { background: var(--card); }
+  .project-card.placeholder::before { background: var(--border) !important; }
+
+  /* Carte Robotronik — mise en avant, sans détails */
+  .project-card.now-card {
+    grid-column: 1 / -1; cursor: default; min-height: 0;
+    background: linear-gradient(90deg, rgba(245,166,35,0.07), transparent 60%), var(--card);
+  }
+  .project-card.now-card::before { background: var(--accent2) !important; height: 3px; }
+  .project-card.now-card { flex-direction: row; gap: 3rem; align-items: center; }
+  .now-card-body { flex: 1; }
+  .now-card-logo { width: 220px; height: 220px; flex-shrink: 0; border: 1px solid var(--border); display: block; }
+  .project-card.now-card .card-desc { flex: none; margin-bottom: 1.25rem; max-width: 620px; }
+
+  .card-meta {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 1.5rem;
+  }
+  .card-num {
+    font-size: 13px; color: var(--muted);
+  }
+  .card-status { font-size: 13px; color: var(--muted); }
+  .card-status::before { content: ''; display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 8px; background: var(--muted); }
+  .card-status.active::before { background: #8fb04a; }
+  .card-status.paused::before { background: var(--accent2); }
+  .card-status.soon::before   { background: #6c6a62; }
+
+  .card-title {
+    font-family: 'Syne', sans-serif; font-weight: 800;
+    font-size: 28px; letter-spacing: -0.02em;
+    color: var(--text); margin-bottom: 1rem;
+    line-height: 1.1;
+  }
+  .project-card.featured .card-title { font-size: 38px; }
+
+  .card-desc {
+    font-size: 15px; color: #b3afa3;
+    line-height: 1.65; margin-bottom: 1.5rem;
+    max-width: 520px; flex: 1;
+  }
+
+  .card-tags { display: flex; flex-wrap: wrap; gap: 4px 8px; margin-bottom: 1.5rem; }
+  .card-tag {
+    font-size: 13px; color: var(--muted);
+  }
+  .card-tag:not(:last-child)::after { content: '·'; margin-left: 8px; }
+  .card-tag.lit { color: var(--text); }
+
+  .card-arrow {
+    margin-top: auto; font-size: 14px;
+    color: var(--text);
+    display: flex; align-items: center; gap: 8px;
+    transition: color 0.2s, gap 0.2s;
+  }
+  .project-card:hover .card-arrow { gap: 14px; }
+
+  /* Image placeholder dans la featured card */
+  .card-visual {
+    flex-shrink: 0; width: 340px;
+    background: #0d0d0d;
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    position: relative; overflow: hidden;
+  }
+  .card-visual img {
+    width: 100%; height: 100%; object-fit: cover;
+    filter: brightness(0.7) saturate(0.8);
+    transition: filter 0.4s;
+  }
+  .project-card:hover .card-visual img { filter: brightness(0.85) saturate(1); }
+  .card-visual-label {
+    position: absolute; bottom: 1rem; right: 1rem;
+    font-size: 12px; color: rgba(236,232,222,0.6);
+  }
+
+
+  /* ── CONTACT ── */
+  .contact-section {
+    border-top: 1px solid var(--border);
+    max-width: 1400px; margin: 0 auto;
+    padding: 4rem 3rem;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .contact-left h2 {
+    font-family: 'Syne', sans-serif; font-weight: 800;
+    font-size: 32px; letter-spacing: -0.02em;
+    color: var(--text); margin-bottom: 0.5rem;
+  }
+  .contact-left p { font-size: 15px; color: var(--muted); }
+  .contact-links { display: flex; gap: 1px; background: var(--border); }
+  .contact-link {
+    background: var(--card); padding: 1rem 1.75rem;
+    text-decoration: none;
+    font-size: 14px;
+    color: var(--text); transition: background 0.2s, color 0.2s;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .contact-link:hover { background: #1c1c1a; }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 1.5rem 3rem;
+    display: flex; justify-content: space-between;
+    font-size: 13px; color: var(--muted);
+  }
+
+  /* ── ANIMATIONS ── */
+  .fade-in {
+    opacity: 0; animation: fadeUp 0.65s ease forwards;
+  }
+  .fade-in:nth-child(1) { animation-delay: 0.1s; }
+  .fade-in:nth-child(2) { animation-delay: 0.22s; }
+  .fade-in:nth-child(3) { animation-delay: 0.34s; }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: none; }
+  }
+  .reveal {
+    opacity: 0; transform: translateY(24px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible { opacity: 1; transform: none; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    .project-card.now-card { flex-direction: column-reverse; align-items: flex-start; gap: 1.5rem; }
+    .now-card-logo { width: 120px; height: 120px; }
+    nav { padding: 1rem 1.5rem; }
+    .hero { grid-template-columns: 1fr; padding: 120px 1.5rem 60px; gap: 3rem; }
+    .hero-right { border-left: none; padding-left: 0; border-top: 1px solid var(--border); padding-top: 2rem; }
+    .projects-section { padding: 3rem 1.5rem; }
+    .projects-grid { grid-template-columns: 1fr; }
+    .project-card.featured { flex-direction: column; }
+    .card-visual { width: 100%; height: 200px; }
+    .contact-section { flex-direction: column; gap: 2rem; padding: 3rem 1.5rem; }
+    footer { flex-direction: column; gap: 0.5rem; padding: 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero-grid" aria-hidden="true"></div>
+
+<nav>
+  <a href="index.html" class="nav-logo">RB</a>
+  <div class="nav-links">
+    <a href="#projets" class="nav-link">Projets</a>
+    <a href="#contact" class="nav-link">Contact</a>
+  </div>
+</nav>
+
+<!-- ── HERO ── -->
+<section class="hero">
+  <div>
+    <div class="hero-eyebrow fade-in">Élève-ingénieur · Grenoble INP – Phelma</div>
+    <h1 class="hero-name fade-in">
+      Robin
+      <em>Bonfill</em>
+    </h1>
+    <p class="hero-bio fade-in">
+      Je suis en première année à Phelma, à Grenoble, après deux ans de prépa PSI au lycée Lapérouse, à Albi. À côté des cours, je conçois et je fabrique : CAO sur Fusion 360, pièces imprimées en 3D, électronique et Python pour piloter le tout.
+    </p>
+    <div class="now fade-in">
+      <img class="now-logo" src="robotronik_logo.png" alt="Logo Robotronik Phelma">
+      <div>
+      <div class="now-label">En ce moment</div>
+      <p>Équipe Robotronik : je travaille sur la mécanique du robot, sous Fusion 360. On vise la Coupe de France de Robotique (CDFR) et, si on se qualifie, Eurobot. <span>Rien de détaillé ici pour ne pas dévoiler les stratégies de l'équipe.</span></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-right fade-in">
+    <div class="hero-photo">
+      <img src="portrait_hero.jpg" alt="Robin Bonfill">
+    </div>
+    <div class="cartouche">
+      <div class="c-k">Nom</div><div class="c-v">Robin Bonfill</div>
+      <div class="c-k">École</div><div class="c-v">Grenoble INP – Phelma (UGA)<small>1 400 élèves · 11 laboratoires · 360+ diplômés par promotion</small></div>
+      <div class="c-k">Origine</div><div class="c-v">Prépa PSI — Lycée Lapérouse, Albi</div>
+      <div class="c-k">Équipe</div><div class="c-v">Robotronik — mécanique du robot</div>
+      <div class="c-k">Outils</div><div class="c-v">Fusion 360 · KiCad · Python · Bambu Lab</div>
+      <div class="c-k">Anglais</div><div class="c-v">TOEIC 905 / 990</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── OUTILS — arc au scroll ── -->
+<div class="tools-wrap" id="toolsWrap">
+  <div class="tools-sticky">
+    <div class="tools-label">Outils</div>
+    <canvas id="arcCanvas"></canvas>
+    <div class="tools-stage" id="toolsStage">
+
+      <div class="tool-card" data-i="0">
+        <div><div class="tool-image-wrap"><img src="fusion360_logo.png" alt="Fusion 360"></div>
+        </div>
+        <div>
+          <div class="tool-name">Fusion 360</div>
+          <div class="tool-desc">Modélisation 3D — toute la CAO, de la pièce unitaire à l'assemblage complet.</div>
+        </div>
+      </div>
+
+      <div class="tool-card" data-i="1">
+        <div><div class="tool-image-wrap"><img src="bambulab_a1.png" alt="Bambu Lab A1"></div>
+        </div>
+        <div>
+          <div class="tool-name">Bambu Lab</div>
+          <div class="tool-desc">Impression FDM — prototypage rapide de tous les boîtiers et pièces mécaniques.</div>
+        </div>
+      </div>
+
+      <div class="tool-card" data-i="2">
+        <div><div class="tool-image-wrap"><img src="python_logo.png" alt="Python"></div>
+        </div>
+        <div>
+          <div class="tool-name">Python</div>
+          <div class="tool-desc">NumPy, matplotlib, OpenCV — traitement image, simulation, boucle fermée.</div>
+        </div>
+      </div>
+
+      <div class="tool-card" data-i="3">
+        <div><div class="tool-image-wrap"><img src="kicad_logo.png" alt="KiCad"></div>
+        </div>
+        <div>
+          <div class="tool-name">KiCad</div>
+          <div class="tool-desc">Conception PCB — schémas électriques et routage des cartes d'alimentation.</div>
+        </div>
+      </div>
+
+      <div class="tool-card" data-i="4">
+        <div><div class="tool-image-wrap"><img src="arduino_logo.png" alt="Arduino"></div>
+        </div>
+        <div>
+          <div class="tool-name">Arduino</div>
+          <div class="tool-desc">Calibration et acquisition — mesures PT100, prototypage électronique rapide.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ── BREAK PAPIER — citation open-source ── -->
+<div class="paper-break">
+  <div class="cap cap-top" id="capTop"></div>
+
+  <div class="paper-panel">
+    <div class="quote-wrap">
+      <div class="quote-mark">"</div>
+      <p class="quote-text">Hack it. Improve it. Because good ideas deserve to be shared.</p>
+      <div class="quote-caption">— esprit <b>open-source</b> · tous les projets de ce site</div>
+    </div>
+  </div>
+
+  <div class="cap cap-bottom" id="capBottom"></div>
+</div>
+
+<!-- ── PROJETS ── -->
+<section class="projects-section reveal" id="projets">
+  <div class="projects-header">
+    <span class="projects-title">Projets</span>
+    <span class="projects-count">5 projets</span>
+  </div>
+
+  <div class="projects-grid">
+
+    <!-- ROBOTRONIK — en cours, volontairement sans détails -->
+    <div class="project-card now-card">
+      <div class="now-card-body">
+      <div class="card-meta">
+        <span class="card-status paused">En cours</span>
+      </div>
+      <h2 class="card-title">Robotronik — mécanique du robot</h2>
+      <p class="card-desc">
+        Je fais partie de l'équipe Robotronik de Grenoble INP – Phelma, côté mécanique : conception du robot sur Fusion 360. On vise la Coupe de France de Robotique (CDFR) et, si l'équipe se qualifie, Eurobot. Les détails et les choix techniques viendront plus tard, pour ne pas dévoiler les stratégies.
+      </p>
+      <div class="card-tags">
+        <span class="card-tag lit">Robotique</span>
+        <span class="card-tag lit">Mécanique</span>
+        <span class="card-tag">CDFR</span>
+        <span class="card-tag">Eurobot</span>
+        <span class="card-tag">Fusion 360</span>
+      </div>
+      </div>
+      <img class="now-card-logo" src="robotronik_logo.png" alt="Logo Robotronik Phelma">
+    </div>
+
+    <!-- PARABOLE — featured #1 -->
+    <a href="parabole.html" class="project-card featured">
+      <div style="flex:1; display:flex; flex-direction:column;">
+        <div class="card-meta">
+          <span class="card-status active">Terminé</span>
+        </div>
+        <h2 class="card-title">Suivi solaire<br>Parabole motorisée</h2>
+        <p class="card-desc">
+          Concentrateur parabolique avec suivi solaire en boucle fermée — détection de la position du foyer par caméra thermique FPV, correction motorisée sur deux axes altitude et azimut via Raspberry Pi. Simulation thermique 2D par éléments finis.
+        </p>
+        <div class="card-tags">
+          <span class="card-tag lit">Thermique</span>
+          <span class="card-tag lit">Motorisation</span>
+          <span class="card-tag">Python</span>
+          <span class="card-tag">Raspberry Pi</span>
+          <span class="card-tag">Impression 3D</span>
+          <span class="card-tag">Fusion 360</span>
+        </div>
+        <span class="card-arrow">Voir le projet →</span>
+      </div>
+      <div class="card-visual">
+        <img src="IMG_6257.jpg" alt="Parabole motorisée suivi solaire">
+        <span class="card-visual-label">Parabole — système complet</span>
+      </div>
+    </a>
+
+    <!-- NIGHTSIGHT — #2 -->
+    <a href="nightsight.html" class="project-card">
+      <div class="card-meta">
+        <span class="card-status paused">En pause</span>
+      </div>
+      <h2 class="card-title">NightSight</h2>
+      <p class="card-desc">
+        Lunettes binoculaires de vision nocturne et thermique — boîtier entièrement imprimé en 3D, caméras starlight Runcam Night Eagle 3 V2, micro-écrans OLED 0.4" avec combo optique intégré.
+      </p>
+      <div class="card-tags">
+        <span class="card-tag lit">Vision nocturne</span>
+        <span class="card-tag lit">Thermique</span>
+        <span class="card-tag">Impression 3D</span>
+        <span class="card-tag">Électronique</span>
+        <span class="card-tag">Fusion 360</span>
+      </div>
+      <span class="card-arrow">Voir le projet →</span>
+    </a>
+
+    <!-- OPENARM — #3 -->
+    <a href="openarm.html" class="project-card">
+      <div class="card-meta">
+        <span class="card-status soon">En conception</span>
+      </div>
+      <h2 class="card-title">OpenArm</h2>
+      <p class="card-desc">
+        Bras robotique 5/6 axes à structure carbone. Pièces FDM PETG et usinées CNC, actionneurs closed-loop stepper + servos, piloté par Raspberry Pi. Objectif : ouvrir une bouteille de bière.
+      </p>
+      <div class="card-tags">
+        <span class="card-tag lit">Robotique</span>
+        <span class="card-tag">Fibre de carbone</span>
+        <span class="card-tag">CNC</span>
+        <span class="card-tag">Closed-loop</span>
+        <span class="card-tag">Fusion 360</span>
+      </div>
+      <span class="card-arrow">Voir le projet →</span>
+    </a>
+
+    <!-- TORN TRAVEL OPTIMIZER — #4 -->
+    <a href="torn.html" class="project-card">
+      <div class="card-meta">
+        <span class="card-status active">En ligne</span>
+      </div>
+      <h2 class="card-title">Torn Travel<br>Optimizer</h2>
+      <p class="card-desc">
+        Outil web pour le jeu en ligne Torn City — calcule les meilleurs voyages à l'étranger selon ta session de jeu, ton mode de transport et tes bonus, avec estimation de stock en temps réel via l'API YATA.
+      </p>
+      <div class="card-tags">
+        <span class="card-tag lit">Optimisation</span>
+        <span class="card-tag lit">JavaScript</span>
+        <span class="card-tag">API YATA</span>
+        <span class="card-tag">API Torn</span>
+        <span class="card-tag">GitHub Pages</span>
+      </div>
+      <span class="card-arrow">Voir le projet →</span>
+    </a>
+
+
+  </div>
+</section>
+
+<!-- ── CONTACT ── -->
+<section class="contact-section reveal" id="contact">
+  <div class="contact-left">
+    <h2>Contact</h2>
+    <p>Un projet, une question, une collaboration : écris-moi.</p>
+  </div>
+  <div class="contact-links">
+    <a href="https://github.com/r0binetterie" class="contact-link" target="_blank">GitHub ↗</a>
+    <a href="https://www.linkedin.com/in/robin-bonfill-6a9260237" class="contact-link" target="_blank">LinkedIn ↗</a>
+    <a href="mailto:robin.bonfill@grenoble-inp.org" class="contact-link">Email ↗</a>
+  </div>
+</section>
+
+<footer>
+  <span>Robin Bonfill — 2026</span>
+  <span>Grenoble, France</span>
+  <span>Grenoble INP – Phelma</span>
+</footer>
+
+<script>
+  const reveals = document.querySelectorAll('.reveal');
+  const ro = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('visible'); ro.unobserve(e.target); }
+    });
+  }, { threshold: 0.08 });
+  reveals.forEach(el => ro.observe(el));
+
+  /* ── OUTILS — arc au scroll ── */
+  (function(){
+    const wrap = document.getElementById('toolsWrap');
+    const stage = document.getElementById('toolsStage');
+    const cards = Array.from(document.querySelectorAll('.tool-card'));
+    const canvas = document.getElementById('arcCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const n = cards.length;
+    const angleStep = 26;
+    const maxAngle  = 68;
+    const totalSweep = (n - 1) * angleStep + 2 * maxAngle;
+
+    let W, H, centerX, centerY, R;
+
+    function resize(){
+      W = canvas.width = canvas.offsetWidth = wrap.offsetWidth;
+      H = canvas.height = canvas.offsetHeight = window.innerHeight;
+      centerX = W / 2;
+      const apexY = H * 0.32;
+      const edgeDrop = H * 0.5;
+      const maxRad = maxAngle * Math.PI / 180;
+      R = edgeDrop / (1 - Math.cos(maxRad));
+      centerY = apexY + R;
+    }
+
+    function pointOnArc(thetaDeg){
+      const t = thetaDeg * Math.PI / 180;
+      return {
+        x: centerX + R * Math.sin(t),
+        y: centerY - R * Math.cos(t),
+        rot: thetaDeg * 0.35
+      };
+    }
+
+    function drawArcGuide(progress){
+      ctx.clearRect(0, 0, W, H);
+      ctx.setLineDash([4, 8]);
+      ctx.strokeStyle = 'rgba(236,232,222,0.14)';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      for (let a = -maxAngle - 20; a <= maxAngle + 20; a += 2){
+        const p = pointOnArc(a);
+        if (a === -maxAngle - 20) ctx.moveTo(p.x, p.y); else ctx.lineTo(p.x, p.y);
+      }
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    function update(){
+      const rect = wrap.getBoundingClientRect();
+      const total = wrap.offsetHeight - window.innerHeight;
+      let progress = -rect.top / total;
+      progress = Math.min(Math.max(progress, 0), 1);
+
+      drawArcGuide(progress);
+
+      let focusIndex = 0, focusDist = Infinity;
+
+      cards.forEach((card, i) => {
+        const theta = i * angleStep - progress * totalSweep + maxAngle;
+        const p = pointOnArc(theta);
+        const absTheta = Math.abs(theta);
+        const visible = absTheta <= maxAngle + 15;
+        const opacity = visible ? Math.max(0, 1 - absTheta / maxAngle) : 0;
+        const scale = 0.6 + 0.4 * Math.max(0, 1 - absTheta / maxAngle);
+
+        card.style.transform = `translate(${p.x}px, ${p.y}px) rotate(${p.rot}deg) scale(${scale})`;
+        card.style.opacity = opacity;
+        card.style.pointerEvents = opacity > 0.5 ? 'auto' : 'none';
+
+        if (absTheta < focusDist){ focusDist = absTheta; focusIndex = i; }
+      });
+
+      cards.forEach((c, i) => c.classList.toggle('focus', i === focusIndex));
+    }
+
+    window.addEventListener('scroll', () => requestAnimationFrame(update));
+    window.addEventListener('resize', () => { resize(); update(); });
+    resize();
+    update();
+  })();
+
+  /* ── BREAK PAPIER — forme en arc calculée en pixels réels ── */
+  (function(){
+    function waveTopPath(w){
+      const X = f => (f * w).toFixed(1);
+      return `path('M0,160 L0,90 `
+        + `C ${X(0.0625)},40 ${X(0.125)},120 ${X(0.2083)},70 `
+        + `C ${X(0.2986)},15 ${X(0.3611)},95 ${X(0.4444)},60 `
+        + `C ${X(0.5278)},25 ${X(0.5972)},110 ${X(0.6806)},75 `
+        + `C ${X(0.7708)},35 ${X(0.8472)},100 ${X(0.9306)},55 `
+        + `C ${X(0.9653)},35 ${X(0.9861)},50 ${w},70 `
+        + `L${w},160 Z')`;
+    }
+    function waveBottomPath(w){
+      const X = f => (f * w).toFixed(1);
+      return `path('M0,160 L0,65 `
+        + `C ${X(0.0486)},135 ${X(0.1181)},15 ${X(0.2083)},80 `
+        + `C ${X(0.2986)},150 ${X(0.375)},20 ${X(0.4583)},85 `
+        + `C ${X(0.5556)},140 ${X(0.625)},25 ${X(0.7153)},80 `
+        + `C ${X(0.7986)},130 ${X(0.875)},30 ${X(0.9375)},70 `
+        + `C ${X(0.965)},58 ${X(0.985)},60 ${w},65 `
+        + `L${w},160 Z')`;
+    }
+
+    const capTop = document.getElementById('capTop');
+    const capBottom = document.getElementById('capBottom');
+
+    function applyClip(){
+      const w = capTop.offsetWidth;
+      capTop.style.clipPath = waveTopPath(w);
+      capBottom.style.clipPath = waveBottomPath(w);
+    }
+
+    window.addEventListener('resize', applyClip);
+    applyClip();
+  })();
+</script>
+
+</body>
+</html>

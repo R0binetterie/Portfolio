@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Principe physique — Suivi solaire — Robin Bonfill</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body, {
+    delimiters: [
+      {left:'$$', right:'$$', display:true},
+      {left:'$', right:'$', display:false}
+    ]
+  })">
+</script>
+<style>
+  :root {
+    --bg:#0f0f0f;--bg2:#161616;--border:#2a2a2a;
+    --accent:#8fd3ff;--accent2:#f5a623;--accent3:#4fc3f7;
+    --text:#eeeee6;--muted:#888882;--card:#171717;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:16px;line-height:1.75;overflow-x:hidden;cursor:crosshair}
+  body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:999;opacity:.6}
+  #cursor{position:fixed;width:6px;height:6px;background:var(--accent);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:left .05s,top .05s}
+  .progress-bar{position:fixed;top:0;left:0;height:2px;background:var(--accent);z-index:200;width:0%;transition:width .1s linear}
+
+  /* NAV */
+  nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1.25rem 3rem;border-bottom:1px solid var(--border);background:rgba(15,19,24,.94);backdrop-filter:blur(14px)}
+  .nav-logo{font-family:'IBM Plex Sans',sans-serif;font-weight:800;font-size:15px;letter-spacing:.05em;color:var(--accent);text-decoration:none}
+  .nav-back{font-size:12px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;text-decoration:none;transition:color .2s}
+  .nav-back::before{content:'← '}
+  .nav-back:hover{color:var(--text)}
+
+  /* HERO */
+  .hero{padding:140px 3rem 80px;border-bottom:1px solid var(--border);display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:end;max-width:1400px;margin:0 auto;position:relative;overflow:hidden}
+  .hero-canvas{position:absolute;right:0;top:0;bottom:0;width:52%;height:100%;pointer-events:none;opacity:.6}
+  .hero-deco{display:none}
+  .hero-label{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem}
+  .hero-title{font-family:'IBM Plex Sans',sans-serif;font-weight:800;font-size:clamp(42px,6vw,80px);line-height:.95;letter-spacing:-.02em;color:var(--text);margin-bottom:1.5rem}
+  .hero-title span{color:var(--accent)}
+  .hero-desc{font-size:14px;color:var(--muted);max-width:480px;line-height:1.8;margin-bottom:2rem}
+  .hero-tags{display:flex;flex-wrap:wrap;gap:8px}
+  .tag{font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:4px 12px;border:1px solid var(--border);color:var(--muted);border-radius:2px}
+  .tag.accent{border-color:var(--accent);color:var(--accent)}
+  .hero-meta{display:flex;flex-direction:column;gap:1.5rem;align-self:end}
+  .meta-item{display:flex;flex-direction:column;gap:4px}
+  .meta-label{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .meta-value{font-size:14px;color:var(--text)}
+  .status-badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--accent)}
+  .status-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 2s infinite}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(143,211,255,.5)}70%{box-shadow:0 0 0 8px rgba(143,211,255,0)}}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+  /* PHOTOS */
+  .photo-grid{display:grid;gap:2px}
+  .photo-grid.col2{grid-template-columns:1fr 1fr}
+  .photo-grid.col3{grid-template-columns:1fr 1fr 1fr}
+  .photo-grid.featured{grid-template-columns:2fr 1fr}
+  .photo-item{position:relative;overflow:hidden;background:var(--bg2)}
+  .photo-item img{width:100%;height:100%;object-fit:cover;display:block;filter:brightness(.75) saturate(.85);transition:transform .6s cubic-bezier(.25,.46,.45,.94),filter .4s}
+  .photo-item::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 40%,rgba(10,10,10,.55) 100%);pointer-events:none;z-index:1}
+  .photo-item:hover img{transform:scale(1.03);filter:brightness(.88) saturate(1)}
+  .photo-item.tall{aspect-ratio:3/4}
+  .photo-item.wide{aspect-ratio:16/9}
+  .photo-item.square{aspect-ratio:1}
+  .photo-item.auto{aspect-ratio:auto;min-height:280px}
+  .photo-caption{position:absolute;bottom:0;left:0;right:0;padding:2.5rem 1.25rem 1.25rem;background:linear-gradient(to top,rgba(0,0,0,.9),transparent);font-size:11px;color:rgba(232,232,224,.65);letter-spacing:.06em;opacity:0;transition:opacity .3s;z-index:2}
+  .photo-item:hover .photo-caption{opacity:1}
+  .section-title{font-family:'IBM Plex Sans',sans-serif;font-weight:800;font-size:32px;letter-spacing:-.02em;line-height:1;display:inline-block}
+  .section-title:hover{animation:glitch .25s steps(2) forwards}
+  @keyframes glitch{
+    0%{text-shadow:none}
+    25%{text-shadow:2px 0 0 rgba(143,211,255,.6),-2px 0 0 rgba(79,195,247,.4)}
+    50%{text-shadow:-1px 0 0 rgba(143,211,255,.4),1px 0 0 rgba(245,166,35,.3)}
+    100%{text-shadow:none}
+  }
+
+  /* LIGNE CAT-SEP animée au scroll */
+  .cat-sep{display:flex;align-items:center;gap:1.5rem;padding:2.5rem 0 0;margin-bottom:-1rem;overflow:hidden}
+  .cat-sep-line{flex:1;height:1px;position:relative;background:transparent}
+  .cat-sep-line::after{content:'';position:absolute;top:0;left:0;height:1px;width:0;background:linear-gradient(to right,var(--accent),transparent);transition:width 1.4s cubic-bezier(.4,0,.2,1)}
+  .cat-sep.visible .cat-sep-line::after{width:100%}
+  .cat-sep-label{font-family:'IBM Plex Sans',sans-serif;font-weight:800;font-size:36px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);white-space:nowrap;padding-left:1rem}
+
+  /* COMPTEURS ANIMÉS */
+  .stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:3rem}
+  .stat-card{background:var(--card);padding:2rem 1.5rem;text-align:center;position:relative;overflow:hidden}
+  .stat-card::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(143,211,255,.04) 0%,transparent 60%);pointer-events:none}
+  .stat-val{font-family:'IBM Plex Sans',sans-serif;font-weight:800;font-size:52px;color:var(--accent);line-height:1;letter-spacing:-.03em;display:block}
+  .stat-label{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-top:.5rem;display:block}
+  .stat-sub{font-size:11px;color:#444;margin-top:.4rem;display:block}
+
+  /* TIMELINE */
+  .timeline{position:relative;padding-left:2rem;margin-bottom:3rem}
+  .timeline::before{content:'';position:absolute;left:0;top:8px;bottom:0;width:1px;background:linear-gradient(to bottom,var(--accent) 0%,transparent 100%)}
+  .tl-item{position:relative;padding:0 0 2.5rem 2rem}
+  .tl-dot{position:absolute;left:-2rem;top:.4rem;width:7px;height:7px;border-radius:50%;background:var(--border);border:1px solid #333;transform:translateX(-3px);transition:all .4s}
+  .tl-item.visible .tl-dot{background:var(--accent);border-color:var(--accent);box-shadow:0 0 8px rgba(143,211,255,.5)}
+  .tl-date{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:.4rem}
+  .tl-title{font-family:'IBM Plex Sans',sans-serif;font-weight:700;font-size:14px;color:var(--text);margin-bottom:.4rem}
+  .tl-desc{font-size:12px;color:var(--muted);line-height:1.8}
+
+  /* STEP card num hover */
+  .step-num{font-family:'IBM Plex Sans',sans-serif;font-weight:800;font-size:40px;color:var(--border);line-height:1;margin-bottom:.75rem;transition:color .3s}
+  .step-card:hover .step-num{color:rgba(143,211,255,.3)}
+
+  /* LAYOUT */
+  .content{max-width:1400px;margin:0 auto;padding:0 3rem}
+  .page-wrap{display:grid;grid-template-columns:200px 1fr;gap:0;max-width:1400px;margin:0 auto}
+  .section{padding:5rem 0 5rem 3rem;border-bottom:1px solid var(--border)}
+  .section-header{display:flex;align-items:baseline;gap:1.5rem;margin-bottom:2rem}
+  .section-num{font-size:11px;color:var(--muted);letter-spacing:.1em;min-width:2ch;padding-top:6px}
+  .section-title{font-family:'IBM Plex Sans',sans-serif;font-weight:800;font-size:32px;letter-spacing:-.02em;line-height:1}
+  .section-sub{font-size:13px;color:var(--muted);margin-top:-.5rem;margin-bottom:2.5rem;max-width:700px;line-height:1.9}
+
+  /* SOMMAIRE STICKY */
+  .toc{position:sticky;top:80px;height:calc(100vh - 100px);padding:3rem 0 3rem 3rem;border-right:1px solid var(--border);overflow-y:auto;align-self:start}
+  .toc-label{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:1.5rem}
+  .toc-list{list-style:none;display:flex;flex-direction:column;gap:2px}
+  .toc-item a{display:flex;align-items:baseline;gap:.75rem;padding:.5rem .75rem;text-decoration:none;color:var(--muted);font-size:11px;letter-spacing:.05em;transition:color .2s,background .2s;border-left:2px solid transparent}
+  .toc-item a:hover{color:var(--text);background:#111}
+  .toc-item a.active{color:var(--accent);border-left-color:var(--accent)}
+  .toc-cat{font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);padding:.9rem .75rem .3rem;margin-top:.25rem}
+  .toc-sub a{padding-left:1.5rem !important;font-size:10px;color:#444440}
+  .toc-sub a:hover{color:var(--muted)}
+
+  @media(max-width:1100px){
+    .page-wrap{grid-template-columns:1fr}
+    .toc{display:none}
+    .section{padding:4rem 0}
+  }
+
+  /* PHOTOS */
+  .photo-grid{display:grid;gap:2px}
+  .photo-grid.col2{grid-template-columns:1fr 1fr}
+  .photo-grid.col3{grid-template-columns:1fr 1fr 1fr}
+  .photo-grid.featured{grid-template-columns:2fr 1fr}
+  .photo-item{position:relative;overflow:hidden;background:var(--bg2)}
+  .photo-item img{width:100%;height:100%;object-fit:cover;display:block;filter:brightness(.75) saturate(.85);transition:transform .6s cubic-bezier(.25,.46,.45,.94),filter .4s}
+  .photo-item::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 40%,rgba(10,10,10,.55) 100%);pointer-events:none}
+  .photo-item:hover img{transform:scale(1.03);filter:brightness(.88) saturate(1)}
+  .photo-item.tall{aspect-ratio:3/4}
+  .photo-item.wide{aspect-ratio:16/9}
+  .photo-item.square{aspect-ratio:1}
+  .photo-item.auto{aspect-ratio:auto;min-height:280px}
+  .photo-caption{position:absolute;bottom:0;left:0;right:0;padding:2.5rem 1.25rem 1.25rem;background:linear-gradient(to top,rgba(0,0,0,.9),transparent);font-size:11px;color:rgba(232,232,224,.65);letter-spacing:.06em;opacity:0;transition:opacity .3s;z-index:2}
+  .photo-item:hover .photo-caption{opacity:1}
+
+  /* STEPS */
+  .process-steps{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:3rem}
+  .step-card{background:var(--card);padding:1.75rem;position:relative;transition:background .25s}
+  .step-card:hover{background:#191919}
+  .step-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--border);transition:background .3s}
+  .step-card.done::before{background:var(--accent)}
+  .step-num{font-family:'IBM Plex Sans',sans-serif;font-weight:800;font-size:40px;color:var(--border);line-height:1;margin-bottom:.75rem}
+  .step-label{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+  .step-title{font-family:'IBM Plex Sans',sans-serif;font-weight:700;font-size:13px;color:var(--text);margin-bottom:.5rem}
+  .step-desc{font-size:11px;color:var(--muted);line-height:1.7}
+  .step-status{display:inline-flex;align-items:center;gap:6px;font-size:10px;letter-spacing:.08em;text-transform:uppercase;margin-top:.75rem;color:var(--accent)}
+
+  /* PRINCIPE */
+  .principe-block{background:var(--card);border:1px solid var(--border);padding:3rem;margin-bottom:3rem;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}
+  .principe-text h3{font-family:'IBM Plex Sans',sans-serif;font-weight:700;font-size:17px;margin-bottom:1rem;color:var(--text)}
+  .principe-text p{font-size:13px;color:var(--muted);line-height:1.9;margin-bottom:1rem}
+  .principe-text p strong{color:var(--accent);font-weight:400}
+  .schema-wrap{background:#080808;border:1px solid var(--border);padding:2rem}
+
+  /* CAD RENDERS */
+  .cad-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:2px}
+  .cad-item{background:#080808;padding:1.5rem;display:flex;flex-direction:column;align-items:center;gap:1rem}
+  .cad-item img{width:100%;object-fit:contain;max-height:200px;filter:brightness(.9)}
+  .cad-label{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);text-align:center}
+  .cad-label span{color:var(--accent)}
+
+  /* SPECS */
+  .specs-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 3rem}
+  .spec-row{display:flex;justify-content:space-between;align-items:baseline;padding:1rem 0;border-bottom:1px solid var(--border);gap:1.5rem}
+  .spec-row:first-child{border-top:1px solid var(--border)}
+  .spec-key{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);min-width:140px;flex-shrink:0}
+  .spec-val{font-size:13px;color:var(--text);text-align:right}
+  .spec-val.hl{color:var(--accent)}
+  .spec-val.hl2{color:var(--accent2)}
+
+  /* ARCH */
+  .arch-diagram{background:var(--card);border:1px solid var(--border);padding:2.5rem;display:flex;align-items:center;justify-content:center;gap:0;flex-wrap:nowrap;overflow-x:auto;margin-bottom:3rem}
+  .arch-block{display:flex;flex-direction:column;align-items:center;gap:8px;min-width:100px}
+  .arch-box{background:var(--bg);border:1px solid var(--border);padding:.75rem 1.25rem;text-align:center;font-size:11px;letter-spacing:.06em;color:var(--text);white-space:nowrap;position:relative}
+  .arch-box.hl{border-color:var(--accent);color:var(--accent)}
+  .arch-box.hl2{border-color:var(--accent2);color:var(--accent2)}
+  .arch-box.hl3{border-color:var(--accent3);color:var(--accent3)}
+  .arch-box-label{font-size:10px;color:var(--muted);text-align:center;letter-spacing:.05em}
+  .arch-arrow{width:32px;height:1px;background:var(--border);position:relative;flex-shrink:0;align-self:center;margin-top:-24px}
+  .arch-arrow::after{content:'▶';position:absolute;right:-6px;top:-6px;font-size:10px;color:var(--muted)}
+  .arch-label{font-size:9px;color:var(--muted);position:absolute;top:-18px;left:50%;transform:translateX(-50%);white-space:nowrap;letter-spacing:.06em}
+
+  /* CODE BLOCK */
+  .code-block{background:#050505;border:1px solid #1a1a1a;padding:2rem;font-size:11px;line-height:1.8;overflow-x:auto;margin-bottom:2px}
+  .code-block .kw{color:#8fd3ff}
+  .code-block .fn{color:#4fc3f7}
+  .code-block .cm{color:#444;font-style:italic}
+  .code-block .st{color:#f5a623}
+  .code-block .nb{color:#c8a0f0}
+
+  /* SIMULATION IMAGES */
+  .sim-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:2px}
+  .sim-item{background:#080808;padding:1.25rem;text-align:center}
+  .sim-item img{width:100%;object-fit:contain;max-height:180px}
+  .sim-label{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:.75rem}
+
+  /* KATEX */
+  .katex{color:var(--text);font-size:1.05em}
+  .katex-display{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--accent);padding:1.25rem 2rem;margin:1.5rem 0;overflow-x:auto}
+
+  /* DERIVATION STEPS */
+  .derive-block{background:var(--card);border:1px solid var(--border);margin-bottom:2px}
+  .derive-header{padding:1.25rem 2rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:1rem}
+  .derive-num{font-family:'IBM Plex Sans',sans-serif;font-weight:800;font-size:28px;color:var(--border);line-height:1;min-width:2ch}
+  .derive-title{font-family:'IBM Plex Sans',sans-serif;font-weight:700;font-size:14px;color:var(--text)}
+  .derive-body{padding:1.5rem 2rem}
+  .derive-body p{font-size:12px;color:var(--muted);line-height:1.9;margin-bottom:.75rem}
+  .derive-body p strong{color:var(--accent);font-weight:400}
+  .derive-note{font-size:11px;color:var(--muted);padding:.75rem 1rem;border-left:2px solid var(--border);margin-top:1rem;line-height:1.7}
+
+  /* STENCIL SCHÉMA */
+  .stencil-wrap{background:#050505;border:1px solid var(--border);padding:2rem;display:flex;flex-direction:column;align-items:center;gap:1.25rem}
+  .stencil-grid{display:grid;grid-template-columns:repeat(5,40px);grid-template-rows:repeat(5,40px);gap:3px}
+  .stencil-node{width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:9px;border-radius:50%;background:#0d0d0d;border:1px solid #1a1a1a;color:var(--muted);letter-spacing:-.02em;text-align:center;line-height:1.2}
+  .stencil-node.center{background:rgba(180,30,30,.15);border-color:#b41e1e;color:#e05050;font-weight:500}
+  .stencil-node.neighbor{background:rgba(20,140,60,.12);border-color:#148c3c;color:#4caf78}
+  .stencil-node.empty{background:transparent;border-color:transparent}
+  .stencil-caption{font-size:10px;color:var(--muted);letter-spacing:.06em;text-align:center}
+
+  /* ACCORDION */
+  .accordion{border:1px solid var(--border);margin-bottom:2px}
+  .accordion-head{padding:1.25rem 2rem;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);transition:background .2s;user-select:none}
+  .accordion-head:hover{background:#191919}
+  .accordion-head .acc-icon{color:var(--accent);font-size:16px;transition:transform .3s;line-height:1}
+  .accordion-body{display:none;padding:0 2rem 2rem}
+  .accordion.open .accordion-body{display:block}
+  .accordion.open .acc-icon{transform:rotate(45deg)}
+
+  /* FORMULE */
+  .formula-block{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--accent);padding:1.5rem 2rem;margin:2rem 0;font-size:13px;color:var(--text)}
+  .formula-block .eq{font-size:16px;color:var(--accent);letter-spacing:.05em;margin:.5rem 0}
+  .formula-block .note{font-size:11px;color:var(--muted);margin-top:.75rem}
+
+  /* BOUCLE CTRL */
+  .loop-diagram{display:flex;align-items:center;justify-content:center;gap:0;flex-wrap:wrap;background:var(--card);border:1px solid var(--border);padding:2.5rem;margin-bottom:2px}
+  .loop-box{text-align:center;padding:1rem 1.5rem;background:var(--bg);border:1px solid var(--border);font-size:11px}
+  .loop-box.hl{border-color:var(--accent);color:var(--accent)}
+  .loop-box.hl2{border-color:var(--accent2);color:var(--accent2)}
+  .loop-box small{display:block;font-size:10px;color:var(--muted);margin-top:3px}
+  .loop-arr{width:28px;height:1px;background:var(--border);position:relative;flex-shrink:0;align-self:center}
+  .loop-arr::after{content:'▶';position:absolute;right:-6px;top:-6px;font-size:10px;color:var(--muted)}
+
+  /* CHALLENGES */
+  .challenges{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border)}
+  .challenge-item{background:var(--card);padding:2rem}
+  .challenge-num{font-family:'IBM Plex Sans',sans-serif;font-weight:800;font-size:36px;color:var(--border);line-height:1;margin-bottom:1rem}
+  .challenge-title{font-family:'IBM Plex Sans',sans-serif;font-weight:700;font-size:14px;margin-bottom:.75rem;color:var(--text)}
+  .challenge-desc{font-size:12px;color:var(--muted);line-height:1.8}
+
+  /* BOM */
+  .bom-table{width:100%;border-collapse:collapse;font-size:12px}
+  .bom-table th{text-align:left;padding:.5rem 0;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:400;border-bottom:1px solid var(--border)}
+  .bom-table td{padding:.7rem 0;border-bottom:1px solid #1a1a1a;color:var(--text)}
+  .bom-table td:nth-child(2){text-align:center;color:var(--accent)}
+  .bom-table td:nth-child(3){text-align:right;color:var(--muted)}
+
+  /* RÉSULTATS */
+  .result-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:3rem}
+  .result-card{background:var(--card);padding:2rem;text-align:center}
+  .result-val{font-family:'IBM Plex Sans',sans-serif;font-weight:800;font-size:32px;color:var(--accent);line-height:1;margin-bottom:.5rem}
+  .result-label{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+
+  /* ANIM */
+  .fade-in{opacity:0;animation:fadeUp .65s ease forwards}
+  .fade-in:nth-child(1){animation-delay:.1s}
+  .fade-in:nth-child(2){animation-delay:.25s}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+  .reveal{opacity:0;transform:translateY(28px);transition:opacity .75s ease,transform .75s ease}
+  .reveal.visible{opacity:1;transform:none}
+
+  footer{border-top:1px solid var(--border);padding:2rem 3rem;display:flex;justify-content:space-between;font-size:11px;color:var(--muted);letter-spacing:.06em}
+
+  /* TOAST CATÉGORIE */
+  #cat-toast{position:fixed;bottom:2rem;left:3rem;z-index:150;font-family:'IBM Plex Sans',sans-serif;font-weight:800;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);display:flex;align-items:center;gap:.75rem;opacity:0;transform:translateY(6px);transition:opacity .3s ease,transform .3s ease;pointer-events:none}
+  #cat-toast.visible{opacity:1;transform:none}
+  #cat-toast::before{content:'';display:block;width:20px;height:1px;background:var(--accent)}
+
+  /* SÉPARATEUR DE CATÉGORIE */
+  .cat-sep{display:flex;align-items:center;gap:1.5rem;padding:2.5rem 0 0;margin-bottom:-1rem}
+  .cat-sep-line{flex:1;height:1px;background:linear-gradient(to right,var(--accent),transparent)}
+  .cat-sep-label{font-family:'IBM Plex Sans',sans-serif;font-weight:800;font-size:36px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);white-space:nowrap;padding-left:1rem}
+
+  @media(max-width:900px){
+    .hero{grid-template-columns:1fr;padding:120px 1.5rem 60px}
+    .page-wrap > div{padding:0 1.5rem}
+    .section{padding-left:0}
+    .photo-grid.col3{grid-template-columns:1fr 1fr}
+    .photo-grid.featured{grid-template-columns:1fr}
+    .specs-grid{grid-template-columns:1fr;gap:0}
+    .process-steps{grid-template-columns:1fr 1fr}
+    .challenges{grid-template-columns:1fr}
+    .principe-block{grid-template-columns:1fr}
+    .cad-grid{grid-template-columns:1fr 1fr}
+    .sim-grid{grid-template-columns:1fr 1fr}
+    .result-grid{grid-template-columns:1fr}
+    .loop-diagram{flex-wrap:wrap;gap:4px}
+    nav{padding:1rem 1.5rem}
+    footer{flex-direction:column;gap:.5rem;padding:1.5rem}
+    .hero-deco{display:none}
+    .hero-canvas{display:none}
+  }
+
+/* ── THÈME LÉGER ── */
+#cat-toast,.accordion-head,.cad-label,.hero-label,.meta-label,.nav-back,.result-label,.sim-label,.spec-key,.stat-label,.step-label,.step-status,.tag,.tl-date,.toc-cat,.toc-label{text-transform:none!important;letter-spacing:0!important}
+body{cursor:auto!important;position:relative}
+:root{--bg:#0f1318;--bg2:#12171d;--border:#222a33;--accent:#8fd3ff;--accent2:#e8c27a;--accent3:#9be7c4;--text:#e8ecef;--muted:#8d98a3;--card:#12171d}
+body::before{content:'';display:block!important;position:absolute!important;top:0;left:0;right:0;height:80vh;z-index:0;opacity:1!important;pointer-events:none;
+ background-image:linear-gradient(rgba(143,211,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(143,211,255,.05) 1px,transparent 1px);background-size:80px 80px;
+ -webkit-mask-image:linear-gradient(to bottom,#000 20%,transparent);mask-image:linear-gradient(to bottom,#000 20%,transparent)}
+.hero-title,.section-title{font-weight:600!important;letter-spacing:-.01em!important}
+.tag{border-color:transparent!important;background:rgba(255,255,255,.05)!important}
+.stat-val{font-size:36px!important;color:var(--text)!important}
+.result-val{color:var(--text)!important}
+.page-wrap,.section,.step-hero,.lp{position:relative;z-index:1}
+nav{position:fixed;z-index:100}
+
+/* ── NAV : parcours ── */
+.stepper{display:flex;gap:.25rem;align-items:center}
+.stepper a{font-size:13px;color:var(--muted);text-decoration:none;padding:.35rem .7rem;border-radius:3px;white-space:nowrap;transition:color .2s,background .2s}
+.stepper a b{font-weight:500;margin-right:.4rem;color:#56616c}
+.stepper a:hover{color:var(--text)}
+.stepper a.on{color:var(--text);background:rgba(143,211,255,.1)}
+.stepper a.on b{color:var(--accent)}
+@media(max-width:1180px){.stepper a span{display:none}.stepper a b{margin:0}}
+@media(max-width:640px){.stepper{display:none}}
+
+/* ── EN-TÊTE D'ÉTAPE ── */
+.step-hero{max-width:1400px;margin:0 auto;padding:130px 3rem 2.5rem;border-bottom:1px solid var(--border)}
+.step-kicker{font-size:14px;color:var(--accent);margin-bottom:1rem;display:flex;gap:.75rem;align-items:center;flex-wrap:wrap}
+.step-kicker i{font-style:normal;font-size:12px;padding:2px 10px;border-radius:20px;background:rgba(255,255,255,.06);color:var(--muted)}
+.step-kicker i.th{color:var(--accent3)} .step-kicker i.pr{color:var(--accent2)}
+.step-title{font-family:'IBM Plex Sans',sans-serif;font-weight:600;font-size:clamp(34px,4.6vw,60px);line-height:1.05;letter-spacing:-.02em;margin-bottom:1rem}
+.step-lead{font-size:18px;color:#b3bcc4;max-width:620px;line-height:1.6}
+.step-nav{max-width:1400px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);border-top:1px solid var(--border);position:relative;z-index:1}
+.step-nav a{background:var(--card);padding:2rem 3rem;text-decoration:none;color:var(--text);display:flex;flex-direction:column;gap:.35rem;transition:background .2s}
+.step-nav a:hover{background:#171d24}
+.step-nav small{font-size:13px;color:var(--muted)}
+.step-nav strong{font-family:'IBM Plex Sans',sans-serif;font-weight:600;font-size:22px;letter-spacing:-.01em}
+.step-nav .nx{text-align:right}
+.step-nav .nx strong::after{content:' →';color:var(--accent)}
+.step-nav .pv strong::before{content:'← ';color:var(--accent)}
+@media(max-width:900px){.step-hero{padding:110px 1.5rem 2rem}.step-nav a{padding:1.5rem}}
+
+
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<nav>
+  <a href="index.html" class="nav-logo">RB</a>
+  <div class="stepper"><a href="parabole.html"><b>·</b><span>Le problème</span></a><a href="parabole-principe.html" class="on"><b>1</b><span>Principe</span></a><a href="parabole-3d.html"><b>2</b><span>Modèle 3D</span></a><a href="parabole-thermique.html"><b>3</b><span>Thermique</span></a><a href="parabole-electronique.html"><b>4</b><span>Électronique</span></a><a href="parabole-code.html"><b>5</b><span>Code</span></a><a href="parabole-bilan.html"><b>6</b><span>Bilan</span></a></div>
+  <a href="index.html" class="nav-back">Tous les projets</a>
+</nav>
+<header class="step-hero">
+  <div class="step-kicker">Étape 1 sur 6 <i class="th">Théorie</i><i class="">Général</i></div>
+  <h1 class="step-title">Principe physique</h1>
+  <p class="step-lead">Pourquoi et comment une parabole concentre la lumière du soleil — et ce qu'il faut pour qu'elle reste pointée dessus.</p>
+</header>
+<div class="page-wrap">
+<aside class="toc">
+<div class="toc-label">Sur cette page</div>
+<ul class="toc-list">
+<li class="toc-item"><a href="#sec-contexte">Contexte & motivation</a></li>
+<li class="toc-item"><a href="#sec-principe">Principe physique</a></li>
+</ul>
+</aside>
+<div>
+  <section class="section reveal" id="sec-contexte" style="padding-top:4rem">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:start">
+      <div>
+        <div style="font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem">Contexte &amp; motivation</div>
+        <h3 style="font-family:'IBM Plex Sans',sans-serif;font-weight:800;font-size:22px;letter-spacing:-.02em;color:var(--text);margin-bottom:1.5rem;line-height:1.1">Résoudre l'intermittence du solaire</h3>
+        <p style="font-size:13px;color:var(--muted);line-height:1.9;margin-bottom:1rem">Les centrales solaires à <strong style="color:var(--text)">sels fondus</strong> sont l'une des rares solutions capables de stocker l'énergie solaire à grande échelle — les sels liquéfiés accumulent la chaleur le jour et l'utilisent la nuit pour produire de l'électricité via une turbine, résolvant ainsi le problème fondamental de l'intermittence.</p>
+        <p style="font-size:13px;color:var(--muted);line-height:1.9;margin-bottom:1rem">Ces centrales sont implantées en plein désert, loin de toute infrastructure. Elles utilisent des <strong style="color:var(--text)">héliostats</strong> — des miroirs motorisés orientés en permanence vers le soleil — pour concentrer le rayonnement sur une tour centrale. Chaque héliostat doit connaître la position exacte du soleil en temps réel.</p>
+        <p style="font-size:13px;color:var(--muted);line-height:1.9;margin-bottom:1.5rem">Problème : en plein désert, pas d'internet, pas de GPS fiable, et les structures peuvent se déformer avec le temps (tassement du sol, dilatation thermique). Un système qui calcule la position du soleil à l'avance sera systématiquement biaisé.</p>
+        <div style="background:var(--bg);border:1px solid var(--accent);border-left:3px solid var(--accent);padding:1.25rem 1.5rem">
+          <p style="font-size:13px;color:var(--text);line-height:1.8;margin:0"><strong style="color:var(--accent)">Ma réponse :</strong> un système en <strong>boucle fermée</strong> — il ne prédit pas la position du soleil, il la mesure directement via une caméra thermique. Même si le bâtiment s'affaisse, même sans réseau, il donnera toujours la position réelle.</p>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:2px">
+        <!-- Schéma centrale à sels fondus -->
+        <div style="background:#080808;border:1px solid var(--border);overflow:hidden">
+          <img src="1783098023224_image.png" alt="Centrale solaire à sels fondus — schéma complet" style="width:100%;display:block;filter:brightness(.85) saturate(.9)">
+        </div>
+        <div style="background:var(--card);border:1px solid var(--border);padding:.75rem 1.25rem;font-size:10px;color:var(--muted);letter-spacing:.05em">
+          Schéma — centrale solaire thermodynamique à sels fondus (CSP)
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section reveal" id="sec-principe">
+    <div class="section-header">
+      <span class="section-num">1.2</span>
+      <h2 class="section-title">Principe physique</h2>
+    </div>
+
+    <div class="principe-block">
+      <div class="principe-text">
+        <h3>Propriété fondamentale de la parabole</h3>
+        <p>Tout rayon incident <strong>parallèle à l'axe optique</strong> est réfléchi vers un point unique — le foyer. Le soleil étant à distance infinie, ses rayons arrivent pratiquement parallèles : si l'axe pointe vers lui, toute l'énergie captée converge en un seul point.</p>
+        <p>Dès que la parabole est <strong>désaxée</strong>, le foyer se déplace hors de l'axe. La caméra thermique placée au foyer détecte ce déplacement et permet de corriger l'orientation en boucle fermée.</p>
+        <h3 style="margin-top:1.5rem">Puissance concentrée</h3>
+        <p>Pour une parabole de diamètre $D=0{,}60\,\text{m}$ avec un film de rendement $\eta=0{,}92$ et un flux solaire $G=1000\,\text{W/m}^2$ :</p>
+        $$P_{\text{foyer}} = \eta \cdot G \cdot \pi \left(\frac{D}{2}\right)^2 \approx 260\,\text{W}$$
+        <div class="derive-note" style="margin-top:0;margin-bottom:1rem">La tache au foyer fait ~6 cm de diamètre sur céramique → densité surfacique ~90 W/cm²</div>
+        <p>Le modèle de Stefan-Boltzmann prédit $T_{\max} \approx 740\,°\text{C}$ — la mesure expérimentale donne ~400°C (l'écart s'explique par la conduction dans la céramique qui étale la chaleur).</p>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:2px;">
+        <div style="position:relative;background:#000;overflow:hidden;">
+          <img src="1783110799116_image.png" alt="Parabole axée — tous les rayons convergent au foyer" style="width:100%;display:block;filter:brightness(.95)">
+          <div style="position:absolute;bottom:0;left:0;right:0;padding:.75rem 1rem;background:linear-gradient(to top,rgba(0,0,0,.85),transparent);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:rgba(143,211,255,.8);">Point focal <strong style="color:#8fd3ff">sur l'axe</strong> — tous les rayons convergent au foyer</div>
+        </div>
+        <div style="position:relative;background:#000;overflow:hidden;">
+          <img src="1783110819611_image.png" alt="Parabole désaxée — le foyer se déplace hors axe" style="width:100%;display:block;filter:brightness(.95)">
+          <div style="position:absolute;bottom:0;left:0;right:0;padding:.75rem 1rem;background:linear-gradient(to top,rgba(0,0,0,.85),transparent);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:rgba(245,166,35,.8);">Point focal <strong style="color:#f5a623">hors axe</strong> — le foyer se déplace, la caméra détecte l'écart</div>
+        </div>
+        <div style="padding:.6rem 1rem;background:var(--card);border:1px solid var(--border);font-size:10px;color:var(--muted);letter-spacing:.06em;">Modélisations avec le logiciel Phidemo</div>
+      </div>
+    </div>
+
+    <div class="photo-grid featured" style="margin-bottom:2px">
+      <div class="photo-item auto" style="min-height:360px">
+        <img src="IMG_4774.jpg" alt="Parabole TV avec film réfléchissant">
+        <div class="photo-caption">Parabole TV recouverte du film miroir autocollant</div>
+      </div>
+      <div class="photo-item auto" style="min-height:360px">
+        <img src="IMG_5715.jpg" alt="Parabole montée sur monture 2 axes avec film miroir">
+        <div class="photo-caption">Parabole montée — film miroir et caméra thermique au foyer</div>
+      </div>
+    </div>
+  </section>
+</div>
+</div>
+<div class="step-nav"><a class="pv" href="parabole.html"><small>Retour</small><strong>Le problème</strong></a><a class="nx" href="parabole-3d.html"><small>Étape suivante</small><strong>Modèle 3D</strong></a></div>
+<footer>
+  <span>Robin Bonfill</span>
+  <span>Suivi solaire — Parabole motorisée 2 axes</span>
+  <span>Projet de prépa — Lycée Lapérouse, Albi</span>
+</footer>
+<script>
+  const bar=document.getElementById('progressBar');
+  window.addEventListener('scroll',()=>{const max=document.body.scrollHeight-window.innerHeight;if(bar)bar.style.width=(max>0?window.scrollY/max*100:0)+'%'});
+  const ro=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');ro.unobserve(e.target)}})},{threshold:.05});
+  document.querySelectorAll('.reveal').forEach(el=>ro.observe(el));
+  document.querySelectorAll('.accordion-head').forEach(h=>h.addEventListener('click',()=>h.parentElement.classList.toggle('open')));
+  const tocLinks=document.querySelectorAll('.toc-item a');
+  const secs=document.querySelectorAll('section[id]');
+  const tocObs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){tocLinks.forEach(l=>l.classList.remove('active'));const a=document.querySelector('.toc-item a[href="#'+e.target.id+'"]');if(a)a.classList.add('active')}})},{rootMargin:'-20% 0px -60% 0px'});
+  secs.forEach(s=>tocObs.observe(s));
+  const tlObs=new IntersectionObserver(es=>{es.forEach((e,i)=>{if(e.isIntersecting)setTimeout(()=>e.target.classList.add('visible'),i*120)})},{threshold:.2});
+  document.querySelectorAll('.tl-item').forEach(el=>tlObs.observe(el));
+  const cntObs=new IntersectionObserver(es=>{es.forEach(e=>{if(!e.isIntersecting)return;const el=e.target,target=+el.dataset.target,suf=el.dataset.suffix||'',pre=el.dataset.prefix||'',st=performance.now();
+    (function step(now){const t=Math.min((now-st)/1400,1),v=Math.round((1-Math.pow(1-t,3))*target);el.textContent=pre+v+suf;if(t<1)requestAnimationFrame(step);else el.textContent=pre+target+suf})(st);cntObs.unobserve(el)})},{threshold:.5});
+  document.querySelectorAll('.stat-val[data-target]').forEach(el=>cntObs.observe(el));
+</script>
+
+</body>
+</html>

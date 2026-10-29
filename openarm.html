@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OpenArm — Robin Bonfill</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0f0f0f;--bg2:#161616;--border:#2a2a2a;
+    --accent:#c8f542;--accent2:#f5a623;--accent3:#4fc3f7;
+    --text:#eeeee6;--muted:#888882;--card:#171717;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;font-size:15px;line-height:1.7;overflow-x:hidden;cursor:crosshair}
+  body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:999;opacity:.6}
+  #cursor{position:fixed;width:6px;height:6px;background:var(--accent);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:left .05s,top .05s}
+  .progress-bar{position:fixed;top:0;left:0;height:2px;background:var(--accent);z-index:200;width:0%;transition:width .1s linear}
+
+  nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1.25rem 3rem;border-bottom:1px solid var(--border);background:rgba(10,10,10,.92);backdrop-filter:blur(14px)}
+  .nav-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:15px;letter-spacing:.05em;color:var(--accent);text-decoration:none}
+  .nav-back{font-size:12px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;text-decoration:none;transition:color .2s}
+  .nav-back::before{content:'← '}
+  .nav-back:hover{color:var(--text)}
+
+  /* HERO */
+  .hero{padding:140px 3rem 80px;border-bottom:1px solid var(--border);display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:end;max-width:1400px;margin:0 auto;position:relative;overflow:hidden}
+  .hero-canvas{position:absolute;right:0;top:0;bottom:0;width:52%;height:100%;pointer-events:none;opacity:.55}
+  .hero-label{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem}
+  .hero-title{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(42px,6vw,80px);line-height:.95;letter-spacing:-.02em;color:var(--text);margin-bottom:1.5rem}
+  .hero-title span{color:var(--accent)}
+  .hero-desc{font-size:14px;color:var(--muted);max-width:480px;line-height:1.8;margin-bottom:2rem}
+  .hero-tags{display:flex;flex-wrap:wrap;gap:8px}
+  .tag{font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:4px 12px;border:1px solid var(--border);color:var(--muted);border-radius:2px}
+  .tag.accent{border-color:var(--accent);color:var(--accent)}
+  .tag.orange{border-color:var(--accent2);color:var(--accent2)}
+  .hero-meta{display:flex;flex-direction:column;gap:1.5rem;align-self:end}
+  .meta-item{display:flex;flex-direction:column;gap:4px}
+  .meta-label{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .meta-value{font-size:14px;color:var(--text)}
+  .status-badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--accent2)}
+  .status-dot{width:6px;height:6px;border-radius:50%;background:var(--accent2);animation:pulse 2s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+  /* LAYOUT */
+  .page-wrap{display:grid;grid-template-columns:200px 1fr;gap:0;max-width:1400px;margin:0 auto}
+  .section{padding:5rem 0 5rem 3rem;border-bottom:1px solid var(--border)}
+  .section-header{display:flex;align-items:baseline;gap:1.5rem;margin-bottom:2rem}
+  .section-num{font-size:11px;color:var(--muted);letter-spacing:.1em;min-width:2ch;padding-top:6px}
+  .section-title{font-family:'Syne',sans-serif;font-weight:800;font-size:32px;letter-spacing:-.02em;line-height:1}
+  .section-sub{font-size:13px;color:var(--muted);margin-top:-.5rem;margin-bottom:2.5rem;max-width:700px;line-height:1.9}
+
+  /* SOMMAIRE */
+  .toc{position:sticky;top:80px;height:calc(100vh - 100px);padding:3rem 0 3rem 3rem;border-right:1px solid var(--border);overflow-y:auto;align-self:start}
+  .toc-label{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:1.5rem}
+  .toc-list{list-style:none;display:flex;flex-direction:column;gap:2px}
+  .toc-item a{display:flex;align-items:baseline;gap:.75rem;padding:.5rem .75rem;text-decoration:none;color:var(--muted);font-size:11px;letter-spacing:.05em;transition:color .2s,background .2s;border-left:2px solid transparent}
+  .toc-item a:hover{color:var(--text);background:#111}
+  .toc-item a.active{color:var(--accent);border-left-color:var(--accent)}
+  .toc-cat{font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);padding:.9rem .75rem .3rem}
+  .toc-num{font-size:9px;letter-spacing:.1em;color:var(--border);flex-shrink:0;min-width:2ch}
+  .toc-item a.active .toc-num{color:var(--accent)}
+
+  /* SÉPARATEUR CATÉGORIE */
+  .cat-sep{display:flex;align-items:center;gap:1.5rem;padding:2.5rem 0 0;margin-bottom:-1rem}
+  .cat-sep-line{flex:1;height:1px;background:linear-gradient(to right,var(--accent),transparent)}
+  .cat-sep-label{font-family:'Syne',sans-serif;font-weight:800;font-size:36px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);white-space:nowrap;padding-left:1rem}
+
+  /* STEPS */
+  .process-steps{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:3rem}
+  .step-card{background:var(--card);padding:1.75rem;position:relative;transition:background .25s}
+  .step-card:hover{background:#191919}
+  .step-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--border);transition:background .3s}
+  .step-card.todo::before{background:var(--border)}
+  .step-card.concept::before{background:var(--accent2)}
+  .step-num{font-family:'Syne',sans-serif;font-weight:800;font-size:40px;color:var(--border);line-height:1;margin-bottom:.75rem}
+  .step-label{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+  .step-title{font-family:'Syne',sans-serif;font-weight:700;font-size:13px;color:var(--text);margin-bottom:.5rem}
+  .step-desc{font-size:11px;color:var(--muted);line-height:1.7}
+  .step-status{display:inline-flex;align-items:center;gap:6px;font-size:10px;letter-spacing:.08em;text-transform:uppercase;margin-top:.75rem;color:var(--accent2)}
+
+  /* SPECS GRID */
+  .specs-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 3rem}
+  .spec-row{display:flex;justify-content:space-between;align-items:baseline;padding:1rem 0;border-bottom:1px solid var(--border);gap:1.5rem}
+  .spec-row:first-child{border-top:1px solid var(--border)}
+  .spec-key{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);min-width:140px;flex-shrink:0}
+  .spec-val{font-size:13px;color:var(--text);text-align:right}
+  .spec-val.hl{color:var(--accent)}
+  .spec-val.hl2{color:var(--accent2)}
+
+  /* PLACEHOLDER */
+  .placeholder{border:1px dashed var(--border);background:var(--card);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.75rem;padding:3rem;text-align:center;min-height:200px}
+  .placeholder-icon{font-size:28px;opacity:.2}
+  .placeholder-label{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted)}
+
+  /* INSPO CARD */
+  .inspo-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:3rem}
+  .inspo-item{background:var(--card);padding:2rem}
+  .inspo-title{font-family:'Syne',sans-serif;font-weight:700;font-size:13px;color:var(--text);margin-bottom:.75rem}
+  .inspo-desc{font-size:12px;color:var(--muted);line-height:1.8}
+  .inspo-tag{font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);margin-bottom:.5rem}
+
+  /* AXIS DIAGRAM */
+  .axis-row{display:flex;flex-direction:column;gap:2px;margin-bottom:2rem}
+  .axis-item{display:grid;grid-template-columns:60px 1fr 120px;align-items:center;gap:1.5rem;padding:.75rem 1.5rem;background:var(--card);border:1px solid var(--border)}
+  .axis-num{font-family:'Syne',sans-serif;font-weight:800;font-size:22px;color:var(--border)}
+  .axis-name{font-size:12px;color:var(--text)}
+  .axis-type{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-align:right}
+
+  /* REVEAL */
+  .reveal{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease}
+  .reveal.visible{opacity:1;transform:none}
+  .fade-in{animation:fadeUp .7s ease forwards}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+
+  /* FOOTER */
+  footer{border-top:1px solid var(--border);padding:2rem 3rem;display:flex;justify-content:space-between;font-size:11px;color:var(--muted);letter-spacing:.06em}
+
+  @media(max-width:1100px){
+    .page-wrap{grid-template-columns:1fr}
+    .toc{display:none}
+    .section{padding:4rem 0}
+  }
+  @media(max-width:900px){
+    .hero{grid-template-columns:1fr;padding:120px 1.5rem 60px}
+    .hero-canvas{display:none}
+    .page-wrap > div{padding:0 1.5rem}
+    .section{padding-left:0}
+    .process-steps{grid-template-columns:1fr 1fr}
+    .specs-grid{grid-template-columns:1fr}
+    .inspo-grid{grid-template-columns:1fr}
+    nav{padding:1rem 1.5rem}
+    footer{flex-direction:column;gap:.5rem;padding:1.5rem}
+  }
+</style>
+</head>
+<body>
+<div id="cursor"></div>
+<div class="progress-bar" id="progressBar"></div>
+
+<nav>
+  <a href="index.html" class="nav-logo">RB</a>
+  <a href="index.html" class="nav-back">Tous les projets</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="hero">
+  <canvas id="heroCanvas" class="hero-canvas"></canvas>
+  <div class="fade-in">
+    <div class="hero-label">Projet — Robotique &amp; Fabrication</div>
+    <h1 class="hero-title">Open<br><span>Arm</span></h1>
+    <p class="hero-desc">Bras robotique 5/6 axes à structure carbone, conçu depuis le début. Pièces structurelles en FDM PETG et usinées CNC, actionneurs closed-loop stepper + servos, piloté par Raspberry Pi. Capable d'ouvrir une bière.</p>
+    <div class="hero-tags">
+      <span class="tag accent">Robotique</span>
+      <span class="tag orange">En conception</span>
+      <span class="tag">Fibre de carbone</span>
+      <span class="tag">CNC</span>
+      <span class="tag">Closed-loop stepper</span>
+      <span class="tag">Raspberry Pi</span>
+      <span class="tag">Fusion 360</span>
+    </div>
+  </div>
+  <div class="hero-meta fade-in">
+    <div class="meta-item">
+      <span class="meta-label">Statut</span>
+      <span class="status-badge"><span class="status-dot"></span>En conception — phase 0</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">Axes</span>
+      <span class="meta-value">5 ou 6 — à définir en CAO</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">Structure</span>
+      <span class="meta-value">Carbone + FDM PETG + CNC</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">Cerveau</span>
+      <span class="meta-value">Raspberry Pi — Python + kinematics</span>
+    </div>
+  </div>
+</section>
+
+<div class="page-wrap">
+
+  <!-- SOMMAIRE -->
+  <aside class="toc">
+    <div class="toc-label">Sommaire</div>
+    <ul class="toc-list">
+      <li class="toc-cat">Concept</li>
+      <li class="toc-item"><a href="#sec-concept"><span class="toc-num">01</span>Objectif</a></li>
+      <li class="toc-item"><a href="#sec-steps"><span class="toc-num">02</span>Déroulé prévu</a></li>
+      <li class="toc-cat">Conception</li>
+      <li class="toc-item"><a href="#sec-axes"><span class="toc-num">03</span>Architecture axes</a></li>
+      <li class="toc-item"><a href="#sec-structure"><span class="toc-num">04</span>Structure</a></li>
+      <li class="toc-item"><a href="#sec-motorisation"><span class="toc-num">05</span>Motorisation</a></li>
+      <li class="toc-cat">Specs</li>
+      <li class="toc-item"><a href="#sec-specs"><span class="toc-num">06</span>Specs cibles</a></li>
+      <li class="toc-item"><a href="#sec-bom"><span class="toc-num">07</span>Bill of materials</a></li>
+    </ul>
+  </aside>
+
+  <div>
+
+  <!-- 01 CONCEPT -->
+  <section class="section reveal" id="sec-concept" style="padding-top:4rem">
+    <div class="section-header">
+      <span class="section-num">01</span>
+      <h2 class="section-title">Objectif</h2>
+    </div>
+    <p class="section-sub">Un bras robotique polyvalent, léger, et capable de mouvements précis. Conçu depuis le début avec des matériaux hautes performances accessibles.</p>
+
+    <div class="inspo-grid reveal">
+      <div class="inspo-item">
+        <div class="inspo-tag">Pourquoi</div>
+        <div class="inspo-title">Bras robotique depuis le début</div>
+        <div class="inspo-desc">Concevoir un bras robotique complet — mécanique, électronique, logiciel — sans kit préfabriqué. Comprendre la cinématique inverse, les réducteurs, le contrôle en boucle fermée.</div>
+      </div>
+      <div class="inspo-item">
+        <div class="inspo-tag">Application démo</div>
+        <div class="inspo-title">Ouvrir une bouteille de bière</div>
+        <div class="inspo-desc">Tâche simple en apparence, complexe en pratique : préhension, force contrôlée, trajectoire précise. Un objectif concret et mémorable pour valider le système complet.</div>
+      </div>
+      <div class="inspo-item">
+        <div class="inspo-tag">Ambition</div>
+        <div class="inspo-title">Pick &amp; place polyvalent</div>
+        <div class="inspo-desc">Au-delà de l'application démo, le bras doit être capable de saisir, déplacer et déposer des objets variés. Base pour des expérimentations futures en robotique et vision.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 DÉROULÉ -->
+  <section class="section reveal" id="sec-steps">
+    <div class="section-header">
+      <span class="section-num">02</span>
+      <h2 class="section-title">Déroulé prévu</h2>
+    </div>
+
+    <div class="process-steps reveal">
+      <div class="step-card concept">
+        <div class="step-num">01</div>
+        <div class="step-label">En cours</div>
+        <div class="step-title">Concept &amp; specs</div>
+        <div class="step-desc">Définition du nombre d'axes, de la portée, des couples requis. Choix des actionneurs.</div>
+        <div class="step-status">● En cours</div>
+      </div>
+      <div class="step-card todo">
+        <div class="step-num">02</div>
+        <div class="step-label">À venir</div>
+        <div class="step-title">CAO Fusion 360</div>
+        <div class="step-desc">Modélisation complète : liaisons, bras, réducteurs, supports moteurs, effecteur.</div>
+      </div>
+      <div class="step-card todo">
+        <div class="step-num">03</div>
+        <div class="step-label">À venir</div>
+        <div class="step-title">Fabrication</div>
+        <div class="step-desc">Impression FDM PETG, usinage CNC des pièces critiques, découpe et assemblage des tubes carbone.</div>
+      </div>
+      <div class="step-card todo">
+        <div class="step-num">04</div>
+        <div class="step-label">À venir</div>
+        <div class="step-title">Électronique &amp; code</div>
+        <div class="step-desc">Câblage drivers, encodeurs, RPi. Cinématique inverse Python, boucle de contrôle.</div>
+      </div>
+      <div class="step-card todo">
+        <div class="step-num">05</div>
+        <div class="step-label">À venir</div>
+        <div class="step-title">Tests &amp; démo</div>
+        <div class="step-desc">Calibration, tests de précision, démonstration ouverture de bouteille.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CAT SEP -->
+  <div class="cat-sep reveal"><span class="cat-sep-label">Conception</span><div class="cat-sep-line"></div></div>
+
+  <!-- 03 AXES -->
+  <section class="section reveal" id="sec-axes">
+    <div class="section-header">
+      <span class="section-num">03</span>
+      <h2 class="section-title">Architecture axes</h2>
+    </div>
+    <p class="section-sub">5 ou 6 axes selon les contraintes de portée et de couple. Architecture en série classique — chaque axe porte le suivant.</p>
+
+    <div class="axis-row reveal">
+      <div class="axis-item">
+        <div class="axis-num" style="color:var(--accent)">J1</div>
+        <div class="axis-name">Rotation base — azimut 360°</div>
+        <div class="axis-type">Closed-loop stepper</div>
+      </div>
+      <div class="axis-item">
+        <div class="axis-num" style="color:var(--accent)">J2</div>
+        <div class="axis-name">Épaule — flexion/extension</div>
+        <div class="axis-type">Closed-loop stepper</div>
+      </div>
+      <div class="axis-item">
+        <div class="axis-num" style="color:var(--accent)">J3</div>
+        <div class="axis-name">Coude — flexion/extension</div>
+        <div class="axis-type">Closed-loop stepper</div>
+      </div>
+      <div class="axis-item">
+        <div class="axis-num" style="color:var(--accent2)">J4</div>
+        <div class="axis-name">Poignet — rotation axiale</div>
+        <div class="axis-type">Servo</div>
+      </div>
+      <div class="axis-item">
+        <div class="axis-num" style="color:var(--accent2)">J5</div>
+        <div class="axis-name">Poignet — flexion</div>
+        <div class="axis-type">Servo</div>
+      </div>
+      <div class="axis-item" style="opacity:.4">
+        <div class="axis-num">J6</div>
+        <div class="axis-name">Rotation effecteur — à définir</div>
+        <div class="axis-type">TBD</div>
+      </div>
+    </div>
+
+    <div style="background:var(--card);border:1px solid var(--border);padding:1.5rem 2rem;font-size:12px;color:var(--muted)">
+      J1→J3 : couples élevés → closed-loop steppers + réducteurs épicycloïdaux imprimés &nbsp;·&nbsp; J4→J5 : couples faibles, vitesse → servos haute précision
+    </div>
+  </section>
+
+  <!-- 04 STRUCTURE -->
+  <section class="section reveal" id="sec-structure">
+    <div class="section-header">
+      <span class="section-num">04</span>
+      <h2 class="section-title">Structure</h2>
+    </div>
+    <p class="section-sub">Trois matériaux combinés selon les contraintes mécaniques de chaque pièce.</p>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:3rem">
+      <div style="background:var(--card);padding:2rem">
+        <div style="font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem">Tubes &amp; bras</div>
+        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:16px;color:var(--text);margin-bottom:.75rem">Fibre de carbone</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.8">Rapport rigidité/masse exceptionnel. Tubes ronds ou profilés pour les segments de bras. Résistance à la flexion maximale pour minimiser la déflexion sous charge.</div>
+      </div>
+      <div style="background:var(--card);padding:2rem">
+        <div style="font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--accent2);margin-bottom:1rem">Boîtiers &amp; supports</div>
+        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:16px;color:var(--text);margin-bottom:.75rem">FDM PETG</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.8">Pièces de liaison, boîtiers moteurs, supports encodeurs. Géométries complexes impossibles en CNC. PETG pour la résistance thermique et la rigidité.</div>
+      </div>
+      <div style="background:var(--card);padding:2rem">
+        <div style="font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--accent3);margin-bottom:1rem">Pièces critiques</div>
+        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:16px;color:var(--text);margin-bottom:.75rem">Aluminium CNC</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.8">Brides de liaison carbone, hubs de réducteurs, surfaces d'appui des roulements. Là où la précision dimensionnelle et la dureté sont critiques.</div>
+      </div>
+    </div>
+
+    <div class="placeholder reveal">
+      <div class="placeholder-icon">⬡</div>
+      <div class="placeholder-label">CAO Fusion 360 — à venir</div>
+    </div>
+  </section>
+
+  <!-- 05 MOTORISATION -->
+  <section class="section reveal" id="sec-motorisation">
+    <div class="section-header">
+      <span class="section-num">05</span>
+      <h2 class="section-title">Motorisation</h2>
+    </div>
+    <p class="section-sub">Closed-loop steppers pour les axes à fort couple, servos haute précision pour le poignet. Réducteurs épicycloïdaux imprimés pour les axes principaux.</p>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:3rem">
+      <div style="background:var(--card);padding:2rem">
+        <div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem">Axes J1 → J3</div>
+        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:15px;color:var(--text);margin-bottom:1rem">Closed-loop stepper</div>
+        <p style="font-size:12px;color:var(--muted);line-height:1.8;margin-bottom:1rem">Stepper NEMA 17/23 + encodeur magnétique intégré. Le driver corrige la position en temps réel — pas de perte de pas possible. Couple maintenu même à basse vitesse.</p>
+        <div style="display:flex;flex-direction:column;gap:0">
+          <div class="spec-row"><span class="spec-key">Avantage vs servo</span><span class="spec-val hl">Couple à l'arrêt</span></div>
+          <div class="spec-row"><span class="spec-key">Avantage vs open-loop</span><span class="spec-val hl">Pas de perte de pas</span></div>
+          <div class="spec-row"><span class="spec-key">Réducteur</span><span class="spec-val">Épicycloïdal imprimé</span></div>
+        </div>
+      </div>
+      <div style="background:var(--card);padding:2rem">
+        <div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent2);margin-bottom:1rem">Axes J4 → J5</div>
+        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:15px;color:var(--text);margin-bottom:1rem">Servos haute précision</div>
+        <p style="font-size:12px;color:var(--muted);line-height:1.8;margin-bottom:1rem">Couples faibles mais vitesse et précision angulaire importantes pour l'orientation de l'effecteur. Contrôle PWM ou bus série (ex: Dynamixel ou equiv.).</p>
+        <div style="display:flex;flex-direction:column;gap:0">
+          <div class="spec-row"><span class="spec-key">Avantage</span><span class="spec-val hl2">Légèreté + vitesse</span></div>
+          <div class="spec-row"><span class="spec-key">Résolution</span><span class="spec-val">À définir</span></div>
+          <div class="spec-row"><span class="spec-key">Interface</span><span class="spec-val">PWM / série</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CAT SEP -->
+  <div class="cat-sep reveal"><span class="cat-sep-label">Specs</span><div class="cat-sep-line"></div></div>
+
+  <!-- 06 SPECS -->
+  <section class="section reveal" id="sec-specs">
+    <div class="section-header">
+      <span class="section-num">06</span>
+      <h2 class="section-title">Specs cibles</h2>
+    </div>
+
+    <div class="specs-grid reveal">
+      <div>
+        <div class="spec-row"><span class="spec-key">Nombre d'axes</span><span class="spec-val hl">5 ou 6</span></div>
+        <div class="spec-row"><span class="spec-key">Portée</span><span class="spec-val">~500 mm (à définir)</span></div>
+        <div class="spec-row"><span class="spec-key">Charge utile</span><span class="spec-val">~500 g (à définir)</span></div>
+        <div class="spec-row"><span class="spec-key">Structure bras</span><span class="spec-val hl">Tubes carbone</span></div>
+        <div class="spec-row"><span class="spec-key">Boîtiers</span><span class="spec-val">FDM PETG</span></div>
+      </div>
+      <div>
+        <div class="spec-row"><span class="spec-key">Pièces critiques</span><span class="spec-val">Aluminium CNC</span></div>
+        <div class="spec-row"><span class="spec-key">Axes principaux</span><span class="spec-val hl">Closed-loop stepper</span></div>
+        <div class="spec-row"><span class="spec-key">Poignet</span><span class="spec-val hl2">Servos haute précision</span></div>
+        <div class="spec-row"><span class="spec-key">Cerveau</span><span class="spec-val">Raspberry Pi</span></div>
+        <div class="spec-row"><span class="spec-key">Démo</span><span class="spec-val hl">Ouverture bouteille 🍺</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 07 BOM -->
+  <section class="section reveal" id="sec-bom">
+    <div class="section-header">
+      <span class="section-num">07</span>
+      <h2 class="section-title">Bill of materials</h2>
+    </div>
+    <p class="section-sub">Liste préliminaire — à affiner après la CAO.</p>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);border:1px solid var(--border)">
+      <div style="background:var(--card)">
+        <div style="padding:.6rem 1.5rem;background:var(--bg);border-bottom:1px solid var(--border)">
+          <span style="font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent)">Structure</span>
+        </div>
+        <table style="width:100%;border-collapse:collapse">
+          <tbody>
+            <tr style="border-bottom:1px solid var(--border)"><td style="padding:.75rem 1.5rem;font-size:12px;color:var(--muted)">Tubes fibre de carbone</td><td style="padding:.75rem 1.5rem;font-size:12px;color:var(--text);text-align:right">TBD</td></tr>
+            <tr style="border-bottom:1px solid var(--border)"><td style="padding:.75rem 1.5rem;font-size:12px;color:var(--muted)">Filament PETG</td><td style="padding:.75rem 1.5rem;font-size:12px;color:var(--text);text-align:right">~1 kg</td></tr>
+            <tr style="border-bottom:1px solid var(--border)"><td style="padding:.75rem 1.5rem;font-size:12px;color:var(--muted)">Pièces aluminium CNC</td><td style="padding:.75rem 1.5rem;font-size:12px;color:var(--text);text-align:right">TBD</td></tr>
+            <tr style="border-bottom:1px solid var(--border)"><td style="padding:.75rem 1.5rem;font-size:12px;color:var(--muted)">Roulements (divers)</td><td style="padding:.75rem 1.5rem;font-size:12px;color:var(--text);text-align:right">TBD</td></tr>
+            <tr><td style="padding:.75rem 1.5rem;font-size:12px;color:var(--muted)">Inserts laiton M3/M5</td><td style="padding:.75rem 1.5rem;font-size:12px;color:var(--text);text-align:right">~30</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="background:var(--card)">
+        <div style="padding:.6rem 1.5rem;background:var(--bg);border-bottom:1px solid var(--border)">
+          <span style="font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent)">Électronique</span>
+        </div>
+        <table style="width:100%;border-collapse:collapse">
+          <tbody>
+            <tr style="border-bottom:1px solid var(--border)"><td style="padding:.75rem 1.5rem;font-size:12px;color:var(--muted)">Closed-loop stepper (J1→J3)</td><td style="padding:.75rem 1.5rem;font-size:12px;color:var(--text);text-align:right">×3</td></tr>
+            <tr style="border-bottom:1px solid var(--border)"><td style="padding:.75rem 1.5rem;font-size:12px;color:var(--muted)">Servos haute précision (J4→J5)</td><td style="padding:.75rem 1.5rem;font-size:12px;color:var(--text);text-align:right">×2</td></tr>
+            <tr style="border-bottom:1px solid var(--border)"><td style="padding:.75rem 1.5rem;font-size:12px;color:var(--muted)">Drivers closed-loop</td><td style="padding:.75rem 1.5rem;font-size:12px;color:var(--text);text-align:right">×3</td></tr>
+            <tr style="border-bottom:1px solid var(--border)"><td style="padding:.75rem 1.5rem;font-size:12px;color:var(--muted)">Raspberry Pi</td><td style="padding:.75rem 1.5rem;font-size:12px;color:var(--text);text-align:right">×1</td></tr>
+            <tr><td style="padding:.75rem 1.5rem;font-size:12px;color:var(--muted)">Alimentation 24V</td><td style="padding:.75rem 1.5rem;font-size:12px;color:var(--text);text-align:right">×1</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  </div><!-- fin colonne principale -->
+</div><!-- fin page-wrap -->
+
+<footer>
+  <span>Robin Bonfill — OpenArm</span>
+  <span>Projet en conception — 2026</span>
+</footer>
+
+<script>
+  const cursor=document.getElementById('cursor');
+  document.addEventListener('mousemove',e=>{cursor.style.left=e.clientX+'px';cursor.style.top=e.clientY+'px'});
+  const bar=document.getElementById('progressBar');
+  window.addEventListener('scroll',()=>{const max=document.body.scrollHeight-window.innerHeight;bar.style.width=(window.scrollY/max*100)+'%'});
+  const reveals=document.querySelectorAll('.reveal');
+  const ro=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');ro.unobserve(e.target)}})},{threshold:.07});
+  reveals.forEach(el=>ro.observe(el));
+
+  // Sommaire actif
+  const tocLinks=document.querySelectorAll('.toc-item a');
+  const sections=document.querySelectorAll('section[id]');
+  const tocObs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        tocLinks.forEach(l=>l.classList.remove('active'));
+        const active=document.querySelector(`.toc-item a[href="#${e.target.id}"]`);
+        if(active)active.classList.add('active');
+      }
+    });
+  },{rootMargin:'-20% 0px -60% 0px'});
+  sections.forEach(s=>tocObs.observe(s));
+
+  // Animation canvas — bras robotique stylisé
+  (function(){
+    const cv=document.getElementById('heroCanvas');
+    if(!cv)return;
+    if(window.getComputedStyle(cv).display==='none')return;
+    function resize(){
+      const r=cv.getBoundingClientRect();
+      if(r.width===0||r.height===0)return;
+      cv.width=r.width;cv.height=r.height;
+    }
+    requestAnimationFrame(()=>{resize();loop();});
+    window.addEventListener('resize',resize);
+    const ctx=cv.getContext('2d');
+    let t=0,running=true,rafId=null;
+    const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{running=e.isIntersecting;});},{threshold:.01});
+    obs.observe(cv.parentElement);
+
+    function draw(){
+      if(cv.width===0||cv.height===0){resize();return;}
+      const W=cv.width,H=cv.height;
+      ctx.clearRect(0,0,W,H);
+
+      // Grille
+      ctx.strokeStyle='#1a1a1a';ctx.lineWidth=.5;
+      const s=40;
+      for(let x=0;x<W;x+=s){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+      for(let y=0;y<H;y+=s){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+
+      // Base du bras
+      const bx=W*.5,by=H*.82;
+
+      // Angles oscillants
+      const a1=Math.PI*1.1+Math.sin(t*.007)*.35;
+      const a2=a1+Math.PI*.55+Math.sin(t*.009+1)*.25;
+      const a3=a2-Math.PI*.5+Math.sin(t*.011+2)*.2;
+
+      const L1=H*.28,L2=H*.22,L3=H*.14;
+
+      // Joint 1 → 2
+      const j1x=bx+Math.cos(a1)*L1,j1y=by+Math.sin(a1)*L1;
+      // Joint 2 → 3
+      const j2x=j1x+Math.cos(a2)*L2,j2y=j1y+Math.sin(a2)*L2;
+      // Effecteur
+      const j3x=j2x+Math.cos(a3)*L3,j3y=j2y+Math.sin(a3)*L3;
+
+      // Segments du bras
+      function drawSeg(x1,y1,x2,y2,col,w){
+        ctx.strokeStyle=col;ctx.lineWidth=w;
+        ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+      }
+      function drawJoint(x,y,r,col){
+        ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);
+        ctx.fillStyle=col;ctx.fill();
+        ctx.strokeStyle='rgba(200,245,66,.3)';ctx.lineWidth=1;ctx.stroke();
+      }
+
+      drawSeg(bx,by,j1x,j1y,'rgba(200,245,66,.6)',3);
+      drawSeg(j1x,j1y,j2x,j2y,'rgba(200,245,66,.5)',2.5);
+      drawSeg(j2x,j2y,j3x,j3y,'rgba(245,166,35,.6)',2);
+
+      // Effecteur (pince stylisée)
+      const ea=a3;
+      const p1x=j3x+Math.cos(ea+.3)*18,p1y=j3y+Math.sin(ea+.3)*18;
+      const p2x=j3x+Math.cos(ea-.3)*18,p2y=j3y+Math.sin(ea-.3)*18;
+      ctx.strokeStyle='rgba(79,195,247,.7)';ctx.lineWidth=1.5;
+      ctx.beginPath();ctx.moveTo(j3x,j3y);ctx.lineTo(p1x,p1y);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(j3x,j3y);ctx.lineTo(p2x,p2y);ctx.stroke();
+
+      // Joints
+      drawJoint(bx,by,10,'#1a1a1a');
+      drawJoint(bx,by,5,'rgba(200,245,66,.8)');
+      drawJoint(j1x,j1y,7,'#1a1a1a');
+      drawJoint(j1x,j1y,4,'rgba(200,245,66,.7)');
+      drawJoint(j2x,j2y,6,'#1a1a1a');
+      drawJoint(j2x,j2y,3,'rgba(245,166,35,.8)');
+      drawJoint(j3x,j3y,5,'#1a1a1a');
+      drawJoint(j3x,j3y,3,'rgba(79,195,247,.8)');
+
+      // Base (socle)
+      ctx.strokeStyle='rgba(200,245,66,.3)';ctx.lineWidth=1.5;
+      ctx.beginPath();ctx.moveTo(bx-30,by+2);ctx.lineTo(bx+30,by+2);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(bx-20,by+2);ctx.lineTo(bx-35,by+16);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(bx+20,by+2);ctx.lineTo(bx+35,by+16);ctx.stroke();
+
+      // Label
+      ctx.font='9px DM Mono,monospace';
+      ctx.fillStyle='rgba(200,245,66,.2)';
+      ctx.fillText('5-AXIS OPEN LOOP',bx-55,by+35);
+
+      t++;
+      if(t>100000)t=0;
+      rafId=null;
+      if(running)loop();
+    }
+    function loop(){rafId=requestAnimationFrame(draw);}
+  })();
+</script>
+</body>
+</html>

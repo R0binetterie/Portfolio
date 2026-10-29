@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NightSight — Robin Bonfill</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --bg2: #111111;
+    --border: #222222;
+    --accent: #c8f542;
+    --accent2: #f5a623;
+    --text: #e8e8e0;
+    --muted: #555550;
+    --card: #131313;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 14px;
+    line-height: 1.6;
+    overflow-x: hidden;
+    cursor: crosshair;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 999;
+    opacity: 0.6;
+  }
+
+  #cursor {
+    position: fixed;
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: left 0.05s, top 0.05s;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 3rem;
+    border-bottom: 1px solid var(--border);
+    background: rgba(10,10,10,0.92);
+    backdrop-filter: blur(14px);
+  }
+  .nav-logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800; font-size: 15px;
+    letter-spacing: 0.05em;
+    color: var(--accent); text-decoration: none;
+  }
+  .nav-back {
+    font-size: 12px; color: var(--muted);
+    letter-spacing: 0.08em; text-transform: uppercase;
+    text-decoration: none; transition: color 0.2s;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .nav-back:hover { color: var(--text); }
+  .nav-back::before { content: '←'; }
+
+  /* ── HERO ── */
+  .hero {
+    padding: 140px 3rem 80px;
+    border-bottom: 1px solid var(--border);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem; align-items: end;
+    max-width: 1400px; margin: 0 auto;
+  }
+  .hero-label {
+    font-size: 11px; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--accent); margin-bottom: 1rem;
+  }
+  .hero-title {
+    font-family: 'Syne', sans-serif; font-weight: 800;
+    font-size: clamp(52px, 7vw, 96px);
+    line-height: 0.95; letter-spacing: -0.02em;
+    color: var(--text); margin-bottom: 1.5rem;
+  }
+  .hero-title span { color: var(--accent); }
+  .hero-desc {
+    font-size: 14px; color: var(--muted);
+    max-width: 480px; line-height: 1.8; margin-bottom: 2rem;
+  }
+  .hero-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+  .tag {
+    font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 4px 12px; border: 1px solid var(--border);
+    color: var(--muted); border-radius: 2px;
+  }
+  .tag.accent { border-color: var(--accent); color: var(--accent); }
+  .hero-meta { display: flex; flex-direction: column; gap: 1.5rem; align-self: end; }
+  .meta-item { display: flex; flex-direction: column; gap: 4px; }
+  .meta-label {
+    font-size: 10px; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  .meta-value { font-size: 14px; color: var(--text); }
+  .status-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 12px; color: var(--accent2);
+  }
+  .status-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--accent2); animation: pulse 2s infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  /* ── PROGRESS BAR (timeline nav) ── */
+  .progress-bar {
+    position: fixed;
+    top: 0; left: 0;
+    height: 2px;
+    background: var(--accent);
+    z-index: 200;
+    width: 0%;
+    transition: width 0.1s linear;
+  }
+
+
+
+  /* ── CONTENT ── */
+  .content { max-width: 1400px; margin: 0 auto; padding: 0 3rem; }
+
+  .section { padding: 5rem 0; border-bottom: 1px solid var(--border); }
+  .section-header {
+    display: flex; align-items: baseline;
+    gap: 1.5rem; margin-bottom: 3rem;
+  }
+  .section-num { font-size: 11px; color: var(--muted); letter-spacing: 0.1em; min-width: 2ch; }
+  .section-title {
+    font-family: 'Syne', sans-serif; font-weight: 700;
+    font-size: 22px; letter-spacing: -0.01em;
+  }
+  .section-sub {
+    font-size: 13px; color: var(--muted);
+    margin-top: -2rem; margin-bottom: 2.5rem;
+    max-width: 640px; line-height: 1.8;
+  }
+
+  /* ── PHOTO ITEMS — dark overlay on bright images ── */
+  .photo-grid { display: grid; gap: 2px; }
+  .photo-grid.col2 { grid-template-columns: 1fr 1fr; }
+  .photo-grid.col3 { grid-template-columns: 1fr 1fr 1fr; }
+  .photo-grid.featured { grid-template-columns: 2fr 1fr; }
+
+  .photo-item {
+    position: relative; overflow: hidden; background: var(--bg2);
+  }
+  .photo-item img {
+    width: 100%; height: 100%; object-fit: cover; display: block;
+    transition: transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94), filter 0.4s;
+    filter: brightness(0.75) saturate(0.85);
+  }
+  /* dark vignette overlay to absorb bright images */
+  .photo-item::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at center, transparent 40%, rgba(10,10,10,0.55) 100%);
+    pointer-events: none;
+  }
+  .photo-item:hover img {
+    transform: scale(1.03);
+    filter: brightness(0.88) saturate(1);
+  }
+  .photo-item.tall   { aspect-ratio: 3/4; }
+  .photo-item.wide   { aspect-ratio: 16/9; }
+  .photo-item.square { aspect-ratio: 1; }
+  .photo-item.auto   { aspect-ratio: auto; min-height: 280px; }
+
+  .photo-caption {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    padding: 2.5rem 1.25rem 1.25rem;
+    background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+    font-size: 11px; color: rgba(232,232,224,0.65);
+    letter-spacing: 0.06em;
+    opacity: 0; transition: opacity 0.3s;
+    z-index: 2;
+  }
+  .photo-item:hover .photo-caption { opacity: 1; }
+
+  /* ── STEP CARDS (timeline process) ── */
+  .process-steps {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin-bottom: 3rem;
+  }
+  .step-card {
+    background: var(--card);
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+    cursor: default;
+    transition: background 0.25s;
+  }
+  .step-card:hover { background: #191919; }
+  .step-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--border);
+    transition: background 0.3s;
+  }
+  .step-card.done::before { background: var(--accent); }
+  .step-card.wip::before  { background: var(--accent2); animation: shimmer 2s infinite; }
+  .step-card.future::before { background: var(--border); }
+  @keyframes shimmer {
+    0%,100% { opacity:1 } 50% { opacity:0.4 }
+  }
+  .step-num {
+    font-family: 'Syne', sans-serif; font-weight: 800;
+    font-size: 48px; color: var(--border);
+    line-height: 1; margin-bottom: 1rem;
+    transition: color 0.3s;
+  }
+  .step-card.done:hover .step-num { color: #2a2a2a; }
+  .step-label {
+    font-size: 10px; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .step-title {
+    font-family: 'Syne', sans-serif; font-weight: 700;
+    font-size: 15px; color: var(--text); margin-bottom: 0.75rem;
+  }
+  .step-desc { font-size: 12px; color: var(--muted); line-height: 1.8; }
+  .step-status {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase;
+    margin-top: 1rem;
+  }
+  .step-status.done  { color: var(--accent); }
+  .step-status.wip   { color: var(--accent2); }
+  .step-status.future{ color: var(--muted); }
+
+  /* ── RENDER ── */
+  .render-showcase { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; margin-bottom: 2px; }
+  .render-item { position: relative; overflow: hidden; background: #080808; }
+  .render-item img {
+    width: 100%; height: 100%; object-fit: contain; display: block;
+    padding: 2rem; transition: transform 0.5s ease;
+  }
+  .render-item:hover img { transform: scale(1.04); }
+  .render-item.wide { aspect-ratio: 16/9; }
+  .render-credit {
+    font-size: 10px; color: var(--muted); letter-spacing: 0.06em;
+    padding: 0.75rem 1rem;
+    border-top: 1px solid var(--border);
+  }
+  .render-credit a { color: var(--muted); text-decoration: underline; }
+
+  /* ── SPECS ── */
+  .specs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+  .spec-row {
+    display: flex; justify-content: space-between; align-items: baseline;
+    padding: 1rem 0; border-bottom: 1px solid var(--border); gap: 2rem;
+  }
+  .spec-row:first-child { border-top: 1px solid var(--border); }
+  .spec-key {
+    font-size: 11px; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--muted); min-width: 160px;
+  }
+  .spec-val { font-size: 13px; color: var(--text); text-align: right; }
+  .spec-val.highlight { color: var(--accent); }
+
+  /* ── ARCH DIAGRAM ── */
+  .arch-diagram {
+    background: var(--card); border: 1px solid var(--border);
+    padding: 3rem; display: flex; align-items: center;
+    justify-content: center; gap: 0; flex-wrap: nowrap; overflow-x: auto;
+  }
+  .arch-block { display: flex; flex-direction: column; align-items: center; gap: 8px; min-width: 100px; }
+  .arch-box {
+    background: var(--bg); border: 1px solid var(--border);
+    padding: 0.75rem 1.25rem; text-align: center;
+    font-size: 11px; letter-spacing: 0.06em; color: var(--text);
+    white-space: nowrap; position: relative; transition: border-color 0.2s;
+  }
+  .arch-box.highlight { border-color: var(--accent); color: var(--accent); }
+  .arch-box.thermal   { border-color: var(--accent2); color: var(--accent2); }
+  .arch-box-label { font-size: 10px; color: var(--muted); text-align: center; letter-spacing: 0.05em; }
+  .arch-arrow {
+    width: 40px; height: 1px; background: var(--border);
+    position: relative; flex-shrink: 0; align-self: center; margin-top: -24px;
+  }
+  .arch-arrow::after {
+    content: '▶'; position: absolute; right: -6px; top: -6px;
+    font-size: 10px; color: var(--muted);
+  }
+  .arch-label {
+    font-size: 9px; color: var(--muted);
+    position: absolute; top: -18px; left: 50%; transform: translateX(-50%);
+    white-space: nowrap; letter-spacing: 0.06em;
+  }
+
+  /* ── VERSIONS ── */
+  .versions {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 1px; background: var(--border);
+    border: 1px solid var(--border); margin-bottom: 3rem;
+  }
+  .version-tab {
+    background: var(--card); padding: 2rem;
+    cursor: pointer; transition: background 0.2s; position: relative;
+  }
+  .version-tab.active { background: var(--bg2); }
+  .version-tab.active::after {
+    content: ''; position: absolute;
+    top: 0; left: 0; right: 0; height: 2px; background: var(--accent);
+  }
+  .version-tab h3 {
+    font-family: 'Syne', sans-serif; font-weight: 700;
+    font-size: 16px; margin-bottom: 0.5rem;
+  }
+  .version-tab p { font-size: 12px; color: var(--muted); line-height: 1.7; }
+  .version-icon { font-size: 22px; margin-bottom: 1rem; }
+  .version-credit {
+    margin-top: 0.75rem; font-size: 10px; color: #333;
+    letter-spacing: 0.06em;
+  }
+  .version-credit a { color: #444; text-decoration: underline; }
+
+  /* ── POV ── */
+  .pov-section { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
+  .pov-item { position: relative; aspect-ratio: 3/4; background: #000; overflow: hidden; }
+  .pov-item img {
+    width: 100%; height: 100%; object-fit: cover; display: block;
+    filter: brightness(0.85);
+    transition: filter 0.3s, transform 0.5s;
+  }
+  .pov-item:hover img { filter: brightness(1); transform: scale(1.02); }
+  .pov-label {
+    position: absolute; top: 1rem; left: 1rem;
+    font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: rgba(255,255,255,0.5); background: rgba(0,0,0,0.6);
+    padding: 3px 8px; z-index: 2;
+  }
+
+  /* ── CHALLENGES ── */
+  .challenges {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 1px; background: var(--border); border: 1px solid var(--border);
+  }
+  .challenge-item { background: var(--card); padding: 2rem; }
+  .challenge-num {
+    font-family: 'Syne', sans-serif; font-weight: 800;
+    font-size: 36px; color: var(--border); line-height: 1; margin-bottom: 1rem;
+  }
+  .challenge-title {
+    font-family: 'Syne', sans-serif; font-weight: 700;
+    font-size: 14px; margin-bottom: 0.75rem; color: var(--text);
+  }
+  .challenge-desc { font-size: 12px; color: var(--muted); line-height: 1.8; }
+
+  /* ── PERSPECTIVES ── */
+  .perspectives {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 1px; background: var(--border); border: 1px solid var(--border);
+  }
+  .persp-item {
+    background: var(--card); padding: 2.5rem;
+    position: relative; overflow: hidden;
+  }
+  .persp-item::before {
+    content: ''; position: absolute;
+    top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, var(--accent), transparent);
+  }
+  .persp-tag {
+    font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 1rem;
+  }
+  .persp-title {
+    font-family: 'Syne', sans-serif; font-weight: 700;
+    font-size: 17px; margin-bottom: 1rem; color: var(--text);
+  }
+  .persp-desc { font-size: 12px; color: var(--muted); line-height: 1.9; }
+  .persp-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 1.5rem; }
+  .chip {
+    font-size: 10px; padding: 3px 10px;
+    border: 1px solid #2a2a2a; color: #444;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    border-radius: 2px;
+  }
+
+  /* ── ANIMATED SCAN LINE on POV images ── */
+  @keyframes scanline {
+    0%   { transform: translateY(-100%); }
+    100% { transform: translateY(400%); }
+  }
+  .pov-item .scan {
+    position: absolute; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(200,245,66,0.15), transparent);
+    animation: scanline 4s linear infinite;
+    pointer-events: none; z-index: 3;
+  }
+
+  /* ── FLOATING NUMBERS (hero decoration) ── */
+  .hero-deco {
+    position: absolute; right: 3rem; top: 50%;
+    transform: translateY(-50%);
+    font-family: 'Syne', sans-serif; font-weight: 800;
+    font-size: 180px; color: #111; line-height: 1;
+    pointer-events: none; user-select: none;
+    letter-spacing: -0.05em;
+  }
+
+  /* ── SCROLL REVEAL ── */
+  .reveal {
+    opacity: 0; transform: translateY(28px);
+    transition: opacity 0.75s ease, transform 0.75s ease;
+  }
+  .reveal.visible { opacity: 1; transform: none; }
+
+  .fade-in { opacity: 0; animation: fadeUp 0.65s ease forwards; }
+  .fade-in:nth-child(1) { animation-delay: 0.1s; }
+  .fade-in:nth-child(2) { animation-delay: 0.25s; }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: none; }
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 2rem 3rem;
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 11px; color: var(--muted); letter-spacing: 0.06em;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr; padding: 120px 1.5rem 60px; }
+    .content { padding: 0 1.5rem; }
+    .photo-grid.col3 { grid-template-columns: 1fr 1fr; }
+    .photo-grid.featured { grid-template-columns: 1fr; }
+    .specs-grid { grid-template-columns: 1fr; }
+    .versions { grid-template-columns: 1fr; }
+    .challenges { grid-template-columns: 1fr; }
+    .perspectives { grid-template-columns: 1fr; }
+    .pov-section { grid-template-columns: 1fr 1fr; }
+    .render-showcase { grid-template-columns: 1fr; }
+    .process-steps { grid-template-columns: 1fr 1fr; }
+    .timeline-nav { display: none; }
+    nav { padding: 1rem 1.5rem; }
+    footer { flex-direction: column; gap: 0.5rem; text-align: center; padding: 1.5rem; }
+    .hero-deco { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div id="cursor"></div>
+<div class="progress-bar" id="progressBar"></div>
+
+
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nav-logo">RB</a>
+  <a href="index.html" class="nav-back">Tous les projets</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="hero" style="position:relative;">
+  <div class="hero-deco">NV</div>
+  <div class="fade-in">
+    <div class="hero-label">Projet — Électronique &amp; Fabrication 3D</div>
+    <h1 class="hero-title">Night<span>Sight</span></h1>
+    <p class="hero-desc">
+      Lunettes binoculaires de vision nocturne et thermique construites depuis le début — boîtier entièrement imprimé en 3D, caméras starlight, micro-écrans OLED 0.4" avec un combo écran/optique tout-en-un.
+    </p>
+    <div class="hero-tags">
+      <span class="tag accent">Vision nocturne</span>
+      <span class="tag accent">Thermique</span>
+      <span class="tag">Impression 3D</span>
+      <span class="tag">Électronique</span>
+      <span class="tag">Fusion 360</span>
+      <span class="tag">Micro OLED</span>
+    </div>
+  </div>
+
+  <div class="hero-meta fade-in">
+    <div class="meta-item">
+      <span class="meta-label">Statut</span>
+      <span class="status-badge"><span class="status-dot"></span>En cours — en pause</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">Sous-versions</span>
+      <span class="meta-value">Vision nocturne (starlight) + Thermique</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">Alimentation</span>
+      <span class="meta-value">Batterie externe 5V → Buck converter 4V</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">Affichage</span>
+      <span class="meta-value">2× Micro OLED 0.4" — combo écran/optique intégré</span>
+    </div>
+  </div>
+</section>
+
+<div class="content">
+
+  <!-- PROGRESSION OVERVIEW -->
+  <section class="section reveal" style="padding-top: 4rem; padding-bottom: 4rem;">
+    <div class="process-steps">
+      <div class="step-card done">
+        <div class="step-num">01</div>
+        <div class="step-label">Étape</div>
+        <div class="step-title">CAD &amp; modélisation</div>
+        <div class="step-desc">Dessin de toutes les pièces dans Fusion 360 — boîtiers, charnières, support écrans, chemins optiques.</div>
+        <div class="step-status done">✓ Terminé</div>
+      </div>
+      <div class="step-card done">
+        <div class="step-num">02</div>
+        <div class="step-label">Étape</div>
+        <div class="step-title">Impression &amp; itérations</div>
+        <div class="step-desc">Multiples passes d'impression FDM pour affiner les tolérances — en particulier le chemin optique et les charnières.</div>
+        <div class="step-status done">✓ Terminé</div>
+      </div>
+      <div class="step-card done">
+        <div class="step-num">03</div>
+        <div class="step-label">Étape</div>
+        <div class="step-title">Construction &amp; câblage</div>
+        <div class="step-desc">Assemblage électronique, passage des câbles dans les axes de charnière, intégration des modules OLED et caméras.</div>
+        <div class="step-status done">✓ Terminé</div>
+      </div>
+      <div class="step-card wip">
+        <div class="step-num">04</div>
+        <div class="step-label">Étape</div>
+        <div class="step-title">Fusion NV + thermique</div>
+        <div class="step-desc">Superposition des flux vidéo via Raspberry Pi pour combiner vision nocturne et détection de chaleur en une seule image.</div>
+        <div class="step-status wip">⟳ En développement</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 1 : CAD -->
+  <section class="section reveal" id="sec-cad">
+    <div class="section-header">
+      <span class="section-num">01</span>
+      <h2 class="section-title">Modélisation 3D</h2>
+    </div>
+    <p class="section-sub">
+      Toutes les pièces sont dessinées sur mesure dans Fusion 360. La coupe transversale révèle l'imbrication précise des modules caméra, écran et chemin optique. La version thermique est entièrement conçue depuis le début — le boîtier NV s'inspire du design open-source de <a href="https://vonscherfarm.com" style="color:var(--muted);text-decoration:underline;" target="_blank">Vonscherfarm</a>.
+    </p>
+
+    <div class="render-showcase" style="margin-bottom:2px;">
+      <div class="render-item wide">
+        <img src="Capture_d_e_cran_2026-05-30_a__23_40_17.png" alt="CAO coupe transversale Fusion 360">
+      </div>
+      <div class="render-item wide">
+        <img src="Capture_d_e_cran_2026-05-30_a__23_41_30.png" alt="Render 3D final NightSight">
+      </div>
+    </div>
+    <div class="render-credit">
+      Render Fusion 360 — Design NV basé sur <a href="https://vonscherfarm.com" target="_blank">Vonscherfarm</a> · Design thermique original
+    </div>
+  </section>
+
+  <!-- SECTION 2 : IMPRESSION -->
+  <section class="section reveal" id="sec-print">
+    <div class="section-header">
+      <span class="section-num">02</span>
+      <h2 class="section-title">Impression &amp; itérations</h2>
+    </div>
+    <p class="section-sub">
+      Plusieurs passes d'impression sur Bambu Lab pour affiner les tolérances — PLA pour les prototypes rapides, PETG pour les pièces finales. Le défi principal : les logements du combo écran/optique doivent être précis au dixième pour que l'image soit nette à distance d'œil confortable. Chaque itération de charnière implique de réimprimer et re-câbler.
+    </p>
+
+    <div class="photo-grid col3" style="margin-bottom:2px;">
+      <div class="photo-item auto" style="min-height:300px;">
+        <img src="print_bambu_1.jpg" alt="Bambu Lab en cours d'impression pièces NightSight">
+        <div class="photo-caption">Bambu Lab — impression des boîtiers en cours</div>
+      </div>
+      <div class="photo-item auto" style="min-height:300px;">
+        <img src="IMG_5227.jpg" alt="Bambu Lab impression pièces NightSight deuxième angle">
+        <div class="photo-caption">Plateau d'impression — premières couches</div>
+      </div>
+      <div class="photo-item auto" style="min-height:300px;">
+        <img src="IMG_2575.jpg" alt="Boîtiers imprimés vert olive et noir résultat">
+        <div class="photo-caption">Résultat — boîtiers vert olive &amp; noir sortis imprimante</div>
+      </div>
+    </div>
+    <div class="photo-grid col2">
+      <div class="photo-item auto" style="min-height:240px;">
+        <img src="IMG_2789.jpg" alt="Châssis central imprimé noir pièces de liaison">
+        <div class="photo-caption">Châssis central — liaison bi-tube + support fixation casque</div>
+      </div>
+      <div class="photo-item auto" style="min-height:240px;">
+        <img src="IMG_5177.jpg" alt="Setup atelier imprimante fer à souder alim de labo">
+        <div class="photo-caption">Setup atelier — Bambu Lab + alim de labo + station de soudure</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 3 : CONSTRUCTION -->
+  <section class="section reveal" id="sec-build">
+    <div class="section-header">
+      <span class="section-num">03</span>
+      <h2 class="section-title">Construction &amp; câblage</h2>
+    </div>
+    <p class="section-sub">
+      L'assemblage électronique est simple — le vrai défi est mécanique : faire passer plusieurs fils (5V alim + signal CVBS vidéo) à travers l'axe creux des charnières sans créer de point de rupture ni de friction à la rotation.
+    </p>
+
+    <div class="photo-grid featured" style="margin-bottom:2px;">
+      <div class="photo-item auto" style="min-height:360px;">
+        <img src="IMG_5241.jpg" alt="Lunettes ouvertes vue dessus câblage charnière fils rouges noirs">
+        <div class="photo-caption">Vue dessus — câblage charnière centrale avec fils alim rouge/noir</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:2px;">
+        <div class="photo-item auto" style="min-height:178px;">
+          <img src="IMG_2836.jpg" alt="Module vert câblage en cours">
+          <div class="photo-caption">Câblage interne d'un tube</div>
+        </div>
+        <div class="photo-item auto" style="min-height:178px;">
+          <img src="IMG_2790.jpg" alt="Module assemblé côté oculaire">
+          <div class="photo-caption">Intégration écran OLED + caméra</div>
+        </div>
+      </div>
+    </div>
+    <div class="photo-grid col3" style="margin-bottom:2px;">
+      <div class="photo-item square">
+        <img src="IMG_2629.jpg" alt="Oculaire avec eyecup caoutchouc">
+        <div class="photo-caption">Oculaire — eyecup + lentille grossissante</div>
+      </div>
+      <div class="photo-item square">
+        <img src="IMG_3687.jpg" alt="Câblage charnière détail">
+        <div class="photo-caption">Câblage charnière — vue extérieure</div>
+      </div>
+      <div class="photo-item square">
+        <img src="IMG_3686.jpg" alt="Fils colorés charnière pivot">
+        <div class="photo-caption">Axe pivot — fils 26AWG torsadés</div>
+      </div>
+    </div>
+    <div class="photo-grid col3">
+      <div class="photo-item square">
+        <img src="IMG_2835.jpg" alt="Deux tubes assemblage côte à côte">
+        <div class="photo-caption">Deux tubes en parallèle</div>
+      </div>
+      <div class="photo-item square">
+        <img src="IMG_2849.jpg" alt="Lunettes finales bi-tube">
+        <div class="photo-caption">Assemblage final bi-tube</div>
+      </div>
+      <div class="photo-item square">
+        <img src="IMG_2863.jpg" alt="Lunettes complètes avec batterie">
+        <div class="photo-caption">Système complet + batterie externe</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 4 : TESTS -->
+  <section class="section reveal" id="sec-tests">
+    <div class="section-header">
+      <span class="section-num">04</span>
+      <h2 class="section-title">Tests &amp; résultats</h2>
+    </div>
+    <p class="section-sub">
+      Photos prises directement à travers les oculaires — ce que l'œil perçoit via les micro-OLED 0.4". Les images noires autour sont normales : c'est l'eyecup qui masque l'environnement.
+    </p>
+
+    <div class="pov-section">
+      <div class="pov-item">
+        <div class="scan"></div>
+        <img src="IMG_2855.jpg" alt="Vue POV vision nocturne lampe">
+        <span class="pov-label">NV — Test lampe</span>
+      </div>
+      <div class="pov-item">
+        <div class="scan"></div>
+        <img src="IMG_5147.jpg" alt="Vue POV NV v2 pièce sombre">
+        <span class="pov-label">NV — Pièce sombre</span>
+      </div>
+      <div class="pov-item">
+        <div class="scan"></div>
+        <img src="IMG_5148.jpg" alt="Vue POV NV v2 bureau">
+        <span class="pov-label">NV — Bureau nuit</span>
+      </div>
+      <div class="pov-item">
+        <div class="scan" style="animation-delay:1.5s;"></div>
+        <img src="IMG_3285.jpg" alt="Vue POV thermique bureau">
+        <span class="pov-label" style="color:rgba(245,166,35,0.7);border-left:2px solid rgba(245,166,35,0.4);">Thermique — Test int.</span>
+      </div>
+      <div class="pov-item">
+        <div class="scan" style="animation-delay:2s;"></div>
+        <img src="IMG_3287.jpg" alt="Vue POV thermique large">
+        <span class="pov-label" style="color:rgba(245,166,35,0.7);border-left:2px solid rgba(245,166,35,0.4);">Thermique — Large</span>
+      </div>
+      <div class="pov-item">
+        <div class="scan" style="animation-delay:2.5s;"></div>
+        <img src="IMG_3332.jpg" alt="Vue POV mono proto initial">
+        <span class="pov-label">Mono — Proto initial</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 5 : DEUX VERSIONS -->
+  <section class="section reveal" id="sec-versions">
+    <div class="section-header">
+      <span class="section-num">05</span>
+      <h2 class="section-title">Deux sous-versions</h2>
+    </div>
+
+    <div class="versions">
+      <div class="version-tab active" onclick="switchVersion(this)">
+        <div class="version-icon">🌑</div>
+        <h3>Vision nocturne</h3>
+        <p>Caméras Runcam Night Eagle 3 V2 (starlight) — fonctionnelles en quasi-obscurité totale. Image N&amp;B amplifiée sur micro-OLED. Boîtier vert olive.</p>
+        <div class="version-credit">Design boîtier inspiré de <a href="https://vonscherfarm.com" target="_blank">Vonscherfarm</a></div>
+      </div>
+      <div class="version-tab" onclick="switchVersion(this)">
+        <div class="version-icon" style="color:var(--accent2);">🌡</div>
+        <h3>Thermique</h3>
+        <p>Module caméra thermique intégré dans le même format de boîtier. Détecte les différences de température sans lumière. Boîtier entièrement conçu depuis le début.</p>
+        <div class="version-credit" style="color:var(--accent);opacity:0.5;">Design 100% original</div>
+      </div>
+    </div>
+
+    <div class="photo-grid col2" style="margin-bottom:2px;">
+      <div class="photo-item auto" style="min-height:300px;">
+        <img src="IMG_2863.jpg" alt="Lunettes NV finales">
+        <div class="photo-caption">Version NV — tubes vert olive + charnière centrale</div>
+      </div>
+      <div class="photo-item auto" style="min-height:300px;">
+        <img src="IMG_3166.jpg" alt="Module caméra thermique">
+        <div class="photo-caption">Module caméra thermique — design original</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION BOM -->
+  <section class="section reveal" id="sec-bom">
+    <div class="section-header">
+      <span class="section-num">06</span>
+      <h2 class="section-title">Bill of materials</h2>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1px; background:var(--border); border:1px solid var(--border); margin-bottom:3rem;">
+
+      <!-- Version NV -->
+      <div style="background:var(--card); padding:2rem;">
+        <div style="font-size:10px; letter-spacing:.15em; text-transform:uppercase; color:var(--accent); margin-bottom:1.5rem;">Version nocturne</div>
+        <table style="width:100%; border-collapse:collapse; font-size:12px;">
+          <thead>
+            <tr style="border-bottom:1px solid var(--border);">
+              <th style="text-align:left; padding:.5rem 0; font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); font-weight:400;">Composant</th>
+              <th style="text-align:center; padding:.5rem 0; font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); font-weight:400;">Qté</th>
+              <th style="text-align:right; padding:.5rem 0; font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); font-weight:400;">Rôle</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom:1px solid #1a1a1a;">
+              <td style="padding:.7rem 0; color:var(--text);">Runcam Night Eagle 3 V2</td>
+              <td style="text-align:center; color:var(--accent);">×2</td>
+              <td style="text-align:right; color:var(--muted);">Caméra starlight</td>
+            </tr>
+            <tr style="border-bottom:1px solid #1a1a1a;">
+              <td style="padding:.7rem 0; color:var(--text);">Micro OLED 0.4" combo optique</td>
+              <td style="text-align:center; color:var(--accent);">×2</td>
+              <td style="text-align:right; color:var(--muted);">Écran + optique</td>
+            </tr>
+            <tr style="border-bottom:1px solid #1a1a1a;">
+              <td style="padding:.7rem 0; color:var(--text);">Buck converter MP1584</td>
+              <td style="text-align:center; color:var(--accent);">×1</td>
+              <td style="text-align:right; color:var(--muted);">5V → 4V</td>
+            </tr>
+            <tr style="border-bottom:1px solid #1a1a1a;">
+              <td style="padding:.7rem 0; color:var(--text);">Batterie externe USB 5V</td>
+              <td style="text-align:center; color:var(--accent);">×1</td>
+              <td style="text-align:right; color:var(--muted);">Alimentation</td>
+            </tr>
+            <tr style="border-bottom:1px solid #1a1a1a;">
+              <td style="padding:.7rem 0; color:var(--text);">Câble coaxial spiralé</td>
+              <td style="text-align:center; color:var(--accent);">×1</td>
+              <td style="text-align:right; color:var(--muted);">Liaison batterie</td>
+            </tr>
+            <tr style="border-bottom:1px solid #1a1a1a;">
+              <td style="padding:.7rem 0; color:var(--text);">Fil 26AWG multi-brin</td>
+              <td style="text-align:center; color:var(--accent);">~1m</td>
+              <td style="text-align:right; color:var(--muted);">Câblage interne</td>
+            </tr>
+            <tr style="border-bottom:1px solid #1a1a1a;">
+              <td style="padding:.7rem 0; color:var(--text);">Visserie M2 / M3</td>
+              <td style="text-align:center; color:var(--accent);">×20</td>
+              <td style="text-align:right; color:var(--muted);">Assemblage</td>
+            </tr>
+            <tr style="border-bottom:1px solid #1a1a1a;">
+              <td style="padding:.7rem 0; color:var(--text);">Rondelles laiton M2</td>
+              <td style="text-align:center; color:var(--accent);">×4</td>
+              <td style="text-align:right; color:var(--muted);">Entretoise charnière</td>
+            </tr>
+            <tr>
+              <td style="padding:.7rem 0; color:var(--text);">Filament PETG / PLA</td>
+              <td style="text-align:center; color:var(--accent);">~200g</td>
+              <td style="text-align:right; color:var(--muted);">Boîtier imprimé</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Version thermique -->
+      <div style="background:var(--card); padding:2rem; border-left:1px solid var(--border);">
+        <div style="font-size:10px; letter-spacing:.15em; text-transform:uppercase; color:var(--accent2); margin-bottom:1.5rem;">Version thermique</div>
+        <table style="width:100%; border-collapse:collapse; font-size:12px;">
+          <thead>
+            <tr style="border-bottom:1px solid var(--border);">
+              <th style="text-align:left; padding:.5rem 0; font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); font-weight:400;">Composant</th>
+              <th style="text-align:center; padding:.5rem 0; font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); font-weight:400;">Qté</th>
+              <th style="text-align:right; padding:.5rem 0; font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); font-weight:400;">Rôle</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom:1px solid #1a1a1a;">
+              <td style="padding:.7rem 0; color:var(--text);">Module caméra thermique</td>
+              <td style="text-align:center; color:var(--accent2);">×1</td>
+              <td style="text-align:right; color:var(--muted);">Détection thermique</td>
+            </tr>
+            <tr style="border-bottom:1px solid #1a1a1a;">
+              <td style="padding:.7rem 0; color:var(--text);">Micro OLED 0.4" combo optique</td>
+              <td style="text-align:center; color:var(--accent2);">×1</td>
+              <td style="text-align:right; color:var(--muted);">Écran + optique</td>
+            </tr>
+            <tr style="border-bottom:1px solid #1a1a1a;">
+              <td style="padding:.7rem 0; color:var(--text);">Buck converter MP1584</td>
+              <td style="text-align:center; color:var(--accent2);">×1</td>
+              <td style="text-align:right; color:var(--muted);">Régulation tension</td>
+            </tr>
+            <tr style="border-bottom:1px solid #1a1a1a;">
+              <td style="padding:.7rem 0; color:var(--text);">Batterie externe USB 5V</td>
+              <td style="text-align:center; color:var(--accent2);">×1</td>
+              <td style="text-align:right; color:var(--muted);">Alimentation</td>
+            </tr>
+            <tr style="border-bottom:1px solid #1a1a1a;">
+              <td style="padding:.7rem 0; color:var(--text);">Fil 26AWG multi-brin</td>
+              <td style="text-align:center; color:var(--accent2);">~0.5m</td>
+              <td style="text-align:right; color:var(--muted);">Câblage interne</td>
+            </tr>
+            <tr style="border-bottom:1px solid #1a1a1a;">
+              <td style="padding:.7rem 0; color:var(--text);">Visserie M2 / M3</td>
+              <td style="text-align:center; color:var(--accent2);">×12</td>
+              <td style="text-align:right; color:var(--muted);">Assemblage</td>
+            </tr>
+            <tr>
+              <td style="padding:.7rem 0; color:var(--text);">Filament PETG / PLA</td>
+              <td style="text-align:center; color:var(--accent2);">~120g</td>
+              <td style="text-align:right; color:var(--muted);">Boîtier imprimé</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- SECTION 7 (ex-6) : ARCHITECTURE -->
+  <section class="section reveal" id="sec-arch">
+    <div class="section-header">
+      <span class="section-num">07</span>
+      <h2 class="section-title">Architecture électronique</h2>
+    </div>
+
+    <div class="arch-diagram" style="margin-bottom:3rem;">
+      <div class="arch-block">
+        <div class="arch-box highlight">Batterie externe<br>5V USB</div>
+        <div class="arch-box-label">Alimentation</div>
+      </div>
+      <div class="arch-arrow"><span class="arch-label">5V</span></div>
+      <div class="arch-block">
+        <div class="arch-box">Buck converter<br>MP1584</div>
+        <div class="arch-box-label">Régulation</div>
+      </div>
+      <div class="arch-arrow"><span class="arch-label">4V</span></div>
+      <div class="arch-block">
+        <div class="arch-box">× 2 Caméras<br>starlight</div>
+        <div class="arch-box-label">Acquisition</div>
+      </div>
+      <div class="arch-arrow"><span class="arch-label">CVBS</span></div>
+      <div class="arch-block">
+        <div class="arch-box highlight">× 2 Micro OLED<br>0.4"</div>
+        <div class="arch-box-label">Affichage</div>
+      </div>
+      <div class="arch-arrow"></div>
+      <div class="arch-block">
+        <div class="arch-box">Lentilles<br>grossissantes</div>
+        <div class="arch-box-label">Optique</div>
+      </div>
+      <div class="arch-arrow"></div>
+      <div class="arch-block">
+        <div class="arch-box highlight">Œil</div>
+        <div class="arch-box-label">Utilisateur</div>
+      </div>
+    </div>
+
+    <div class="photo-grid col2" style="margin-bottom:3rem;">
+      <div class="photo-item auto" style="min-height:220px; background:#0c0c0c;">
+        <img src="buck_converter.png" alt="Schéma buck converter 5V vers 4V MP1584" style="object-fit:contain; padding:1.5rem;">
+        <div class="photo-caption">Buck converter — régulation 5V → 4V pour les caméras</div>
+      </div>
+      <div style="padding:1.5rem; background:var(--card); border:1px solid var(--border); display:flex; flex-direction:column; justify-content:center; gap:1rem;">
+        <p style="font-size:12px; color:var(--muted); line-height:1.9;">
+          Le 5V de la batterie externe est abaissé à 4V par un buck converter MP1584 avant d'alimenter les caméras. L'électronique en elle-même est simple — la vraie difficulté est de faire transiter tous ces câbles à travers les axes de rotation des charnières.
+        </p>
+        <p style="font-size:11px; color:#333; letter-spacing:0.06em;">
+          Alim → Buck → 2× Caméra → 2× OLED → Lentilles → Œil
+        </p>
+      </div>
+    </div>
+
+    <div class="specs-grid">
+      <div>
+        <div class="spec-row"><span class="spec-key">Alimentation entrée</span><span class="spec-val highlight">5V USB (batterie externe)</span></div>
+        <div class="spec-row"><span class="spec-key">Tension caméras</span><span class="spec-val">4V (buck MP1584)</span></div>
+        <div class="spec-row"><span class="spec-key">Caméras NV</span><span class="spec-val">Runcam Night Eagle 3 V2 — starlight</span></div>
+        <div class="spec-row"><span class="spec-key">Écrans</span><span class="spec-val highlight">2× Micro OLED 0.4" N&amp;B</span></div>
+      </div>
+      <div>
+        <div class="spec-row"><span class="spec-key">Optique</span><span class="spec-val">Module combo écran/optique tout-en-un</span></div>
+        <div class="spec-row"><span class="spec-key">Boîtier</span><span class="spec-val">PLA / PETG — FDM custom</span></div>
+        <div class="spec-row"><span class="spec-key">CAO</span><span class="spec-val">Fusion 360 — toutes pièces custom</span></div>
+        <div class="spec-row"><span class="spec-key">Câblage charnière</span><span class="spec-val highlight">Fils 26AWG dans l'axe pivot</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 7 : DÉFIS -->
+  <section class="section reveal" id="sec-challenges">
+    <div class="section-header">
+      <span class="section-num">08</span>
+      <h2 class="section-title">Défis techniques</h2>
+    </div>
+
+    <div class="challenges">
+      <div class="challenge-item">
+        <div class="challenge-num">01</div>
+        <div class="challenge-title">Câblage dans les charnières</div>
+        <div class="challenge-desc">Faire passer alimentation + signal CVBS à travers l'axe de rotation sans friction ni rupture. Solution : fils 26AWG torsadés dans l'axe creux imprimé.</div>
+      </div>
+      <div class="challenge-item">
+        <div class="challenge-num">02</div>
+        <div class="challenge-title">Intégration optique</div>
+        <div class="challenge-desc">Le combo écran/optique est un module tout-en-un — le défi était d'imprimer le boîtier aux bonnes dimensions pour que l'image soit nette à distance d'œil confortable. Plusieurs itérations d'impression pour trouver la bonne cote.</div>
+      </div>
+      <div class="challenge-item">
+        <div class="challenge-num">03</div>
+        <div class="challenge-title">Adapter le thermique</div>
+        <div class="challenge-desc">Intégrer le module thermique dans le même format de boîtier NV — géométrie d'objectif différente, résolution différente. Tout remodéliser sans repartir de zéro.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 8 : PERSPECTIVES -->
+  <section class="section reveal" id="sec-next">
+    <div class="section-header">
+      <span class="section-num">09</span>
+      <h2 class="section-title">Prochaines étapes</h2>
+    </div>
+
+    <div class="perspectives">
+      <div class="persp-item">
+        <div class="persp-tag">Fusion sensorielle</div>
+        <div class="persp-title">NV + thermique combinés</div>
+        <div class="persp-desc">
+          Le thermique ne voit pas à travers les vitres, miroirs ou surfaces réfléchissantes — là où le NV excelle. L'idée : utiliser un Raspberry Pi pour superposer les deux flux et faire ressortir uniquement les hotspots thermiques sur l'image NV. Le meilleur des deux mondes.
+        </div>
+        <div class="persp-chips">
+          <span class="chip">Raspberry Pi</span>
+          <span class="chip">Fusion vidéo</span>
+          <span class="chip">Hotspot detection</span>
+          <span class="chip">OpenCV</span>
+        </div>
+      </div>
+      <div class="persp-item">
+        <div class="persp-tag">Amélioration optique</div>
+        <div class="persp-title">Remplacement des objectifs caméra</div>
+        <div class="persp-desc">
+          Les Runcam Night Eagle 3 V2 ont de bons capteurs mais des objectifs d'origine limités. L'idée serait de les remplacer par des objectifs à plus large ouverture numérique pour gagner en sensibilité et en champ de vision — surtout en très basse lumière.
+        </div>
+        <div class="persp-chips">
+          <span class="chip">Runcam Night Eagle 3 V2</span>
+          <span class="chip">Optique custom</span>
+          <span class="chip">Low-light</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <span>Robin Bonfill</span>
+  <span>NightSight — Vision nocturne &amp; thermique DIY</span>
+  <span>Gaillac, France</span>
+</footer>
+
+<script>
+  // Cursor
+  const cursor = document.getElementById('cursor');
+  document.addEventListener('mousemove', e => {
+    cursor.style.left = e.clientX + 'px';
+    cursor.style.top  = e.clientY + 'px';
+  });
+
+  // Progress bar
+  const bar = document.getElementById('progressBar');
+  window.addEventListener('scroll', () => {
+    const max = document.body.scrollHeight - window.innerHeight;
+    bar.style.width = (window.scrollY / max * 100) + '%';
+  });
+
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const ro = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); ro.unobserve(e.target); } });
+  }, { threshold: 0.07 });
+  reveals.forEach(el => ro.observe(el));
+
+  // Version tabs
+  function switchVersion(el) {
+    document.querySelectorAll('.version-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+  }
+</script>
+
+</body>
+</html>

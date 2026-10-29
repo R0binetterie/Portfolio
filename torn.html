@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Torn Travel Optimizer — Robin Bonfill</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<style>
+  :root {
+    --bg:#0f0f0f;--bg2:#161616;--border:#2a2a2a;
+    --accent:#c8f542;--accent2:#f5a623;--accent3:#4fc3f7;
+    --text:#eeeee6;--muted:#888882;--card:#171717;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;font-size:15px;line-height:1.7;overflow-x:hidden;cursor:crosshair}
+  body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:999;opacity:.6}
+  #cursor{position:fixed;width:6px;height:6px;background:var(--accent);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:left .05s,top .05s}
+  .progress-bar{position:fixed;top:0;left:0;height:2px;background:var(--accent);z-index:200;width:0%;transition:width .1s linear}
+
+  nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1.25rem 3rem;border-bottom:1px solid var(--border);background:rgba(10,10,10,.92);backdrop-filter:blur(14px)}
+  .nav-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:15px;letter-spacing:.05em;color:var(--accent);text-decoration:none}
+  .nav-back{font-size:12px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;text-decoration:none;transition:color .2s}
+  .nav-back::before{content:'← '}
+  .nav-back:hover{color:var(--text)}
+
+  /* HERO */
+  .hero{padding:140px 3rem 80px;border-bottom:1px solid var(--border);display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:end;max-width:1400px;margin:0 auto;position:relative;overflow:hidden}
+  .hero-canvas{position:absolute;right:0;top:0;bottom:0;width:52%;height:100%;pointer-events:none;opacity:.55}
+  .hero-label{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem}
+  .hero-title{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(42px,6vw,80px);line-height:.95;letter-spacing:-.02em;color:var(--text);margin-bottom:1.5rem}
+  .hero-title span{color:var(--accent)}
+  .hero-desc{font-size:14px;color:var(--muted);max-width:480px;line-height:1.8;margin-bottom:2rem}
+  .hero-tags{display:flex;flex-wrap:wrap;gap:8px}
+  .tag{font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:4px 12px;border:1px solid var(--border);color:var(--muted);border-radius:2px}
+  .tag.accent{border-color:var(--accent);color:var(--accent)}
+  .tag.orange{border-color:var(--accent2);color:var(--accent2)}
+  .hero-meta{display:flex;flex-direction:column;gap:1.5rem;align-self:end}
+  .meta-item{display:flex;flex-direction:column;gap:4px}
+  .meta-label{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .meta-value{font-size:14px;color:var(--text)}
+  .meta-value a{color:var(--accent);text-decoration:none;border-bottom:1px solid transparent;transition:border-color .2s}
+  .meta-value a:hover{border-color:var(--accent)}
+  .status-badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--accent)}
+  .status-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 2s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+  /* LAYOUT */
+  .page-wrap{display:grid;grid-template-columns:200px 1fr;gap:0;max-width:1400px;margin:0 auto}
+  .section{padding:5rem 0 5rem 3rem;border-bottom:1px solid var(--border)}
+  .section-header{display:flex;align-items:baseline;gap:1.5rem;margin-bottom:2rem}
+  .section-num{font-size:11px;color:var(--muted);letter-spacing:.1em;min-width:2ch;padding-top:6px}
+  .section-title{font-family:'Syne',sans-serif;font-weight:800;font-size:32px;letter-spacing:-.02em;line-height:1}
+  .section-sub{font-size:13px;color:var(--muted);margin-top:-.5rem;margin-bottom:2.5rem;max-width:700px;line-height:1.9}
+
+  /* SOMMAIRE */
+  .toc{position:sticky;top:80px;height:calc(100vh - 100px);padding:3rem 0 3rem 3rem;border-right:1px solid var(--border);overflow-y:auto;align-self:start}
+  .toc-label{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:1.5rem}
+  .toc-list{list-style:none;display:flex;flex-direction:column;gap:2px}
+  .toc-item a{display:flex;align-items:baseline;gap:.75rem;padding:.5rem .75rem;text-decoration:none;color:var(--muted);font-size:11px;letter-spacing:.05em;transition:color .2s,background .2s;border-left:2px solid transparent}
+  .toc-item a:hover{color:var(--text);background:#111}
+  .toc-item a.active{color:var(--accent);border-left-color:var(--accent)}
+  .toc-cat{font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);padding:.9rem .75rem .3rem}
+  .toc-num{font-size:9px;letter-spacing:.1em;color:var(--border);flex-shrink:0;min-width:2ch}
+  .toc-item a.active .toc-num{color:var(--accent)}
+
+  /* SÉPARATEUR CATÉGORIE */
+  .cat-sep{display:flex;align-items:center;gap:1.5rem;padding:2.5rem 0 0;margin-bottom:-1rem}
+  .cat-sep-line{flex:1;height:1px;background:linear-gradient(to right,var(--accent),transparent)}
+  .cat-sep-label{font-family:'Syne',sans-serif;font-weight:800;font-size:36px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);white-space:nowrap;padding-left:1rem}
+
+  /* INSPO / CARDS GRID */
+  .inspo-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:1rem}
+  .inspo-item{background:var(--card);padding:2rem}
+  .inspo-title{font-family:'Syne',sans-serif;font-weight:700;font-size:13px;color:var(--text);margin-bottom:.75rem}
+  .inspo-desc{font-size:12px;color:var(--muted);line-height:1.8}
+  .inspo-tag{font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);margin-bottom:.5rem}
+
+  /* SPECS / TABLE */
+  .specs-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 3rem}
+  .spec-row{display:flex;justify-content:space-between;align-items:baseline;padding:1rem 0;border-bottom:1px solid var(--border);gap:1.5rem}
+  .spec-row:first-child{border-top:1px solid var(--border)}
+  .spec-key{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);min-width:140px;flex-shrink:0}
+  .spec-val{font-size:13px;color:var(--text);text-align:right}
+  .spec-val.hl{color:var(--accent)}
+  .spec-val.hl2{color:var(--accent2)}
+
+  .data-table{width:100%;border-collapse:collapse;margin-bottom:2.5rem}
+  .data-table th{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);text-align:left;padding:.75rem 1rem;border-bottom:1px solid var(--border)}
+  .data-table td{font-size:12px;color:var(--text);padding:.75rem 1rem;border-bottom:1px solid var(--border)}
+  .data-table td.muted{color:var(--muted)}
+  .data-table td.hl{color:var(--accent)}
+
+  /* KATEX BLOCK */
+  .math-block{background:var(--card);border-left:3px solid var(--accent);padding:1.25rem 1.5rem;margin:1.5rem 0 2.5rem;overflow-x:auto;font-size:14px}
+
+  /* COUNTRY GRID */
+  .country-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:2.5rem}
+  .country-item{background:var(--card);padding:1.25rem;display:flex;flex-direction:column;gap:.35rem}
+  .country-name{font-family:'Syne',sans-serif;font-weight:700;font-size:13px;color:var(--text)}
+  .country-item .country-meta{font-size:10px;color:var(--muted);letter-spacing:.05em}
+  .country-item .country-meta b{color:var(--accent2);font-weight:500}
+
+  /* STEPS (paramètres UI) */
+  .param-list{display:flex;flex-direction:column;gap:2px;margin-bottom:1rem}
+  .param-row{display:grid;grid-template-columns:180px 1fr;gap:1.5rem;padding:1rem 1.5rem;background:var(--card);border:1px solid var(--border)}
+  .param-name{font-family:'Syne',sans-serif;font-weight:700;font-size:12px;color:var(--text)}
+  .param-desc{font-size:12px;color:var(--muted);line-height:1.7}
+
+  /* LIMITS LIST */
+  .limit-list{display:flex;flex-direction:column;gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:1rem}
+  .limit-item{background:var(--card);padding:1.5rem;display:flex;gap:1.25rem;align-items:flex-start}
+  .limit-icon{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent2);min-width:5.5rem;padding-top:2px}
+  .limit-body{flex:1}
+  .limit-title{font-family:'Syne',sans-serif;font-weight:700;font-size:13px;color:var(--text);margin-bottom:.35rem}
+  .limit-desc{font-size:12px;color:var(--muted);line-height:1.75}
+
+  /* CAPTURES D'ÉCRAN */
+  .screenshot-frame{border:1px solid var(--border);background:var(--card);padding:.5rem;margin-bottom:.75rem}
+  .screenshot-frame img{width:100%;display:block;border:1px solid var(--border)}
+  .screenshot-caption{font-size:11px;color:var(--muted);letter-spacing:.03em;margin-bottom:2.5rem}
+  .screenshot-caption b{color:var(--accent);font-weight:500}
+
+  /* CONTRIBUER — CTA */
+  .contribute-box{
+    background:var(--card); border:1px solid var(--border); border-left:3px solid var(--accent);
+    padding:2.5rem; display:flex; flex-direction:column; gap:1.25rem;
+  }
+  .contribute-box h3{font-family:'Syne',sans-serif;font-weight:800;font-size:22px;color:var(--text)}
+  .contribute-box p{font-size:13px;color:var(--muted);line-height:1.85;max-width:640px}
+  .contribute-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:.25rem}
+  .contribute-list span{font-size:11px;letter-spacing:.06em;padding:5px 12px;border:1px solid var(--border);color:var(--muted);border-radius:2px}
+  .contribute-btn{
+    display:inline-flex; align-items:center; gap:8px; align-self:flex-start;
+    margin-top:.5rem; padding:.8rem 1.5rem; border:1px solid var(--accent); color:var(--accent);
+    text-decoration:none; font-size:12px; letter-spacing:.08em; text-transform:uppercase;
+    transition:background .2s, color .2s;
+  }
+  .contribute-btn:hover{background:var(--accent); color:#0f0f0f}
+
+  /* REVEAL */
+  .reveal{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease}
+  .reveal.visible{opacity:1;transform:none}
+  .fade-in{animation:fadeUp .7s ease forwards}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+
+  /* STATS CHIFFRES */
+  .big-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:2.5rem}
+  .big-stat{background:var(--card);padding:2rem 1.5rem;display:flex;flex-direction:column;gap:.5rem}
+  .big-stat-val{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(28px,4vw,48px);line-height:1;color:var(--accent)}
+  .big-stat-val.orange{color:var(--accent2)}
+  .big-stat-val.blue{color:var(--accent3)}
+  .big-stat-val.white{color:var(--text)}
+  .big-stat-label{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+
+  /* BLOC CODE */
+  .code-block{background:#0a0a0a;border:1px solid var(--border);border-left:3px solid var(--accent3);padding:1.25rem 1.5rem;margin:1.5rem 0;overflow-x:auto;position:relative}
+  .code-block pre{font-family:'DM Mono',monospace;font-size:12px;line-height:1.9;color:#c8c8c0;margin:0}
+  .code-block .cb-lang{position:absolute;top:10px;right:14px;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--accent3)}
+  .code-kw{color:#c8f542}
+  .code-str{color:#f5a623}
+  .code-cm{color:#555b70;font-style:italic}
+  .code-fn{color:#4fc3f7}
+  .code-num{color:#e06c75}
+
+  /* DOWNLOAD BUTTON */
+  .dl-btn{
+    display:inline-flex;align-items:center;gap:10px;
+    padding:.9rem 1.75rem;background:transparent;
+    border:1px solid var(--accent3);color:var(--accent3);
+    text-decoration:none;font-size:12px;letter-spacing:.08em;text-transform:uppercase;
+    transition:background .2s,color .2s;cursor:pointer;font-family:'DM Mono',monospace;
+  }
+  .dl-btn:hover{background:var(--accent3);color:#0f0f0f}
+  .dl-btn svg{flex-shrink:0}
+  .dl-btn-group{display:flex;flex-wrap:wrap;gap:12px;margin:1.5rem 0 2.5rem}
+
+  /* IMAGE PLACEHOLDER */
+  .img-placeholder{
+    width:100%;aspect-ratio:16/9;
+    background:var(--card);border:1px dashed var(--border);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:.75rem;margin-bottom:.75rem;position:relative;overflow:hidden;
+  }
+  .img-placeholder::before{
+    content:'';position:absolute;inset:0;
+    background:repeating-linear-gradient(45deg,transparent,transparent 20px,rgba(255,255,255,.015) 20px,rgba(255,255,255,.015) 21px);
+  }
+  .img-placeholder-icon{font-size:28px;opacity:.25}
+  .img-placeholder-label{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);opacity:.6}
+  .img-placeholder-sub{font-size:10px;color:var(--border);font-style:italic}
+
+  /* QUOTE / HIGHLIGHT */
+  .pull-quote{
+    border-left:3px solid var(--accent2);
+    padding:1.25rem 1.5rem;margin:2rem 0;
+    background:rgba(245,166,35,.04);
+  }
+  .pull-quote p{font-size:14px;color:var(--text);line-height:1.85;font-style:italic}
+  .pull-quote cite{display:block;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:.75rem;font-style:normal}
+
+  /* TIMELINE TEXTE */
+  .text-timeline{display:flex;flex-direction:column;gap:0;margin:1.5rem 0 2.5rem;position:relative}
+  .text-timeline::before{content:'';position:absolute;left:8px;top:8px;bottom:8px;width:1px;background:var(--border)}
+  .tt-item{display:flex;gap:1.25rem;padding:.75rem 0;position:relative}
+  .tt-dot{width:17px;height:17px;border-radius:50%;background:var(--card);border:1px solid var(--accent);flex-shrink:0;margin-top:3px;display:flex;align-items:center;justify-content:center}
+  .tt-dot-inner{width:5px;height:5px;border-radius:50%;background:var(--accent)}
+  .tt-dot.orange{border-color:var(--accent2)}.tt-dot.orange .tt-dot-inner{background:var(--accent2)}
+  .tt-dot.blue{border-color:var(--accent3)}.tt-dot.blue .tt-dot-inner{background:var(--accent3)}
+  .tt-content{flex:1}
+  .tt-time{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.25rem}
+  .tt-title{font-family:'Syne',sans-serif;font-weight:700;font-size:13px;color:var(--text);margin-bottom:.25rem}
+  .tt-desc{font-size:12px;color:var(--muted);line-height:1.7}
+
+  /* FOOTER */
+  footer{border-top:1px solid var(--border);padding:2rem 3rem;display:flex;justify-content:space-between;font-size:11px;color:var(--muted);letter-spacing:.06em}
+
+  @media(max-width:1100px){
+    .page-wrap{grid-template-columns:1fr}
+    .toc{display:none}
+    .section{padding:4rem 0}
+  }
+  @media(max-width:900px){
+    .hero{grid-template-columns:1fr;padding:120px 1.5rem 60px}
+    .hero-canvas{display:none}
+    .page-wrap > div{padding:0 1.5rem}
+    .section{padding-left:0}
+    .inspo-grid{grid-template-columns:1fr}
+    .specs-grid{grid-template-columns:1fr}
+    .param-row{grid-template-columns:1fr}
+    nav{padding:1rem 1.5rem}
+    footer{flex-direction:column;gap:.5rem;padding:1.5rem}
+  }
+</style>
+</head>
+<body>
+<div id="cursor"></div>
+<div class="progress-bar" id="progressBar"></div>
+
+<nav>
+  <a href="index.html" class="nav-logo">RB</a>
+  <a href="index.html" class="nav-back">Tous les projets</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="hero">
+  <canvas id="heroCanvas" class="hero-canvas"></canvas>
+  <div class="fade-in">
+    <div class="hero-label">Projet — Outil web &amp; jeu en ligne</div>
+    <h1 class="hero-title">Torn Travel<br><span>Optimizer</span></h1>
+    <p class="hero-desc">Un outil web qui calcule les meilleurs voyages à l'étranger sur le jeu en ligne Torn City : quoi acheter, où, et combien de fois, en fonction de ta session de jeu, ton mode de transport et tes bonus. Prix et stocks en temps réel via API.</p>
+    <div class="hero-tags">
+      <span class="tag accent">Optimisation</span>
+      <span class="tag accent">JavaScript vanilla</span>
+      <span class="tag">API YATA</span>
+      <span class="tag">API Torn</span>
+      <span class="tag">GitHub Pages</span>
+    </div>
+  </div>
+  <div class="hero-meta fade-in">
+    <div class="meta-item">
+      <span class="meta-label">Statut</span>
+      <span class="status-badge"><span class="status-dot"></span>En ligne — actif</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">Lien</span>
+      <span class="meta-value"><a href="https://r0binetterie.github.io/" target="_blank">r0binetterie.github.io ↗</a></span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">Stack</span>
+      <span class="meta-value">HTML / CSS / JS — zéro dépendance</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">Données</span>
+      <span class="meta-value">API YATA (stocks) + API Torn (prix)</span>
+    </div>
+  </div>
+</section>
+
+<div class="page-wrap">
+
+  <!-- SOMMAIRE -->
+  <aside class="toc">
+    <div class="toc-label">Sommaire</div>
+    <ul class="toc-list">
+      <li class="toc-cat">Contexte</li>
+      <li class="toc-item"><a href="#sec-jeu"><span class="toc-num">01</span>Le jeu &amp; le problème</a></li>
+      <li class="toc-item"><a href="#sec-outil"><span class="toc-num">02</span>Ce que calcule l'outil</a></li>
+      <li class="toc-cat">Données &amp; modèle</li>
+      <li class="toc-item"><a href="#sec-data"><span class="toc-num">03</span>Sources de données</a></li>
+      <li class="toc-item"><a href="#sec-stock"><span class="toc-num">04</span>Modèle de stock</a></li>
+      <li class="toc-item"><a href="#sec-algo"><span class="toc-num">05</span>Algorithme d'optimisation</a></li>
+      <li class="toc-cat">Interface</li>
+      <li class="toc-item"><a href="#sec-ui"><span class="toc-num">06</span>Paramètres &amp; réglages</a></li>
+      <li class="toc-cat">Bilan</li>
+      <li class="toc-item"><a href="#sec-limits"><span class="toc-num">07</span>Limites &amp; pistes</a></li>
+      <li class="toc-item"><a href="#sec-stack"><span class="toc-num">08</span>Stack technique</a></li>
+      <li class="toc-item"><a href="#sec-contribute"><span class="toc-num">09</span>Contribuer</a></li>
+    </ul>
+  </aside>
+
+  <div>
+
+  <!-- 01 LE JEU -->
+  <section class="section reveal" id="sec-jeu" style="padding-top:4rem">
+    <div class="section-header">
+      <span class="section-num">01</span>
+      <h2 class="section-title">Le jeu &amp; le problème</h2>
+    </div>
+    <p class="section-sub">Torn City est un jeu en ligne dans lequel on peut voyager à l'étranger pour acheter des objets propres à chaque pays — peluches, fleurs, drogues — et les revendre bien plus cher sur le marché domestique.</p>
+
+    <p style="font-size:13px;color:var(--muted);line-height:1.9;margin-bottom:2rem;max-width:700px">
+      Le voyage se débloque au <b style="color:var(--text)">niveau 15</b>. À partir de là, chaque destination a un temps de vol et un coût propres, et la quantité d'objets qu'on peut ramener dépend d'un ensemble de bonus cumulables — c'est cette capacité qui détermine combien un aller-retour peut rapporter.
+    </p>
+
+    <table class="data-table reveal">
+      <thead><tr><th>Source de capacité</th><th>Effet</th><th>Portée</th></tr></thead>
+      <tbody>
+        <tr><td>Mode de vol</td><td class="hl">+10 (Standard) ou +15 (Airstrip / WLT / Business)</td><td class="muted">Capacité de base</td></tr>
+        <tr><td>Valise (Small/Medium/Large)</td><td>+2 / +3 / +4</td><td class="muted">Générale</td></tr>
+        <tr><td>Upgrade de faction — Excursion</td><td>jusqu'à +10</td><td class="muted">Générale</td></tr>
+        <tr><td>Toy Shop (7★)</td><td>+5</td><td class="muted">Peluches uniquement</td></tr>
+        <tr><td>Flower Shop (7★)</td><td>+5</td><td class="muted">Fleurs uniquement</td></tr>
+        <tr><td>Lingerie Store (3★)</td><td>+2</td><td class="muted">Générale</td></tr>
+        <tr><td>Cruise Line (3★ / +10★)</td><td>+2 / +5</td><td class="muted">Générale</td></tr>
+        <tr><td>World Travel Day</td><td class="hl2">Capacité totale ×2</td><td class="muted">Événement ponctuel, tous joueurs</td></tr>
+      </tbody>
+    </table>
+
+    <div class="inspo-grid reveal">
+      <div class="inspo-item">
+        <div class="inspo-tag">Contrainte 1</div>
+        <div class="inspo-title">Le stock à l'étranger</div>
+        <div class="inspo-desc">Chaque pays a un stock limité par objet, qui se vide progressivement puis se reconstitue après un délai. Arriver au mauvais moment veut dire repartir les mains vides.</div>
+      </div>
+      <div class="inspo-item">
+        <div class="inspo-tag">Contrainte 2</div>
+        <div class="inspo-title">Le nombre d'objets ramenables</div>
+        <div class="inspo-desc">Le nombre d'objets ramenables cumule mode de vol, valise, upgrades de faction et bonus de job — impossible de tout acheter, il faut prioriser.</div>
+      </div>
+      <div class="inspo-item">
+        <div class="inspo-tag">Contrainte 3</div>
+        <div class="inspo-title">Le temps de session</div>
+        <div class="inspo-desc">Chaque pays a un temps de vol différent. Sur une session de jeu donnée, certaines destinations permettent plusieurs allers-retours, d'autres un seul.</div>
+      </div>
+    </div>
+
+    <p style="font-size:13px;color:var(--muted);line-height:1.9;margin:2.5rem 0 1.5rem;max-width:700px">
+      Selon les objets ciblés, deux grandes stratégies s'opposent : viser peu d'objets à très forte marge, ou beaucoup d'objets à marge plus modeste mais au stock plus généreux.
+    </p>
+
+    <div class="inspo-grid reveal">
+      <div class="inspo-item">
+        <div class="inspo-tag">Stratégie — valeur</div>
+        <div class="inspo-title">Miser sur les drogues (ex. Xanax)</div>
+        <div class="inspo-desc">Marge énorme par unité, mais stock de restock faible et très lent à se vider — un run peut suffire à rentabiliser toute la session, à condition d'arriver au bon moment.</div>
+      </div>
+      <div class="inspo-item">
+        <div class="inspo-tag">Stratégie — volume</div>
+        <div class="inspo-title">Miser sur peluches &amp; fleurs</div>
+        <div class="inspo-desc">Marge plus faible par unité, mais restock plus généreux et plus rapide — plus tolérant aux erreurs de timing, et compatible avec plusieurs allers-retours sur les pays courts (Mexique, Canada).</div>
+      </div>
+      <div class="inspo-item">
+        <div class="inspo-tag">Rôle de l'outil</div>
+        <div class="inspo-title">Comparer automatiquement</div>
+        <div class="inspo-desc">Plutôt que de trancher à l'instinct, l'outil chiffre les deux approches pour chaque pays et retient celle qui maximise le profit sur la session donnée.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS CHIFFRES -->
+  <div style="padding:0 0 0 3rem;border-bottom:1px solid var(--border)">
+    <div class="big-stats reveal">
+      <div class="big-stat">
+        <div class="big-stat-val">11</div>
+        <div class="big-stat-label">Destinations</div>
+      </div>
+      <div class="big-stat">
+        <div class="big-stat-val orange">~30+</div>
+        <div class="big-stat-label">Items trackés</div>
+      </div>
+      <div class="big-stat">
+        <div class="big-stat-val blue">4</div>
+        <div class="big-stat-label">Modes de vol</div>
+      </div>
+      <div class="big-stat">
+        <div class="big-stat-val white">0</div>
+        <div class="big-stat-label">Dépendances JS</div>
+      </div>
+    </div>
+
+    <!-- Placeholder screenshot interface -->
+    <div class="reveal" style="margin-bottom:2.5rem">
+      <div class="img-placeholder" style="aspect-ratio:21/9">
+        <div class="img-placeholder-icon">🖥</div>
+        <div class="img-placeholder-label">Screenshot — Interface principale</div>
+        <div class="img-placeholder-sub">sidebar paramètres · timeline meilleur run · classement destinations</div>
+      </div>
+      <p class="screenshot-caption">Vue d'ensemble de l'outil : paramètres à gauche, <b>timeline horizontale</b> du meilleur run au centre, classement des autres destinations en dessous.</p>
+    </div>
+  </div>
+
+  <!-- 02 CE QUE CALCULE L'OUTIL -->
+  <section class="section reveal" id="sec-outil">
+    <div class="section-header">
+      <span class="section-num">02</span>
+      <h2 class="section-title">Ce que calcule l'outil</h2>
+    </div>
+    <p class="section-sub">À partir de ta session disponible et de tes bonus, l'outil croise ces trois contraintes et classe les destinations par profit estimé — plutôt que de refaire ce calcul à la main à chaque session.</p>
+
+    <div class="specs-grid reveal">
+      <div>
+        <div class="spec-row"><span class="spec-key">Entrée</span><span class="spec-val">Durée de session, mode de vol, valise</span></div>
+        <div class="spec-row"><span class="spec-key">Entrée</span><span class="spec-val">Bonus faction &amp; jobs</span></div>
+        <div class="spec-row"><span class="spec-key">Entrée</span><span class="spec-val">Clé API Torn (optionnelle)</span></div>
+      </div>
+      <div>
+        <div class="spec-row"><span class="spec-key">Sortie</span><span class="spec-val hl">Classement des pays par profit</span></div>
+        <div class="spec-row"><span class="spec-key">Sortie</span><span class="spec-val">Détail des objets à acheter par run</span></div>
+        <div class="spec-row"><span class="spec-key">Sortie</span><span class="spec-val">Timeline des allers-retours</span></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="cat-sep reveal"><div class="cat-sep-line"></div><div class="cat-sep-label">Données &amp; modèle</div></div>
+
+  <!-- 03 SOURCES DE DONNÉES -->
+  <section class="section reveal" id="sec-data">
+    <div class="section-header">
+      <span class="section-num">03</span>
+      <h2 class="section-title">Sources de données</h2>
+    </div>
+    <p class="section-sub">Deux API externes, combinées à une base statique de secours si l'une d'elles est indisponible.</p>
+
+    <table class="data-table reveal">
+      <thead><tr><th>Donnée</th><th>Source</th><th>Fraîcheur</th></tr></thead>
+      <tbody>
+        <tr><td>Stocks étrangers</td><td class="hl">API YATA</td><td class="muted">Crowd-sourced, variable</td></tr>
+        <tr><td>Prix du marché</td><td class="hl">API Torn (clé publique perso)</td><td class="muted">Quotidien</td></tr>
+        <tr><td>Prix de base / temps de vol</td><td class="muted">Base statique (data.js)</td><td class="muted">Mise à jour manuelle</td></tr>
+      </tbody>
+    </table>
+
+    <div class="inspo-grid reveal" style="grid-template-columns:1fr 1fr">
+      <div class="inspo-item">
+        <div class="inspo-tag">Confidentialité</div>
+        <div class="inspo-title">Clé API jamais stockée côté serveur</div>
+        <div class="inspo-desc">La clé Torn est gardée uniquement dans le <code>sessionStorage</code> du navigateur — jamais envoyée ailleurs qu'aux API officielles de Torn. Niveau d'accès "Public Only", donc sans risque.</div>
+      </div>
+      <div class="inspo-item">
+        <div class="inspo-tag">Limite connue</div>
+        <div class="inspo-title">CORS côté YATA</div>
+        <div class="inspo-desc">L'API YATA peut bloquer les requêtes depuis GitHub Pages selon sa politique CORS. Si les stocks ne se chargent pas, l'outil retombe sur les prix historiques en cache.</div>
+      </div>
+    </div>
+
+    <div class="pull-quote reveal">
+      <p>L'API YATA retourne un seul snapshot par pays — la quantité au moment où le dernier joueur a atterri et soumis ses données. Ce n'est pas un flux temps réel : la fraîcheur varie de quelques minutes à plusieurs heures selon la popularité de la destination.</p>
+      <cite>Limite principale — YATA /api/v1/travel/export/</cite>
+    </div>
+
+    <div class="country-grid reveal">
+      <div class="country-item"><span class="country-name">Mexique</span><span class="country-meta"><b>20 min</b> · $5 000</span></div>
+      <div class="country-item"><span class="country-name">Canada</span><span class="country-meta"><b>37 min</b> · $7 500</span></div>
+      <div class="country-item"><span class="country-name">Caïmans</span><span class="country-meta"><b>57 min</b> · $10 000</span></div>
+      <div class="country-item"><span class="country-name">Hawaï</span><span class="country-meta"><b>2h01</b> · $12 000</span></div>
+      <div class="country-item"><span class="country-name">Royaume-Uni</span><span class="country-meta"><b>2h39</b> · $18 000</span></div>
+      <div class="country-item"><span class="country-name">Suisse</span><span class="country-meta"><b>2h49</b> · $20 000</span></div>
+      <div class="country-item"><span class="country-name">Argentine</span><span class="country-meta"><b>3h09</b> · $22 000</span></div>
+      <div class="country-item"><span class="country-name">Japon</span><span class="country-meta"><b>3h23</b> · $25 000</span></div>
+      <div class="country-item"><span class="country-name">Émirats</span><span class="country-meta"><b>4h31</b> · $32 000</span></div>
+      <div class="country-item"><span class="country-name">Chine</span><span class="country-meta"><b>4h02</b> · $35 000</span></div>
+      <div class="country-item"><span class="country-name">Afrique du Sud</span><span class="country-meta"><b>5h11</b> · $40 000</span></div>
+    </div>
+  </section>
+
+  <!-- 04 MODÈLE DE STOCK -->
+  <section class="section reveal" id="sec-stock">
+    <div class="section-header">
+      <span class="section-num">04</span>
+      <h2 class="section-title">Modèle de stock</h2>
+    </div>
+    <p class="section-sub">Le stock YATA n'est pas mis à jour en continu — il faut donc estimer où en sera le stock au moment réel de l'arrivée, pas au moment de la requête.</p>
+
+    <!-- Mécanique réelle du jeu -->
+    <p style="font-size:13px;color:var(--muted);line-height:1.9;margin-bottom:2rem;max-width:700px">
+      Comprendre le modèle commence par comprendre la mécanique réelle du jeu. Les stocks à l'étranger ne sont pas continus — ils suivent un cycle précis en quatre phases.
+    </p>
+
+    <div class="param-list reveal">
+      <div class="param-row">
+        <div class="param-name">1. Stock plein</div>
+        <div class="param-desc">À chaque restock, la boutique reçoit <b style="color:var(--text)">2 500 unités</b> pour les peluches et les fleurs (quantité fixe, indépendante de la demande). Les drogues ont des quantités et des cycles différents.</div>
+      </div>
+      <div class="param-row">
+        <div class="param-name">2. Vidage progressif</div>
+        <div class="param-desc">Les joueurs achètent en continu. La vitesse de vidage varie fortement selon l'objet et sa popularité — un Camel Plushie (UAE) peut se vider en <b style="color:var(--accent2)">~33 minutes</b>, un Tribulus Omanense (UAE) en <b style="color:var(--accent2)">~6 heures</b>.</div>
+      </div>
+      <div class="param-row">
+        <div class="param-name">3. Attente du tick</div>
+        <div class="param-desc">Dès que le stock atteint zéro, le jeu ne restock <i>pas</i> immédiatement. Il attend le prochain <b style="color:var(--text)">tick TCT</b> — les horaires <b style="color:var(--accent)">XX:00, XX:15, XX:30, XX:45</b> en Torn City Time (UTC). L'attente peut donc aller de quelques secondes à 14 minutes.</div>
+      </div>
+      <div class="param-row">
+        <div class="param-name">4. Restock aléatoire</div>
+        <div class="param-desc">Le tick ne déclenche pas un restock instantané — il ouvre une fenêtre pendant laquelle le restock peut se produire. En pratique, le restock arrive <b style="color:var(--accent2)">quelques minutes après le tick</b>, avec un délai variable.</div>
+      </div>
+    </div>
+
+    <!-- Timeline texte du cycle -->
+    <div class="text-timeline reveal">
+      <div class="tt-item">
+        <div class="tt-dot"><div class="tt-dot-inner"></div></div>
+        <div class="tt-content">
+          <div class="tt-time">Phase 1</div>
+          <div class="tt-title">Stock plein — 2 500 unités</div>
+          <div class="tt-desc">La boutique vient d'être restockée. Les joueurs commencent à acheter.</div>
+        </div>
+      </div>
+      <div class="tt-item">
+        <div class="tt-dot orange"><div class="tt-dot-inner"></div></div>
+        <div class="tt-content">
+          <div class="tt-time">Phase 2 — durée variable</div>
+          <div class="tt-title">Vidage progressif</div>
+          <div class="tt-desc">Le stock descend selon la popularité de l'item. Camel Plushie : ~33 min. Tribulus Omanense : ~6h.</div>
+        </div>
+      </div>
+      <div class="tt-item">
+        <div class="tt-dot orange"><div class="tt-dot-inner"></div></div>
+        <div class="tt-content">
+          <div class="tt-time">Phase 3 — jusqu'à 14 min</div>
+          <div class="tt-title">Attente du tick TCT</div>
+          <div class="tt-desc">Stock = 0. Le jeu attend le prochain multiple de 15 min en Torn City Time (UTC) : XX:00, XX:15, XX:30 ou XX:45.</div>
+        </div>
+      </div>
+      <div class="tt-item">
+        <div class="tt-dot blue"><div class="tt-dot-inner"></div></div>
+        <div class="tt-content">
+          <div class="tt-time">Phase 4 — quelques minutes</div>
+          <div class="tt-title">Restock aléatoire post-tick</div>
+          <div class="tt-desc">Après le tick, le restock arrive avec un délai aléatoire. Observé : ~14 min pour le Camel Plushie, ~1h pour le Tribulus.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Illustration graphique du cycle -->
+    <div style="margin:2.5rem 0;background:var(--card);border:1px solid var(--border);padding:2rem">
+      <div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:1.25rem">Cycle type — Camel Plushie (UAE)</div>
+      <div style="position:relative;height:90px;margin-bottom:1.5rem">
+        <svg viewBox="0 0 800 90" style="width:100%;height:100%" preserveAspectRatio="none">
+          <!-- Grille -->
+          <line x1="0" y1="70" x2="800" y2="70" stroke="#2a2a2a" stroke-width="1"/>
+          <line x1="0" y1="10" x2="800" y2="10" stroke="#2a2a2a" stroke-width="0.5" stroke-dasharray="4,4"/>
+          <!-- Courbe de stock : descente, zéro, tick, restock, re-descente -->
+          <polyline points="0,10 260,68 260,70 350,70 420,10 640,68 640,70 730,70 800,14"
+            fill="none" stroke="#4fc3f7" stroke-width="2"/>
+          <polygon points="0,10 260,68 260,70 0,70"
+            fill="rgba(79,195,247,0.07)"/>
+          <polygon points="420,10 640,68 640,70 420,70"
+            fill="rgba(79,195,247,0.07)"/>
+          <!-- Tick markers -->
+          <line x1="350" y1="10" x2="350" y2="80" stroke="#c8f542" stroke-width="1" stroke-dasharray="3,3"/>
+          <line x1="730" y1="10" x2="730" y2="80" stroke="#c8f542" stroke-width="1" stroke-dasharray="3,3"/>
+          <!-- Zone attente tick -->
+          <rect x="260" y="10" width="90" height="60" fill="rgba(245,166,35,0.07)"/>
+          <rect x="640" y="10" width="90" height="60" fill="rgba(245,166,35,0.07)"/>
+          <!-- Labels Y -->
+          <text x="6" y="14" font-size="8" fill="#888882" font-family="monospace">2500</text>
+          <text x="6" y="74" font-size="8" fill="#888882" font-family="monospace">0</text>
+        </svg>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:1.5rem;font-size:11px;color:var(--muted)">
+        <span style="display:flex;align-items:center;gap:6px"><span style="display:inline-block;width:20px;height:2px;background:#4fc3f7"></span>Stock</span>
+        <span style="display:flex;align-items:center;gap:6px"><span style="display:inline-block;width:20px;height:2px;background:#c8f542;border-top:2px dashed #c8f542"></span>Tick TCT (XX:00 / XX:15 / XX:30 / XX:45)</span>
+        <span style="display:flex;align-items:center;gap:6px"><span style="display:inline-block;width:20px;height:10px;background:rgba(245,166,35,0.15);border:1px solid rgba(245,166,35,0.3)"></span>Fenêtre d'attente tick</span>
+      </div>
+    </div>
+
+    <!-- Formule -->
+    <p style="font-size:13px;color:var(--muted);line-height:1.9;margin-bottom:1rem;max-width:700px">
+      Le modèle simule ce cycle minute par minute à partir du dernier snapshot YATA, jusqu'à l'heure d'arrivée estimée :
+    </p>
+    <div class="math-block reveal" id="stockFormula"></div>
+    <p style="font-size:12px;color:var(--muted);line-height:1.9;margin-top:.5rem;margin-bottom:2.5rem;max-width:700px">
+      où <span style="color:var(--text)">δ = Q<sub>restock</sub> / T<sub>vidage</sub></span> est la vitesse de vidage en unités par minute, propre à chaque objet. Lorsque le stock atteint zéro, le modèle attend le prochain tick TCT puis simule le délai de restock.
+    </p>
+
+    <!-- Probabilité de disponibilité -->
+    <div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem">Conversion stock estimé → probabilité</div>
+    <table class="data-table reveal">
+      <thead><tr><th>Stock estimé à l'arrivée</th><th>Probabilité affichée</th><th>Label</th></tr></thead>
+      <tbody>
+        <tr><td class="hl">&gt; 50 % du max</td><td>90 %</td><td class="muted">~N en stock</td></tr>
+        <tr><td>&gt; 100 unités</td><td>65 %</td><td class="muted">stock faible</td></tr>
+        <tr><td>&gt; 0 mais très bas</td><td>30 %</td><td class="muted">stock très faible</td></tr>
+        <tr><td class="hl2">0 — restock imminent</td><td>55 %</td><td class="muted">restock probable à l'arrivée</td></tr>
+        <tr><td>0 — restock lointain</td><td>15 %</td><td class="muted">stock vide, restock lointain</td></tr>
+      </tbody>
+    </table>
+
+    <!-- Collecte de données -->
+    <div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin:2rem 0 1rem">Calibration du modèle — collecte de données réelles</div>
+    <p style="font-size:13px;color:var(--muted);line-height:1.9;margin-bottom:1.5rem;max-width:700px">
+      Les paramètres T<sub>vidage</sub> de chaque objet ne sont pas connus a priori. L'API YATA ne fournit qu'un snapshot instantané (quantité au moment du dernier relevé), pas d'historique. Pour calibrer le modèle, un script de collecte automatique a été développé :
+    </p>
+
+    <div class="inspo-grid reveal">
+      <div class="inspo-item">
+        <div class="inspo-tag">Collecte</div>
+        <div class="inspo-title">Polling YATA toutes les 6 min</div>
+        <div class="inspo-desc">L'API YATA impose une limite de 10 appels/heure par IP. Le tracker appelle l'API toutes les ~370 secondes et accumule les points <code>(timestamp, quantité)</code> dans un fichier JSON local.</div>
+      </div>
+      <div class="inspo-item">
+        <div class="inspo-tag">Détection</div>
+        <div class="inspo-title">Cycles vidage/restock</div>
+        <div class="inspo-desc">Chaque descente continue vers zéro est identifiée comme un cycle de vidage. La remontée brusque suivante signe le restock. Sur 24h de collecte (~240 points par item), plusieurs cycles complets sont mesurés.</div>
+      </div>
+      <div class="inspo-item">
+        <div class="inspo-tag">Résultat</div>
+        <div class="inspo-title">Paramètres réels par item</div>
+        <div class="inspo-desc">Après une nuit de collecte : T<sub>vidage</sub> moyen, délai moyen avant restock, délai entre tick TCT et restock effectif. Ces valeurs remplacent les estimations manuelles dans <code>data.js</code>.</div>
+      </div>
+    </div>
+
+    <!-- Code block tracker -->
+    <div class="code-block reveal">
+      <span class="cb-lang">Python</span>
+      <pre><span class="code-cm"># Lancement — Mac (empêche la mise en veille)</span>
+<span class="code-fn">caffeinate</span> -i <span class="code-fn">python</span> yata_tracker.py
+
+<span class="code-cm"># Sortie console toutes les ~6 minutes</span>
+[23:14:02] Appel #1... <span class="code-str">+47 pts</span> | 47 total | 23 items | prochain dans 370s
+[23:20:12] Appel #2... <span class="code-str">+12 pts</span> | 59 total | 23 items | prochain dans 370s
+<span class="code-cm">...</span>
+
+<span class="code-cm"># Ctrl+C le matin → analyse + graphes automatiques</span>
+<span class="code-kw">Camel Plushie</span> (UAE) : 240 pts | vidage ~<span class="code-num">33</span> min | restock ~<span class="code-num">14</span> min</pre>
+    </div>
+
+    <!-- Bouton download -->
+    <div class="dl-btn-group reveal">
+      <a href="yata_tracker.py" download class="dl-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Télécharger yata_tracker.py
+      </a>
+      <a href="https://r0binetterie.github.io/" target="_blank" class="dl-btn" style="border-color:var(--accent);color:var(--accent)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        Ouvrir l'outil ↗
+      </a>
+    </div>
+
+    <!-- Placeholder graphe collecté -->
+    <div class="reveal">
+      <div class="img-placeholder" style="aspect-ratio:3/1">
+        <div class="img-placeholder-icon">📊</div>
+        <div class="img-placeholder-label">Graphe — Résultats de collecte YATA</div>
+        <div class="img-placeholder-sub">courbes de stock sur 24h par item / à remplacer après la nuit de collecte</div>
+      </div>
+      <p class="screenshot-caption">Courbes générées par <code>yata_tracker.py --plot</code> après une nuit de polling. Chaque pic correspond à un restock, chaque descente à un cycle de vidage.</p>
+    </div>
+
+    <div style="margin-top:1.5rem;background:var(--card);border:1px solid var(--border);border-left:3px solid var(--accent3);padding:1.5rem">
+      <div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent3);margin-bottom:.75rem">Données collectées — exemples UAE</div>
+      <table class="data-table" style="margin-bottom:0">
+        <thead><tr><th>Item</th><th>T<sub>vidage</sub> moyen</th><th>Délai restock</th><th>Source</th></tr></thead>
+        <tbody>
+          <tr><td>Camel Plushie</td><td class="hl">~33 min</td><td class="muted">~14 min après vidage</td><td class="muted">Mesure graphique weav3r.dev</td></tr>
+          <tr><td>Tribulus Omanense</td><td class="hl">~6 h</td><td class="muted">~1 h après vidage</td><td class="muted">Mesure graphique weav3r.dev</td></tr>
+          <tr><td>Autres items</td><td class="muted">En cours</td><td class="muted">—</td><td class="muted">Tracker Python (nuit de collecte)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="reveal" style="margin-top:2rem">
+      <div class="img-placeholder" style="aspect-ratio:16/7">
+        <div class="img-placeholder-icon">📈</div>
+        <div class="img-placeholder-label">Screenshot — Timeline stock + détail profit</div>
+        <div class="img-placeholder-sub">torn_screenshot_stock.png</div>
+      </div>
+      <p class="screenshot-caption">Timeline d'un run UAE : courbe de stock estimée entre le départ et l'arrivée, barres verticales pour chaque tick TCT, et décomposition du calcul de profit — <b>brut → ajusté par la probabilité → net après frais de vol</b>.</p>
+    </div>
+
+    <div class="specs-grid reveal">
+      <div>
+        <div class="spec-row"><span class="spec-key">Données d'entrée</span><span class="spec-val">Snapshot YATA + timestamp</span></div>
+        <div class="spec-row"><span class="spec-key">Simulation</span><span class="spec-val">Minute par minute jusqu'à arrivée</span></div>
+        <div class="spec-row"><span class="spec-key">Ticks TCT</span><span class="spec-val">XX:00 / XX:15 / XX:30 / XX:45 UTC</span></div>
+      </div>
+      <div>
+        <div class="spec-row"><span class="spec-key">Sortie</span><span class="spec-val hl">Probabilité de disponibilité (0–100 %)</span></div>
+        <div class="spec-row"><span class="spec-key">Sortie</span><span class="spec-val">Label lisible par état du stock</span></div>
+        <div class="spec-row"><span class="spec-key">Calibration</span><span class="spec-val">Script Python — polling YATA 10×/h</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 ALGORITHME D'OPTIMISATION -->
+  <section class="section reveal" id="sec-algo">
+    <div class="section-header">
+      <span class="section-num">05</span>
+      <h2 class="section-title">Algorithme d'optimisation</h2>
+    </div>
+    <p class="section-sub">Pour chaque pays non exclu, l'outil calcule combien d'allers-retours tiennent dans la session, puis répartit la capacité de valise sur les objets les plus rentables.</p>
+
+    <div class="param-list reveal">
+      <div class="param-row">
+        <div class="param-name">1. Trips possibles</div>
+        <div class="param-desc">Temps de vol aller-retour + marge, divisé dans la durée de session. Option "finir le voyage à l'étranger" pour ne pas décompter le dernier retour.</div>
+      </div>
+      <div class="param-row">
+        <div class="param-name">2. Tri par rentabilité</div>
+        <div class="param-desc">Les objets disponibles dans le pays sont triés par profit unitaire (prix de revente − prix d'achat), prix de marché temps réel si la clé API est fournie.</div>
+      </div>
+      <div class="param-row">
+        <div class="param-name">3. Allocation de la valise</div>
+        <div class="param-desc">La capacité de base va à l'objet le plus rentable ; les bonus de job (Toy Shop, Flower Shop) s'ajoutent uniquement sur leur catégorie d'objet correspondante.</div>
+      </div>
+      <div class="param-row">
+        <div class="param-name">4. Profit ajusté</div>
+        <div class="param-desc">Le profit brut est pondéré par la probabilité de disponibilité du stock à l'arrivée, puis multiplié par le nombre de trips, moins le coût total des vols.</div>
+      </div>
+      <div class="param-row">
+        <div class="param-name">5. Classement final</div>
+        <div class="param-desc">Les pays sont classés par profit total sur la session, avec le détail de chaque run et une timeline des départs/arrivées.</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="cat-sep reveal"><div class="cat-sep-line"></div><div class="cat-sep-label">Interface</div></div>
+
+  <!-- 06 PARAMÈTRES -->
+  <section class="section reveal" id="sec-ui">
+    <div class="section-header">
+      <span class="section-num">06</span>
+      <h2 class="section-title">Paramètres &amp; réglages</h2>
+    </div>
+    <p class="section-sub">Une sidebar de paramètres à gauche, les résultats classés à droite — pensé pour être réglé une fois par session puis rafraîchi au fil du jeu.</p>
+
+    <div class="reveal">
+      <div class="img-placeholder" style="aspect-ratio:16/9">
+        <div class="img-placeholder-icon">🖥</div>
+        <div class="img-placeholder-label">Screenshot — Interface complète</div>
+        <div class="img-placeholder-sub">torn_screenshot_ui.png</div>
+      </div>
+      <p class="screenshot-caption">Vue d'ensemble : paramètres de session à gauche, meilleur run mis en avant avec sa timeline, puis le classement des autres destinations par profit.</p>
+    </div>
+
+    <div class="inspo-grid reveal">
+      <div class="inspo-item">
+        <div class="inspo-tag">Session</div>
+        <div class="inspo-title">Départ, durée, budget</div>
+        <div class="inspo-desc">Départ immédiat ou programmé, durée de session (1 à 24h), budget maximum par aller-retour.</div>
+      </div>
+      <div class="inspo-item">
+        <div class="inspo-tag">Voyage</div>
+        <div class="inspo-title">Mode, valise, bonus</div>
+        <div class="inspo-desc">Standard / Airstrip / WLT / Business Class, taille de valise, bonus faction (Excursion +10) et bonus de job (Toy Shop, Flower Shop, Lingerie Store, Cruise Line).</div>
+      </div>
+      <div class="inspo-item">
+        <div class="inspo-tag">Filtres</div>
+        <div class="inspo-title">Pays, objets, fraîcheur</div>
+        <div class="inspo-desc">Exclusion de pays au clic, filtre par type d'objet (peluches/fleurs/drogues), durée mini de vol, nombre max de trips, fraîcheur maximale des données YATA acceptée.</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="cat-sep reveal"><div class="cat-sep-line"></div><div class="cat-sep-label">Bilan</div></div>
+
+  <!-- 07 LIMITES -->
+  <section class="section reveal" id="sec-limits">
+    <div class="section-header">
+      <span class="section-num">07</span>
+      <h2 class="section-title">Limites &amp; pistes</h2>
+    </div>
+    <p class="section-sub">Un outil utile mais qui reste une estimation — pas un accès temps réel garanti à l'état du jeu.</p>
+
+    <div class="limit-list reveal">
+      <div class="limit-item">
+        <span class="limit-icon">Limite</span>
+        <div class="limit-body">
+          <div class="limit-title">Estimation, pas certitude</div>
+          <div class="limit-desc">Le modèle de stock est une simulation probabiliste basée sur le dernier relevé YATA — pas un accès temps réel à l'état exact du stock à l'étranger.</div>
+        </div>
+      </div>
+      <div class="limit-item">
+        <span class="limit-icon">Limite</span>
+        <div class="limit-body">
+          <div class="limit-title">Prix de base manuels</div>
+          <div class="limit-desc">Sans clé API, les prix de revente viennent d'une base statique mise à jour à la main — ils peuvent dériver du marché réel avec le temps.</div>
+        </div>
+      </div>
+      <div class="limit-item">
+        <span class="limit-icon">Piste</span>
+        <div class="limit-body">
+          <div class="limit-title">World Travel Day non automatisé</div>
+          <div class="limit-desc">Le doublement de capacité pendant l'événement World Travel Day n'est pas encore pris en compte dans le calcul — à ajuster manuellement pour l'instant.</div>
+        </div>
+      </div>
+      <div class="limit-item">
+        <span class="limit-icon">Piste</span>
+        <div class="limit-body">
+          <div class="limit-title">Historique des runs</div>
+          <div class="limit-desc">Garder une trace des sessions passées pour comparer le profit estimé au profit réellement obtenu, et affiner le modèle de stock avec le temps.</div>
+        </div>
+      </div>
+      <div class="limit-item">
+        <span class="limit-icon">Piste</span>
+        <div class="limit-body">
+          <div class="limit-title">Rafraîchissement automatique</div>
+          <div class="limit-desc">Notification ou rafraîchissement périodique des stocks YATA en arrière-plan, sans action manuelle.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 08 STACK TECHNIQUE -->
+  <section class="section reveal" id="sec-stack">
+    <div class="section-header">
+      <span class="section-num">08</span>
+      <h2 class="section-title">Stack technique</h2>
+    </div>
+
+    <div class="specs-grid reveal">
+      <div>
+        <div class="spec-row"><span class="spec-key">Frontend</span><span class="spec-val">HTML / CSS / JS vanilla</span></div>
+        <div class="spec-row"><span class="spec-key">Dépendances</span><span class="spec-val hl">Aucune</span></div>
+        <div class="spec-row"><span class="spec-key">Hébergement</span><span class="spec-val">GitHub Pages</span></div>
+      </div>
+      <div>
+        <div class="spec-row"><span class="spec-key">Stockage clé API</span><span class="spec-val">sessionStorage</span></div>
+        <div class="spec-row"><span class="spec-key">Cache stocks</span><span class="spec-val">localStorage</span></div>
+        <div class="spec-row"><span class="spec-key">Dépôt</span><span class="spec-val"><a href="https://r0binetterie.github.io/" target="_blank" style="color:var(--accent);text-decoration:none">r0binetterie.github.io ↗</a></span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 09 CONTRIBUER -->
+  <section class="section reveal" id="sec-contribute" style="border-bottom:none">
+    <div class="section-header">
+      <span class="section-num">09</span>
+      <h2 class="section-title">Contribuer</h2>
+    </div>
+    <p class="section-sub">Le projet est ouvert — code, données et idées bienvenus.</p>
+
+    <div class="contribute-box reveal">
+      <h3>Envie de participer ?</h3>
+      <p>
+        Que ce soit pour aider au développement (nouvelles fonctionnalités, corrections, refonte de l'algorithme d'allocation) ou pour contribuer des données — par exemple des statistiques réelles de restock par pays et par objet pour affiner le modèle de stock — toute contribution est la bienvenue.
+      </p>
+      <div class="contribute-list">
+        <span>Développement</span>
+        <span>Statistiques de restock</span>
+        <span>Données de prix</span>
+        <span>Retours d'usage</span>
+      </div>
+      <a href="https://r0binetterie.github.io/" target="_blank" class="contribute-btn">Voir le dépôt ↗</a>
+    </div>
+  </section>
+
+  </div><!-- fin colonne principale -->
+</div><!-- fin page-wrap -->
+
+<footer>
+  <span>Robin Bonfill — Torn Travel Optimizer</span>
+  <span>Projet en ligne — 2026</span>
+</footer>
+
+<script>
+  const cursor=document.getElementById('cursor');
+  document.addEventListener('mousemove',e=>{cursor.style.left=e.clientX+'px';cursor.style.top=e.clientY+'px'});
+  const bar=document.getElementById('progressBar');
+  window.addEventListener('scroll',()=>{const max=document.body.scrollHeight-window.innerHeight;bar.style.width=(window.scrollY/max*100)+'%'});
+  const reveals=document.querySelectorAll('.reveal');
+  const ro=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');ro.unobserve(e.target)}})},{threshold:.07});
+  reveals.forEach(el=>ro.observe(el));
+
+  // Sommaire actif
+  const tocLinks=document.querySelectorAll('.toc-item a');
+  const sections=document.querySelectorAll('section[id]');
+  const tocObs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        tocLinks.forEach(l=>l.classList.remove('active'));
+        const active=document.querySelector(`.toc-item a[href="#${e.target.id}"]`);
+        if(active)active.classList.add('active');
+      }
+    });
+  },{rootMargin:'-20% 0px -60% 0px'});
+  sections.forEach(s=>tocObs.observe(s));
+
+  // KaTeX — formule du modèle de vidage/restock
+  if(window.katex){
+    katex.render(
+      "\\text{stock}(t+\\Delta t) = \\max\\left(0,\\ \\text{stock}(t) - \\delta \\cdot \\Delta t\\right), \\qquad \\delta = \\frac{Q_{restock}}{T_{vidage}}",
+      document.getElementById('stockFormula'),
+      { throwOnError:false, displayMode:true }
+    );
+  }
+
+  // Animation canvas hero — avion qui traverse en pointillés
+  (function(){
+    const cv=document.getElementById('heroCanvas');
+    if(!cv)return;
+    if(window.getComputedStyle(cv).display==='none')return;
+    function resize(){
+      const r=cv.getBoundingClientRect();
+      if(r.width===0||r.height===0)return;
+      cv.width=r.width;cv.height=r.height;
+    }
+    requestAnimationFrame(()=>{resize();loop();});
+    window.addEventListener('resize',resize);
+    const ctx=cv.getContext('2d');
+    let t=0,running=true;
+    const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{running=e.isIntersecting;});},{threshold:.01});
+    obs.observe(cv.parentElement);
+
+    function draw(){
+      if(cv.width===0||cv.height===0){resize();return;}
+      const W=cv.width,H=cv.height;
+      ctx.clearRect(0,0,W,H);
+
+      // Grille façon plan de vol
+      ctx.strokeStyle='#1a1a1a';ctx.lineWidth=.5;
+      const s=40;
+      for(let x=0;x<W;x+=s){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+      for(let y=0;y<H;y+=s){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+
+      // Trajectoire en arc (départ bas-gauche, arrivée bas-droite)
+      const x0=W*.12,y0=H*.78,x1=W*.88,y1=H*.78,apexY=H*.22;
+      function bez(t){
+        const cx=W*.5,cy=apexY;
+        const x=(1-t)*(1-t)*x0+2*(1-t)*t*cx+t*t*x1;
+        const y=(1-t)*(1-t)*y0+2*(1-t)*t*cy+t*t*y1;
+        return{x,y};
+      }
+
+      ctx.setLineDash([4,7]);
+      ctx.strokeStyle='rgba(200,245,66,.25)';
+      ctx.lineWidth=1.5;
+      ctx.beginPath();
+      for(let i=0;i<=40;i++){const p=bez(i/40); if(i===0)ctx.moveTo(p.x,p.y); else ctx.lineTo(p.x,p.y);}
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Points de départ / arrivée
+      function dot(x,y,r,col){ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fillStyle=col;ctx.fill();}
+      dot(x0,y0,4,'rgba(200,245,66,.6)');
+      dot(x1,y1,4,'rgba(245,166,35,.7)');
+
+      // Avion qui avance en boucle le long de la courbe
+      const progress=(t%240)/240;
+      const p=bez(progress);
+      const p2=bez(Math.min(progress+0.01,1));
+      const angle=Math.atan2(p2.y-p.y,p2.x-p.x);
+
+      ctx.save();
+      ctx.translate(p.x,p.y);
+      ctx.rotate(angle);
+      ctx.fillStyle='#c8f542';
+      ctx.beginPath();
+      ctx.moveTo(10,0);
+      ctx.lineTo(-8,-5);
+      ctx.lineTo(-4,0);
+      ctx.lineTo(-8,5);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+
+      ctx.font='9px DM Mono,monospace';
+      ctx.fillStyle='rgba(200,245,66,.25)';
+      ctx.fillText('FLIGHT PLANNER',x0-10,y0+22);
+
+      t++;
+      if(running)requestAnimationFrame(draw);
+    }
+    function loop(){requestAnimationFrame(draw);}
+  })();
+</script>
+</body>
+</html>
