@@ -147,74 +147,6 @@
   .fade-in{animation:fadeUp .7s ease forwards}
   @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
 
-  /* STATS CHIFFRES */
-  .big-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:2.5rem}
-  .big-stat{background:var(--card);padding:2rem 1.5rem;display:flex;flex-direction:column;gap:.5rem}
-  .big-stat-val{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(28px,4vw,48px);line-height:1;color:var(--accent)}
-  .big-stat-val.orange{color:var(--accent2)}
-  .big-stat-val.blue{color:var(--accent3)}
-  .big-stat-val.white{color:var(--text)}
-  .big-stat-label{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
-
-  /* BLOC CODE */
-  .code-block{background:#0a0a0a;border:1px solid var(--border);border-left:3px solid var(--accent3);padding:1.25rem 1.5rem;margin:1.5rem 0;overflow-x:auto;position:relative}
-  .code-block pre{font-family:'DM Mono',monospace;font-size:12px;line-height:1.9;color:#c8c8c0;margin:0}
-  .code-block .cb-lang{position:absolute;top:10px;right:14px;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--accent3)}
-  .code-kw{color:#c8f542}
-  .code-str{color:#f5a623}
-  .code-cm{color:#555b70;font-style:italic}
-  .code-fn{color:#4fc3f7}
-  .code-num{color:#e06c75}
-
-  /* DOWNLOAD BUTTON */
-  .dl-btn{
-    display:inline-flex;align-items:center;gap:10px;
-    padding:.9rem 1.75rem;background:transparent;
-    border:1px solid var(--accent3);color:var(--accent3);
-    text-decoration:none;font-size:12px;letter-spacing:.08em;text-transform:uppercase;
-    transition:background .2s,color .2s;cursor:pointer;font-family:'DM Mono',monospace;
-  }
-  .dl-btn:hover{background:var(--accent3);color:#0f0f0f}
-  .dl-btn svg{flex-shrink:0}
-  .dl-btn-group{display:flex;flex-wrap:wrap;gap:12px;margin:1.5rem 0 2.5rem}
-
-  /* IMAGE PLACEHOLDER */
-  .img-placeholder{
-    width:100%;aspect-ratio:16/9;
-    background:var(--card);border:1px dashed var(--border);
-    display:flex;flex-direction:column;align-items:center;justify-content:center;
-    gap:.75rem;margin-bottom:.75rem;position:relative;overflow:hidden;
-  }
-  .img-placeholder::before{
-    content:'';position:absolute;inset:0;
-    background:repeating-linear-gradient(45deg,transparent,transparent 20px,rgba(255,255,255,.015) 20px,rgba(255,255,255,.015) 21px);
-  }
-  .img-placeholder-icon{font-size:28px;opacity:.25}
-  .img-placeholder-label{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);opacity:.6}
-  .img-placeholder-sub{font-size:10px;color:var(--border);font-style:italic}
-
-  /* QUOTE / HIGHLIGHT */
-  .pull-quote{
-    border-left:3px solid var(--accent2);
-    padding:1.25rem 1.5rem;margin:2rem 0;
-    background:rgba(245,166,35,.04);
-  }
-  .pull-quote p{font-size:14px;color:var(--text);line-height:1.85;font-style:italic}
-  .pull-quote cite{display:block;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:.75rem;font-style:normal}
-
-  /* TIMELINE TEXTE */
-  .text-timeline{display:flex;flex-direction:column;gap:0;margin:1.5rem 0 2.5rem;position:relative}
-  .text-timeline::before{content:'';position:absolute;left:8px;top:8px;bottom:8px;width:1px;background:var(--border)}
-  .tt-item{display:flex;gap:1.25rem;padding:.75rem 0;position:relative}
-  .tt-dot{width:17px;height:17px;border-radius:50%;background:var(--card);border:1px solid var(--accent);flex-shrink:0;margin-top:3px;display:flex;align-items:center;justify-content:center}
-  .tt-dot-inner{width:5px;height:5px;border-radius:50%;background:var(--accent)}
-  .tt-dot.orange{border-color:var(--accent2)}.tt-dot.orange .tt-dot-inner{background:var(--accent2)}
-  .tt-dot.blue{border-color:var(--accent3)}.tt-dot.blue .tt-dot-inner{background:var(--accent3)}
-  .tt-content{flex:1}
-  .tt-time{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.25rem}
-  .tt-title{font-family:'Syne',sans-serif;font-weight:700;font-size:13px;color:var(--text);margin-bottom:.25rem}
-  .tt-desc{font-size:12px;color:var(--muted);line-height:1.7}
-
   /* FOOTER */
   footer{border-top:1px solid var(--border);padding:2rem 3rem;display:flex;justify-content:space-between;font-size:11px;color:var(--muted);letter-spacing:.06em}
 
@@ -371,38 +303,6 @@
     </div>
   </section>
 
-  <!-- STATS CHIFFRES -->
-  <div style="padding:0 0 0 3rem;border-bottom:1px solid var(--border)">
-    <div class="big-stats reveal">
-      <div class="big-stat">
-        <div class="big-stat-val">11</div>
-        <div class="big-stat-label">Destinations</div>
-      </div>
-      <div class="big-stat">
-        <div class="big-stat-val orange">~30+</div>
-        <div class="big-stat-label">Items trackés</div>
-      </div>
-      <div class="big-stat">
-        <div class="big-stat-val blue">4</div>
-        <div class="big-stat-label">Modes de vol</div>
-      </div>
-      <div class="big-stat">
-        <div class="big-stat-val white">0</div>
-        <div class="big-stat-label">Dépendances JS</div>
-      </div>
-    </div>
-
-    <!-- Placeholder screenshot interface -->
-    <div class="reveal" style="margin-bottom:2.5rem">
-      <div class="img-placeholder" style="aspect-ratio:21/9">
-        <div class="img-placeholder-icon">🖥</div>
-        <div class="img-placeholder-label">Screenshot — Interface principale</div>
-        <div class="img-placeholder-sub">sidebar paramètres · timeline meilleur run · classement destinations</div>
-      </div>
-      <p class="screenshot-caption">Vue d'ensemble de l'outil : paramètres à gauche, <b>timeline horizontale</b> du meilleur run au centre, classement des autres destinations en dessous.</p>
-    </div>
-  </div>
-
   <!-- 02 CE QUE CALCULE L'OUTIL -->
   <section class="section reveal" id="sec-outil">
     <div class="section-header">
@@ -457,11 +357,6 @@
       </div>
     </div>
 
-    <div class="pull-quote reveal">
-      <p>L'API YATA retourne un seul snapshot par pays — la quantité au moment où le dernier joueur a atterri et soumis ses données. Ce n'est pas un flux temps réel : la fraîcheur varie de quelques minutes à plusieurs heures selon la popularité de la destination.</p>
-      <cite>Limite principale — YATA /api/v1/travel/export/</cite>
-    </div>
-
     <div class="country-grid reveal">
       <div class="country-item"><span class="country-name">Mexique</span><span class="country-meta"><b>20 min</b> · $5 000</span></div>
       <div class="country-item"><span class="country-name">Canada</span><span class="country-meta"><b>37 min</b> · $7 500</span></div>
@@ -485,213 +380,25 @@
     </div>
     <p class="section-sub">Le stock YATA n'est pas mis à jour en continu — il faut donc estimer où en sera le stock au moment réel de l'arrivée, pas au moment de la requête.</p>
 
-    <!-- Mécanique réelle du jeu -->
-    <p style="font-size:13px;color:var(--muted);line-height:1.9;margin-bottom:2rem;max-width:700px">
-      Comprendre le modèle commence par comprendre la mécanique réelle du jeu. Les stocks à l'étranger ne sont pas continus — ils suivent un cycle précis en quatre phases.
-    </p>
-
-    <div class="param-list reveal">
-      <div class="param-row">
-        <div class="param-name">1. Stock plein</div>
-        <div class="param-desc">À chaque restock, la boutique reçoit <b style="color:var(--text)">2 500 unités</b> pour les peluches et les fleurs (quantité fixe, indépendante de la demande). Les drogues ont des quantités et des cycles différents.</div>
-      </div>
-      <div class="param-row">
-        <div class="param-name">2. Vidage progressif</div>
-        <div class="param-desc">Les joueurs achètent en continu. La vitesse de vidage varie fortement selon l'objet et sa popularité — un Camel Plushie (UAE) peut se vider en <b style="color:var(--accent2)">~33 minutes</b>, un Tribulus Omanense (UAE) en <b style="color:var(--accent2)">~6 heures</b>.</div>
-      </div>
-      <div class="param-row">
-        <div class="param-name">3. Attente du tick</div>
-        <div class="param-desc">Dès que le stock atteint zéro, le jeu ne restock <i>pas</i> immédiatement. Il attend le prochain <b style="color:var(--text)">tick TCT</b> — les horaires <b style="color:var(--accent)">XX:00, XX:15, XX:30, XX:45</b> en Torn City Time (UTC). L'attente peut donc aller de quelques secondes à 14 minutes.</div>
-      </div>
-      <div class="param-row">
-        <div class="param-name">4. Restock aléatoire</div>
-        <div class="param-desc">Le tick ne déclenche pas un restock instantané — il ouvre une fenêtre pendant laquelle le restock peut se produire. En pratique, le restock arrive <b style="color:var(--accent2)">quelques minutes après le tick</b>, avec un délai variable.</div>
-      </div>
-    </div>
-
-    <!-- Timeline texte du cycle -->
-    <div class="text-timeline reveal">
-      <div class="tt-item">
-        <div class="tt-dot"><div class="tt-dot-inner"></div></div>
-        <div class="tt-content">
-          <div class="tt-time">Phase 1</div>
-          <div class="tt-title">Stock plein — 2 500 unités</div>
-          <div class="tt-desc">La boutique vient d'être restockée. Les joueurs commencent à acheter.</div>
-        </div>
-      </div>
-      <div class="tt-item">
-        <div class="tt-dot orange"><div class="tt-dot-inner"></div></div>
-        <div class="tt-content">
-          <div class="tt-time">Phase 2 — durée variable</div>
-          <div class="tt-title">Vidage progressif</div>
-          <div class="tt-desc">Le stock descend selon la popularité de l'item. Camel Plushie : ~33 min. Tribulus Omanense : ~6h.</div>
-        </div>
-      </div>
-      <div class="tt-item">
-        <div class="tt-dot orange"><div class="tt-dot-inner"></div></div>
-        <div class="tt-content">
-          <div class="tt-time">Phase 3 — jusqu'à 14 min</div>
-          <div class="tt-title">Attente du tick TCT</div>
-          <div class="tt-desc">Stock = 0. Le jeu attend le prochain multiple de 15 min en Torn City Time (UTC) : XX:00, XX:15, XX:30 ou XX:45.</div>
-        </div>
-      </div>
-      <div class="tt-item">
-        <div class="tt-dot blue"><div class="tt-dot-inner"></div></div>
-        <div class="tt-content">
-          <div class="tt-time">Phase 4 — quelques minutes</div>
-          <div class="tt-title">Restock aléatoire post-tick</div>
-          <div class="tt-desc">Après le tick, le restock arrive avec un délai aléatoire. Observé : ~14 min pour le Camel Plushie, ~1h pour le Tribulus.</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Illustration graphique du cycle -->
-    <div style="margin:2.5rem 0;background:var(--card);border:1px solid var(--border);padding:2rem">
-      <div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:1.25rem">Cycle type — Camel Plushie (UAE)</div>
-      <div style="position:relative;height:90px;margin-bottom:1.5rem">
-        <svg viewBox="0 0 800 90" style="width:100%;height:100%" preserveAspectRatio="none">
-          <!-- Grille -->
-          <line x1="0" y1="70" x2="800" y2="70" stroke="#2a2a2a" stroke-width="1"/>
-          <line x1="0" y1="10" x2="800" y2="10" stroke="#2a2a2a" stroke-width="0.5" stroke-dasharray="4,4"/>
-          <!-- Courbe de stock : descente, zéro, tick, restock, re-descente -->
-          <polyline points="0,10 260,68 260,70 350,70 420,10 640,68 640,70 730,70 800,14"
-            fill="none" stroke="#4fc3f7" stroke-width="2"/>
-          <polygon points="0,10 260,68 260,70 0,70"
-            fill="rgba(79,195,247,0.07)"/>
-          <polygon points="420,10 640,68 640,70 420,70"
-            fill="rgba(79,195,247,0.07)"/>
-          <!-- Tick markers -->
-          <line x1="350" y1="10" x2="350" y2="80" stroke="#c8f542" stroke-width="1" stroke-dasharray="3,3"/>
-          <line x1="730" y1="10" x2="730" y2="80" stroke="#c8f542" stroke-width="1" stroke-dasharray="3,3"/>
-          <!-- Zone attente tick -->
-          <rect x="260" y="10" width="90" height="60" fill="rgba(245,166,35,0.07)"/>
-          <rect x="640" y="10" width="90" height="60" fill="rgba(245,166,35,0.07)"/>
-          <!-- Labels Y -->
-          <text x="6" y="14" font-size="8" fill="#888882" font-family="monospace">2500</text>
-          <text x="6" y="74" font-size="8" fill="#888882" font-family="monospace">0</text>
-        </svg>
-      </div>
-      <div style="display:flex;flex-wrap:wrap;gap:1.5rem;font-size:11px;color:var(--muted)">
-        <span style="display:flex;align-items:center;gap:6px"><span style="display:inline-block;width:20px;height:2px;background:#4fc3f7"></span>Stock</span>
-        <span style="display:flex;align-items:center;gap:6px"><span style="display:inline-block;width:20px;height:2px;background:#c8f542;border-top:2px dashed #c8f542"></span>Tick TCT (XX:00 / XX:15 / XX:30 / XX:45)</span>
-        <span style="display:flex;align-items:center;gap:6px"><span style="display:inline-block;width:20px;height:10px;background:rgba(245,166,35,0.15);border:1px solid rgba(245,166,35,0.3)"></span>Fenêtre d'attente tick</span>
-      </div>
-    </div>
-
-    <!-- Formule -->
-    <p style="font-size:13px;color:var(--muted);line-height:1.9;margin-bottom:1rem;max-width:700px">
-      Le modèle simule ce cycle minute par minute à partir du dernier snapshot YATA, jusqu'à l'heure d'arrivée estimée :
-    </p>
-    <div class="math-block reveal" id="stockFormula"></div>
-    <p style="font-size:12px;color:var(--muted);line-height:1.9;margin-top:.5rem;margin-bottom:2.5rem;max-width:700px">
-      où <span style="color:var(--text)">δ = Q<sub>restock</sub> / T<sub>vidage</sub></span> est la vitesse de vidage en unités par minute, propre à chaque objet. Lorsque le stock atteint zéro, le modèle attend le prochain tick TCT puis simule le délai de restock.
-    </p>
-
-    <!-- Probabilité de disponibilité -->
-    <div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem">Conversion stock estimé → probabilité</div>
-    <table class="data-table reveal">
-      <thead><tr><th>Stock estimé à l'arrivée</th><th>Probabilité affichée</th><th>Label</th></tr></thead>
-      <tbody>
-        <tr><td class="hl">&gt; 50 % du max</td><td>90 %</td><td class="muted">~N en stock</td></tr>
-        <tr><td>&gt; 100 unités</td><td>65 %</td><td class="muted">stock faible</td></tr>
-        <tr><td>&gt; 0 mais très bas</td><td>30 %</td><td class="muted">stock très faible</td></tr>
-        <tr><td class="hl2">0 — restock imminent</td><td>55 %</td><td class="muted">restock probable à l'arrivée</td></tr>
-        <tr><td>0 — restock lointain</td><td>15 %</td><td class="muted">stock vide, restock lointain</td></tr>
-      </tbody>
-    </table>
-
-    <!-- Collecte de données -->
-    <div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin:2rem 0 1rem">Calibration du modèle — collecte de données réelles</div>
     <p style="font-size:13px;color:var(--muted);line-height:1.9;margin-bottom:1.5rem;max-width:700px">
-      Les paramètres T<sub>vidage</sub> de chaque objet ne sont pas connus a priori. L'API YATA ne fournit qu'un snapshot instantané (quantité au moment du dernier relevé), pas d'historique. Pour calibrer le modèle, un script de collecte automatique a été développé :
+      À partir du dernier relevé YATA, le stock est simulé minute par minute jusqu'à l'heure d'arrivée estimée : il se vide à un rythme propre à chaque objet, puis se reconstitue après un délai s'il atteint zéro.
     </p>
 
-    <div class="inspo-grid reveal">
-      <div class="inspo-item">
-        <div class="inspo-tag">Collecte</div>
-        <div class="inspo-title">Polling YATA toutes les 6 min</div>
-        <div class="inspo-desc">L'API YATA impose une limite de 10 appels/heure par IP. Le tracker appelle l'API toutes les ~370 secondes et accumule les points <code>(timestamp, quantité)</code> dans un fichier JSON local.</div>
-      </div>
-      <div class="inspo-item">
-        <div class="inspo-tag">Détection</div>
-        <div class="inspo-title">Cycles vidage/restock</div>
-        <div class="inspo-desc">Chaque descente continue vers zéro est identifiée comme un cycle de vidage. La remontée brusque suivante signe le restock. Sur 24h de collecte (~240 points par item), plusieurs cycles complets sont mesurés.</div>
-      </div>
-      <div class="inspo-item">
-        <div class="inspo-tag">Résultat</div>
-        <div class="inspo-title">Paramètres réels par item</div>
-        <div class="inspo-desc">Après une nuit de collecte : T<sub>vidage</sub> moyen, délai moyen avant restock, délai entre tick TCT et restock effectif. Ces valeurs remplacent les estimations manuelles dans <code>data.js</code>.</div>
-      </div>
+    <div class="math-block reveal" id="stockFormula"></div>
+
+    <div class="screenshot-frame reveal">
+      <img src="torn_screenshot_stock.png" alt="Détail du modèle de stock — Xanax en Suisse">
     </div>
-
-    <!-- Code block tracker -->
-    <div class="code-block reveal">
-      <span class="cb-lang">Python</span>
-      <pre><span class="code-cm"># Lancement — Mac (empêche la mise en veille)</span>
-<span class="code-fn">caffeinate</span> -i <span class="code-fn">python</span> yata_tracker.py
-
-<span class="code-cm"># Sortie console toutes les ~6 minutes</span>
-[23:14:02] Appel #1... <span class="code-str">+47 pts</span> | 47 total | 23 items | prochain dans 370s
-[23:20:12] Appel #2... <span class="code-str">+12 pts</span> | 59 total | 23 items | prochain dans 370s
-<span class="code-cm">...</span>
-
-<span class="code-cm"># Ctrl+C le matin → analyse + graphes automatiques</span>
-<span class="code-kw">Camel Plushie</span> (UAE) : 240 pts | vidage ~<span class="code-num">33</span> min | restock ~<span class="code-num">14</span> min</pre>
-    </div>
-
-    <!-- Bouton download -->
-    <div class="dl-btn-group reveal">
-      <a href="yata_tracker.py" download class="dl-btn">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        Télécharger yata_tracker.py
-      </a>
-      <a href="https://r0binetterie.github.io/" target="_blank" class="dl-btn" style="border-color:var(--accent);color:var(--accent)">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-        Ouvrir l'outil ↗
-      </a>
-    </div>
-
-    <!-- Placeholder graphe collecté -->
-    <div class="reveal">
-      <div class="img-placeholder" style="aspect-ratio:3/1">
-        <div class="img-placeholder-icon">📊</div>
-        <div class="img-placeholder-label">Graphe — Résultats de collecte YATA</div>
-        <div class="img-placeholder-sub">courbes de stock sur 24h par item / à remplacer après la nuit de collecte</div>
-      </div>
-      <p class="screenshot-caption">Courbes générées par <code>yata_tracker.py --plot</code> après une nuit de polling. Chaque pic correspond à un restock, chaque descente à un cycle de vidage.</p>
-    </div>
-
-    <div style="margin-top:1.5rem;background:var(--card);border:1px solid var(--border);border-left:3px solid var(--accent3);padding:1.5rem">
-      <div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent3);margin-bottom:.75rem">Données collectées — exemples UAE</div>
-      <table class="data-table" style="margin-bottom:0">
-        <thead><tr><th>Item</th><th>T<sub>vidage</sub> moyen</th><th>Délai restock</th><th>Source</th></tr></thead>
-        <tbody>
-          <tr><td>Camel Plushie</td><td class="hl">~33 min</td><td class="muted">~14 min après vidage</td><td class="muted">Mesure graphique weav3r.dev</td></tr>
-          <tr><td>Tribulus Omanense</td><td class="hl">~6 h</td><td class="muted">~1 h après vidage</td><td class="muted">Mesure graphique weav3r.dev</td></tr>
-          <tr><td>Autres items</td><td class="muted">En cours</td><td class="muted">—</td><td class="muted">Tracker Python (nuit de collecte)</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="reveal" style="margin-top:2rem">
-      <div class="img-placeholder" style="aspect-ratio:16/7">
-        <div class="img-placeholder-icon">📈</div>
-        <div class="img-placeholder-label">Screenshot — Timeline stock + détail profit</div>
-        <div class="img-placeholder-sub">torn_screenshot_stock.png</div>
-      </div>
-      <p class="screenshot-caption">Timeline d'un run UAE : courbe de stock estimée entre le départ et l'arrivée, barres verticales pour chaque tick TCT, et décomposition du calcul de profit — <b>brut → ajusté par la probabilité → net après frais de vol</b>.</p>
-    </div>
+    <p class="screenshot-caption reveal">Détail d'un run : évolution du stock estimé entre le départ et l'arrivée, et décomposition du calcul de profit (<b>profit brut → profit ajusté par la probabilité de stock → profit net</b>).</p>
 
     <div class="specs-grid reveal">
       <div>
-        <div class="spec-row"><span class="spec-key">Données d'entrée</span><span class="spec-val">Snapshot YATA + timestamp</span></div>
-        <div class="spec-row"><span class="spec-key">Simulation</span><span class="spec-val">Minute par minute jusqu'à arrivée</span></div>
-        <div class="spec-row"><span class="spec-key">Ticks TCT</span><span class="spec-val">XX:00 / XX:15 / XX:30 / XX:45 UTC</span></div>
+        <div class="spec-row"><span class="spec-key">Vidage</span><span class="spec-val">Rythme propre à chaque objet</span></div>
+        <div class="spec-row"><span class="spec-key">Restock</span><span class="spec-val">Délai = moitié du temps de vidage</span></div>
       </div>
       <div>
-        <div class="spec-row"><span class="spec-key">Sortie</span><span class="spec-val hl">Probabilité de disponibilité (0–100 %)</span></div>
-        <div class="spec-row"><span class="spec-key">Sortie</span><span class="spec-val">Label lisible par état du stock</span></div>
-        <div class="spec-row"><span class="spec-key">Calibration</span><span class="spec-val">Script Python — polling YATA 10×/h</span></div>
+        <div class="spec-row"><span class="spec-key">Sortie</span><span class="spec-val hl">Probabilité de disponibilité</span></div>
+        <div class="spec-row"><span class="spec-key">Sortie</span><span class="spec-val">Label lisible ("stock faible", "restock probable"...)</span></div>
       </div>
     </div>
   </section>
@@ -738,14 +445,10 @@
     </div>
     <p class="section-sub">Une sidebar de paramètres à gauche, les résultats classés à droite — pensé pour être réglé une fois par session puis rafraîchi au fil du jeu.</p>
 
-    <div class="reveal">
-      <div class="img-placeholder" style="aspect-ratio:16/9">
-        <div class="img-placeholder-icon">🖥</div>
-        <div class="img-placeholder-label">Screenshot — Interface complète</div>
-        <div class="img-placeholder-sub">torn_screenshot_ui.png</div>
-      </div>
-      <p class="screenshot-caption">Vue d'ensemble : paramètres de session à gauche, meilleur run mis en avant avec sa timeline, puis le classement des autres destinations par profit.</p>
+    <div class="screenshot-frame reveal">
+      <img src="torn_screenshot_ui.png" alt="Interface complète du Torn Travel Optimizer">
     </div>
+    <p class="screenshot-caption reveal">Vue d'ensemble : paramètres de session à gauche, meilleur run mis en avant avec sa timeline, puis le classement des autres destinations par profit.</p>
 
     <div class="inspo-grid reveal">
       <div class="inspo-item">
@@ -831,7 +534,7 @@
       <div>
         <div class="spec-row"><span class="spec-key">Stockage clé API</span><span class="spec-val">sessionStorage</span></div>
         <div class="spec-row"><span class="spec-key">Cache stocks</span><span class="spec-val">localStorage</span></div>
-        <div class="spec-row"><span class="spec-key">Dépôt</span><span class="spec-val"><a href="https://r0binetterie.github.io/" target="_blank" style="color:var(--accent);text-decoration:none">r0binetterie.github.io ↗</a></span></div>
+        <div class="spec-row"><span class="spec-key">Dépôt</span><span class="spec-val"><a href="https://github.com/r0binetterie/r0binetterie.github.io" target="_blank" style="color:var(--accent);text-decoration:none">r0binetterie/r0binetterie.github.io ↗</a></span></div>
       </div>
     </div>
   </section>
@@ -855,7 +558,7 @@
         <span>Données de prix</span>
         <span>Retours d'usage</span>
       </div>
-      <a href="https://r0binetterie.github.io/" target="_blank" class="contribute-btn">Voir le dépôt ↗</a>
+      <a href="https://github.com/r0binetterie/r0binetterie.github.io" target="_blank" class="contribute-btn">Voir le dépôt ↗</a>
     </div>
   </section>
 
