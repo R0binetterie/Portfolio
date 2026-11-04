@@ -538,6 +538,18 @@
   .key-list li::before { content: ''; position: absolute; left: 0; top: .7em; width: 6px; height: 1px; background: var(--accent); }
   .key-list b { color: var(--text); font-weight: 500; }
   .section-sub + .section-sub { margin-top: -1.5rem; }
+  .pcb-diagram { overflow-x: auto; border: 1px solid var(--border); background: var(--card); padding: 1.5rem; }
+  .pcb-diagram svg { display: block; width: 100%; min-width: 680px; height: auto; }
+  .pcb-box rect { fill: var(--bg2); stroke: #3a3a3a; stroke-width: 1; }
+  .pcb-box text { font-family: 'DM Mono', monospace; font-size: 12px; fill: var(--text); text-anchor: middle; }
+  .pcb-box text.sub { font-size: 10px; fill: var(--muted); }
+  .pcb-box.in rect, .pcb-box.nv rect { stroke: var(--accent); }
+  .pcb-box.th rect { stroke: var(--accent2); }
+  .pcb-zone { fill: none; stroke: var(--accent); stroke-width: 1; stroke-dasharray: 5 5; opacity: .6; }
+  .zone-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; fill: var(--accent); }
+  .pcb-wire line, .pcb-wire path { fill: none; stroke: var(--muted); stroke-width: 1.2; }
+  .wire-label { font-family: 'DM Mono', monospace; font-size: 10px; fill: var(--muted); text-anchor: middle; }
+  .pcb-note { font-size: 11px; color: var(--muted); margin-top: 1rem; }
   details.more { border-top: 1px solid var(--border); }
   details.more summary { cursor: pointer; list-style: none; padding: 1rem 0; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
   details.more summary::-webkit-details-marker { display: none; }
@@ -802,14 +814,54 @@
     </details>
   </section>
 
+  <!-- PCB (idée) -->
+  <section class="section reveal" id="sec-pcb">
+    <div class="section-header">
+      <span class="section-num">07</span>
+      <h2 class="section-title">Prochaine étape : un PCB d'alimentation</h2>
+    </div>
+    <p class="section-sub">Le buck a réglé le problème de tension, mais le montage reste un assemblage de modules et de fils volants. Rien ne protège les écrans et les caméras en cas de mauvais branchement ou de court-circuit. L'idée : tout regrouper sur une petite carte.</p>
+    <ul class="key-list">
+      <li><b>Fusible</b> en entrée, contre les surintensités.</li>
+      <li><b>Protection contre l'inversion</b> de polarité, si la batterie est branchée à l'envers.</li>
+      <li><b>Régulation intégrée</b> à 4 V, à la place du module buck.</li>
+      <li><b>Distribution</b> : des connecteurs propres vers les deux tubes, au lieu des fils soudés.</li>
+    </ul>
+    <div class="pcb-diagram">
+      <svg viewBox="0 0 1010 300" role="img" aria-label="Schéma de principe du PCB d'alimentation : batterie, fusible, protection contre l'inversion, régulation 4 V, distribution vers les deux tubes">
+        <defs><marker id="pcbArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M1 1 L9 5 L1 9" fill="none" stroke="context-stroke" stroke-width="1.5"/></marker></defs>
+        <rect class="pcb-zone" x="172" y="62" width="664" height="172" rx="4"/>
+        <text class="zone-label" x="186" y="54">PCB · à concevoir</text>
+        <g class="pcb-box in"><rect x="20" y="120" width="130" height="56" rx="3"/><text x="85" y="144">Batterie USB</text><text class="sub" x="85" y="162">5 V</text></g>
+        <g class="pcb-box "><rect x="190" y="120" width="130" height="56" rx="3"/><text x="255" y="144">Fusible</text><text class="sub" x="255" y="162">surintensité</text></g>
+        <g class="pcb-box "><rect x="360" y="120" width="130" height="56" rx="3"/><text x="425" y="144">Anti-inversion</text><text class="sub" x="425" y="162">polarité</text></g>
+        <g class="pcb-box "><rect x="530" y="120" width="130" height="56" rx="3"/><text x="595" y="144">Régulation</text><text class="sub" x="595" y="162">5 V → 4 V</text></g>
+        <g class="pcb-box "><rect x="700" y="120" width="130" height="56" rx="3"/><text x="765" y="144">Distribution</text><text class="sub" x="765" y="162">connecteurs</text></g>
+        <g class="pcb-box nv"><rect x="870" y="36" width="130" height="56" rx="3"/><text x="935" y="60">Tube NV</text><text class="sub" x="935" y="78">caméra + OLED</text></g>
+        <g class="pcb-box th"><rect x="870" y="208" width="130" height="56" rx="3"/><text x="935" y="232">Tube thermique</text><text class="sub" x="935" y="250">caméra + OLED</text></g>
+        <g class="pcb-wire">
+          <line x1="150" y1="148" x2="188" y2="148" marker-end="url(#pcbArrow)"/>
+          <line x1="320" y1="148" x2="358" y2="148" marker-end="url(#pcbArrow)"/>
+          <line x1="490" y1="148" x2="528" y2="148" marker-end="url(#pcbArrow)"/>
+          <line x1="660" y1="148" x2="698" y2="148" marker-end="url(#pcbArrow)"/>
+          <path d="M830 148 H848 V64 H868" marker-end="url(#pcbArrow)"/>
+          <path d="M830 148 H848 V236 H868" marker-end="url(#pcbArrow)"/>
+        </g>
+        <text class="wire-label" x="160" y="170">5 V</text>
+        <text class="wire-label" x="679" y="140">4 V</text>
+      </svg>
+    </div>
+    <p class="pcb-note">Schéma de principe. La carte n'est pas encore dessinée : les composants restent à choisir.</p>
+  </section>
+
   <!-- SUITE -->
   <section class="section reveal" id="sec-next">
     <div class="section-header">
-      <span class="section-num">07</span>
+      <span class="section-num">08</span>
       <h2 class="section-title">La suite</h2>
     </div>
     <div class="perch-row" aria-hidden="true"><div class="perch sm"><img src="aigle_profil.png" alt=""></div></div>
-    <div class="perspectives three">
+    <div class="perspectives">
       <div class="persp-item">
         <div class="persp-tag">Fusion</div>
         <div class="persp-title">NV + thermique sur une seule image</div>
@@ -819,11 +871,6 @@
         <div class="persp-tag">Optique</div>
         <div class="persp-title">De meilleurs objectifs</div>
         <div class="persp-desc">Remplacer les objectifs d'origine des caméras pour gagner en sensibilité et en champ de vision.</div>
-      </div>
-      <div class="persp-item">
-        <div class="persp-tag">Électronique</div>
-        <div class="persp-title">Un PCB pour protéger le montage</div>
-        <div class="persp-desc">Remplacer le module buck et les fils volants par une petite carte dédiée, pour protéger les écrans et les caméras.</div>
       </div>
     </div>
   </section>
