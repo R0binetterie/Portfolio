@@ -6,10 +6,9 @@
 <title>Suivi solaire — Suivi solaire — Robin Bonfill</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+<link rel="stylesheet" href="vendor/katex/katex.min.css">
+<script defer src="vendor/katex/katex.min.js"></script>
+<script defer src="vendor/katex/auto-render.min.js"
   onload="renderMathInElement(document.body, {
     delimiters: [
       {left:'$$', right:'$$', display:true},
@@ -413,6 +412,18 @@ nav{position:fixed;z-index:100}
 .facts div span{font-size:15px}
 @media(max-width:900px){.lp{padding:0 1.5rem}.why,.path{grid-template-columns:1fr}.facts{grid-template-columns:1fr 1fr}.sc canvas{height:340px}}
 
+
+  /* garde-fous : photos portrait trop hautes, grilles en ligne sur mobile */
+  img { max-width: 100%; }
+  img:not(.lp-logo):not([src$=".svg"]) { max-height: 640px; object-fit: contain; }
+  @media (max-width: 700px) {
+    [style*="grid-template-columns"] { grid-template-columns: 1fr !important; }
+    img:not(.lp-logo):not([src$=".svg"]) { max-height: 520px; }
+  }
+  .katex-display { overflow-x: auto; overflow-y: hidden; padding: .25rem 0; }
+  .page-wrap > * { min-width: 0; }
+  .process-steps > *, [style*="display:grid"] > * { min-width: 0; }
+  .stencil-wrap { max-width: 100%; overflow-x: auto; }  /* la colonne de contenu ne doit pas s'élargir au-delà de l'écran */
 </style>
 </head>
 <body>
@@ -426,18 +437,7 @@ nav{position:fixed;z-index:100}
  <section class="lp-hero">
   <div class="lp-label">Projet de prépa — optique &amp; systèmes embarqués</div>
   <h1 class="lp-title">Garder une parabole<br>pointée <span>sur le soleil.</span></h1>
-  <p class="lp-sub">Sans GPS, sans internet, même quand la structure se déforme.</p>
-  <div class="sc">
-   <canvas id="sc"></canvas>
-   <div class="sc-gauge"><i id="scGauge"></i></div>
-   <div class="sc-bar">
-    <div class="sc-seg" id="scMode"><button data-m="fixed" class="on">Parabole fixe</button><button data-m="track">Avec suivi</button></div>
-    <div class="sc-time"><button class="sc-play" id="scPlay" aria-label="Lecture / pause">❚❚</button><input type="range" id="scTime" min="6" max="18" step="0.01" value="6" aria-label="Heure de la journée"><span class="sc-clock" id="scClock">06:00</span></div>
-    <div class="sc-read"><span class="sc-temp" id="scTemp">25</span><span class="sc-unit">°C au foyer</span></div>
-   </div>
-   <div class="sc-msg" id="scMsg"></div>
-   <div class="sc-note">Schéma illustratif : la mesure réelle sur cible céramique a atteint 400 °C.</div>
-  </div>
+  <p class="lp-sub">Une parabole concentre le soleil en un point très chaud, mais seulement si elle reste pointée dessus. Or le soleil se déplace d'environ 15° par heure. J'ai construit un système qui le suit tout seul, en regardant où tombe la chaleur : sans GPS, sans internet.</p>
  </section>
 
  <section class="lp-block">
@@ -469,6 +469,21 @@ nav{position:fixed;z-index:100}
  </section>
 
  <section class="lp-block">
+  <h2 class="lp-h2">Ce que change le suivi</h2>
+  <p class="lp-h2-sub">Lance la journée ou fais glisser l'heure, puis compare la parabole fixe et la parabole avec suivi. Le chiffre donne la température au foyer.</p>
+  <div class="sc" style="margin-top:0">
+   <canvas id="sc"></canvas>
+   <div class="sc-gauge"><i id="scGauge"></i></div>
+   <div class="sc-bar">
+    <div class="sc-seg" id="scMode"><button data-m="fixed" class="on">Parabole fixe</button><button data-m="track">Avec suivi</button></div>
+    <div class="sc-time"><button class="sc-play" id="scPlay" aria-label="Lecture / pause">▶</button><input type="range" id="scTime" min="6" max="18" step="0.01" value="6" aria-label="Heure de la journée"><span class="sc-clock" id="scClock">06:00</span></div>
+    <div class="sc-read"><span class="sc-temp" id="scTemp">25</span><span class="sc-unit">°C au foyer</span></div>
+   </div>
+   <div class="sc-msg" id="scMsg"></div>
+   <div class="sc-note">Schéma illustratif : la mesure réelle sur cible céramique a atteint 400 °C.</div>
+  </div>
+ </section>
+ <section class="lp-block">
   <h2 class="lp-h2">Le chemin, étape par étape</h2>
   <p class="lp-h2-sub">Du général au particulier, de la théorie vers la pratique.</p>
   <div class="path-rail">Théorie<div></div>Pratique</div>
@@ -495,7 +510,7 @@ nav{position:fixed;z-index:100}
 <script>
   const bar=document.getElementById('progressBar');
   window.addEventListener('scroll',()=>{const max=document.body.scrollHeight-window.innerHeight;if(bar)bar.style.width=(max>0?window.scrollY/max*100:0)+'%'});
-  const ro=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');ro.unobserve(e.target)}})},{threshold:.05});
+  const ro=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');ro.unobserve(e.target)}})},{threshold:0,rootMargin:'0px 0px -40px 0px'});
   document.querySelectorAll('.reveal').forEach(el=>ro.observe(el));
   document.querySelectorAll('.accordion-head').forEach(h=>h.addEventListener('click',()=>h.parentElement.classList.toggle('open')));
   const tocLinks=document.querySelectorAll('.toc-item a');
@@ -513,7 +528,7 @@ nav{position:fixed;z-index:100}
  const cv=document.getElementById('sc'); if(!cv) return;
  const ctx=cv.getContext('2d');
  const slider=document.getElementById('scTime'),clock=document.getElementById('scClock'),tempEl=document.getElementById('scTemp'),gauge=document.getElementById('scGauge'),msg=document.getElementById('scMsg'),play=document.getElementById('scPlay');
- let W=0,H=0,mode='fixed',playing=true,hour=6,axis=-Math.PI/2,vis=true;
+ let W=0,H=0,mode='fixed',playing=false,hour=6,axis=-Math.PI/2,vis=true;
  function size(){const r=cv.getBoundingClientRect(),d=window.devicePixelRatio||1;cv.width=Math.round(r.width*d);cv.height=Math.round(r.height*d);ctx.setTransform(d,0,0,d,0,0);W=r.width;H=r.height}
  window.addEventListener('resize',size); size();
  new IntersectionObserver(e=>{vis=e[0].isIntersecting}).observe(cv);

@@ -694,7 +694,7 @@
     entries.forEach(e => {
       if (e.isIntersecting) { e.target.classList.add('visible'); ro.unobserve(e.target); }
     });
-  }, { threshold: 0.08 });
+  }, {threshold:0,rootMargin:'0px 0px -40px 0px'});
   reveals.forEach(el => ro.observe(el));
 
   /* ── OUTILS — arc au scroll ── */
