@@ -528,6 +528,28 @@
     .eagle-hero { transform: translateX(14%); }
     .perch img { transition: none; transform: none; }
   }
+
+  /* ── PAGE RESSERRÉE ── */
+  .process-steps.three { grid-template-columns: repeat(3, 1fr); margin-bottom: 0; }
+  a.step-card { display: block; text-decoration: none; color: inherit; }
+  .key-list { list-style: none; padding: 0; margin: -1rem 0 2.5rem; max-width: 640px; display: flex; flex-direction: column; gap: .6rem; }
+  .key-list li { font-size: 13px; color: var(--muted); line-height: 1.7; padding-left: 1.1rem; position: relative; }
+  .key-list li::before { content: ''; position: absolute; left: 0; top: .7em; width: 6px; height: 1px; background: var(--accent); }
+  .key-list b { color: var(--text); font-weight: 500; }
+  details.more { border-top: 1px solid var(--border); }
+  details.more summary { cursor: pointer; list-style: none; padding: 1rem 0; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  details.more summary::-webkit-details-marker { display: none; }
+  details.more summary::before { content: '+ '; color: var(--accent); }
+  details.more[open] summary::before { content: '− '; }
+  details.more summary:hover { color: var(--text); }
+  details.more .photo-item { aspect-ratio: 4/3; min-height: 0 !important; }
+  details.more .photo-item img { height: 100%; object-fit: cover; }
+  .bom { border: 1px solid var(--border); margin-top: 2rem; }
+  .bom-row { display: flex; justify-content: space-between; gap: 1rem; padding: .7rem 1rem; border-bottom: 1px solid var(--border); font-size: 12px; flex-wrap: wrap; }
+  .bom-row:last-child { border-bottom: 0; }
+  .bom-row span:first-child { color: var(--text); }
+  .bom-row span:last-child { color: var(--muted); }
+  @media (max-width: 900px) { .process-steps.three { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
@@ -551,7 +573,7 @@
     <div class="hero-label">Projet — Électronique &amp; Fabrication 3D</div>
     <h1 class="hero-title">Night<span>Sight</span></h1>
     <p class="hero-desc">
-      Lunettes binoculaires de vision nocturne et thermique construites depuis le début — boîtier entièrement imprimé en 3D, caméras starlight, micro-écrans OLED 0.4" avec un combo écran/optique tout-en-un.
+      Jumelles de vision nocturne imprimées en 3D : reconstruites à partir d'un modèle open-source, modifiées, puis équipées d'un tube thermique.
     </p>
     <div class="hero-tags">
       <span class="tag accent">Vision nocturne</span>
@@ -569,8 +591,8 @@
       <span class="status-badge"><span class="status-dot"></span>En cours — en pause</span>
     </div>
     <div class="meta-item">
-      <span class="meta-label">Sous-versions</span>
-      <span class="meta-value">Vision nocturne (starlight) + Thermique</span>
+      <span class="meta-label">Configuration</span>
+      <span class="meta-value">1 tube NV (starlight) + 1 tube thermique</span>
     </div>
     <div class="meta-item">
       <span class="meta-label">Alimentation</span>
@@ -585,533 +607,213 @@
 
 <div class="content">
 
-  <!-- SECTION 00 : ORIGINE -->
-  <section class="section reveal" id="sec-origin" style="padding-top:4rem">
+  <!-- EN BREF : les 3 phases -->
+  <section class="section reveal" id="sec-bref" style="padding-top:4rem">
     <div class="section-header">
       <span class="section-num">00</span>
-      <h2 class="section-title">Origine &amp; inspiration</h2>
+      <h2 class="section-title">En bref</h2>
     </div>
-    <p class="section-sub">
-      NightSight n'est pas parti d'une page blanche : le projet a démarré comme une reconstruction fidèle d'un modèle open-source, avant de devenir un terrain d'expérimentation thermique.
-    </p>
-
-    <p style="font-size:14px;color:var(--muted);line-height:1.9;margin-bottom:2rem;max-width:760px">
-      Point de départ : le pack de plans <a href="https://vonscherfarms.com/PVS-69-ALPHA-1-2-file-packs-p513898898" target="_blank" style="color:var(--muted);text-decoration:underline;">PVS-69 Alpha 1/2</a> de <a href="https://vonscherfarm.com" target="_blank" style="color:var(--muted);text-decoration:underline;">Vonscherfarm</a>. Reconstruire ces jumelles de vision nocturne pièce par pièce a surtout été l'occasion de prendre en main mon imprimante 3D pour de vrai, sur un modèle exigeant en tolérances.
-    </p>
-
-    <div class="photo-grid featured" style="margin-bottom:2px;">
-      <div class="photo-item auto" style="min-height:340px;">
-        <img src="vonscherfarm_pvs69.png" alt="PVS-69 Alpha 1/2 — modèle Vonscherfarm">
-        <div class="photo-caption">Modèle de référence — PVS-69 Alpha 1/2, <a href="https://vonscherfarm.com" target="_blank" style="color:inherit">Vonscherfarm</a></div>
-      </div>
-      <div class="photo-item auto" style="min-height:340px;">
-        <img src="cao_backplate.png" alt="Backplate modifiée — render CAO">
-        <div class="photo-caption">Backplate modifiée — première pièce personnalisée</div>
-      </div>
-    </div>
-
-    <p style="font-size:14px;color:var(--muted);line-height:1.9;margin:2rem 0;max-width:760px">
-      Une fois le modèle de base reconstruit, j'ai commencé à modifier certaines pièces — notamment la backplate — avant de monter les jumelles complètes. Le tube de vision nocturne d'origine (design Vonscherfarm) est resté la base mécanique du projet.
-    </p>
-
-    <p style="font-size:14px;color:var(--muted);line-height:1.9;margin-bottom:2rem;max-width:760px">
-      C'est une fois les jumelles montées que l'idée est venue : rien n'empêche de remplacer les caméras infrarouges par une caméra qui capte ce que <em>nous émettons</em> plutôt que ce qu'on réfléchit — une caméra thermique. Elle sort elle aussi un signal analogique, exploitable de la même façon dans le tube. Elle tire plus de courant, mais ça reste largement gérable. Il a en revanche fallu retravailler la façon dont le tube était conçu pour accueillir son nouvel objectif.
-    </p>
-
-    <div class="photo-grid col3">
-      <div class="photo-item auto" style="min-height:220px;">
-        <img src="camera_thermique_module.png" alt="Module caméra thermique">
-        <div class="photo-caption">Caméra thermique — remplace le module IR d'origine</div>
-      </div>
-    </div>
-    <p style="font-size:12px;color:var(--muted);opacity:.7;margin-top:1rem">D'autres photos de cette étape (montage, modification du tube) arrivent bientôt.</p>
-  </section>
-
-  <!-- PROGRESSION OVERVIEW -->
-  <section class="section reveal" style="padding-top: 4rem; padding-bottom: 4rem;">
-    <div class="process-steps">
-      <div class="step-card done">
+    <div class="process-steps three">
+      <a class="step-card done" href="#sec-repro">
         <div class="step-num">01</div>
-        <div class="step-label">Étape</div>
-        <div class="step-title">CAD &amp; modélisation</div>
-        <div class="step-desc">Dessin de toutes les pièces dans Fusion 360 — boîtiers, charnières, support écrans, chemins optiques.</div>
-        <div class="step-status done">✓ Terminé</div>
-      </div>
-      <div class="step-card done">
+        <div class="step-label">Phase</div>
+        <div class="step-title">Reproduire</div>
+        <div class="step-desc">Reconstruire les jumelles PVS-69 de Vonscherfarm pièce par pièce.</div>
+      </a>
+      <a class="step-card done" href="#sec-amelio">
         <div class="step-num">02</div>
-        <div class="step-label">Étape</div>
-        <div class="step-title">Impression &amp; itérations</div>
-        <div class="step-desc">Multiples passes d'impression FDM pour affiner les tolérances — en particulier le chemin optique et les charnières.</div>
-        <div class="step-status done">✓ Terminé</div>
-      </div>
-      <div class="step-card done">
+        <div class="step-label">Phase</div>
+        <div class="step-title">Améliorer</div>
+        <div class="step-desc">Backplate redessinée, câblage dans les charnières, alimentation régulée.</div>
+      </a>
+      <a class="step-card wip" href="#sec-thermique">
         <div class="step-num">03</div>
-        <div class="step-label">Étape</div>
-        <div class="step-title">Construction &amp; câblage</div>
-        <div class="step-desc">Assemblage électronique, passage des câbles dans les axes de charnière, intégration des modules OLED et caméras.</div>
-        <div class="step-status done">✓ Terminé</div>
-      </div>
-      <div class="step-card wip">
-        <div class="step-num">04</div>
-        <div class="step-label">Étape</div>
-        <div class="step-title">Fusion NV + thermique</div>
-        <div class="step-desc">Superposition des flux vidéo via Raspberry Pi pour combiner vision nocturne et détection de chaleur en une seule image.</div>
-        <div class="step-status wip">⟳ En développement</div>
-      </div>
+        <div class="step-label">Phase</div>
+        <div class="step-title">Ajouter le thermique</div>
+        <div class="step-desc">Un des deux tubes devient une caméra thermique.</div>
+      </a>
     </div>
   </section>
 
-  <!-- SECTION 1 : CAD -->
-  <section class="section reveal" id="sec-cad">
+  <!-- PHASE 1 -->
+  <section class="section reveal" id="sec-repro">
     <div class="section-header">
       <span class="section-num">01</span>
-      <h2 class="section-title">Modélisation 3D</h2>
+      <h2 class="section-title">Reproduire un modèle open-source</h2>
     </div>
-    <p class="section-sub">
-      Toutes les pièces sont dessinées sur mesure dans Fusion 360. La coupe transversale révèle l'imbrication précise des modules caméra, écran et chemin optique. La version thermique est entièrement conçue depuis le début — le boîtier NV s'inspire du design open-source de <a href="https://vonscherfarm.com" style="color:var(--muted);text-decoration:underline;" target="_blank">Vonscherfarm</a>.
-    </p>
-
-    <div class="render-showcase" style="margin-bottom:2px;">
-      <div class="render-item wide">
-        <img src="Capture_d_e_cran_2026-05-30_a__23_40_17.png" alt="CAO coupe transversale Fusion 360">
+    <p class="section-sub">Point de départ : les plans <a href="https://vonscherfarms.com/PVS-69-ALPHA-1-2-file-packs-p513898898" target="_blank" style="color:inherit;text-decoration:underline">PVS-69 Alpha 1/2</a>. Un modèle exigeant en tolérances, idéal pour vraiment prendre en main l'imprimante 3D.</p>
+    <div class="perch-row" aria-hidden="true"><div class="perch"><img src="aigle_meca.png" alt=""></div></div>
+    <div class="photo-grid col3">
+      <div class="photo-item auto" style="min-height:280px;">
+        <img src="vonscherfarm_pvs69.png" alt="PVS-69 Alpha 1/2 — modèle Vonscherfarm">
+        <div class="photo-caption">Le modèle de référence</div>
       </div>
-      <div class="render-item wide">
-        <img src="Capture_d_e_cran_2026-05-30_a__23_41_30.png" alt="Render 3D final NightSight">
+      <div class="photo-item auto" style="min-height:280px;">
+        <img src="IMG_2575.jpg" alt="Boîtiers imprimés">
+        <div class="photo-caption">Boîtiers imprimés (PLA pour les essais, PETG au final)</div>
       </div>
-    </div>
-    <div class="render-credit">
-      Render Fusion 360 — Design NV basé sur <a href="https://vonscherfarm.com" target="_blank">Vonscherfarm</a> · Design thermique original
+      <div class="photo-item auto" style="min-height:280px;">
+        <img src="IMG_2849.jpg" alt="Jumelles bi-tube assemblées">
+        <div class="photo-caption">Premier assemblage : deux tubes NV</div>
+      </div>
     </div>
   </section>
 
-  <!-- SECTION 2 : IMPRESSION -->
-  <section class="section reveal" id="sec-print">
+  <!-- PHASE 2 -->
+  <section class="section reveal" id="sec-amelio">
     <div class="section-header">
       <span class="section-num">02</span>
-      <h2 class="section-title">Impression &amp; itérations</h2>
+      <h2 class="section-title">Améliorer</h2>
     </div>
-    <p class="section-sub">
-      Plusieurs passes d'impression sur Bambu Lab pour affiner les tolérances — PLA pour les prototypes rapides, PETG pour les pièces finales. Le défi principal : les logements du combo écran/optique doivent être précis au dixième pour que l'image soit nette à distance d'œil confortable. Chaque itération de charnière implique de réimprimer et re-câbler.
-    </p>
-
-    <div class="perch-row" aria-hidden="true"><div class="perch"><img src="aigle_meca.png" alt=""></div></div>
-    <div class="photo-grid col3" style="margin-bottom:2px;">
-      <div class="photo-item auto" style="min-height:300px;">
-        <img src="print_bambu_1.jpg" alt="Bambu Lab en cours d'impression pièces NightSight">
-        <div class="photo-caption">Bambu Lab — impression des boîtiers en cours</div>
+    <ul class="key-list">
+      <li><b>Backplate</b> redessinée : la première pièce vraiment à moi.</li>
+      <li><b>Charnières</b> : l'alimentation et la vidéo passent dans l'axe creux, en fils 26AWG torsadés.</li>
+      <li><b>Alimentation</b> : batterie USB 5 V abaissée à 4 V par un buck MP1584.</li>
+    </ul>
+    <div class="perch-row" aria-hidden="true"><div class="perch wide"><img src="aigle_soudure.png" alt=""></div></div>
+    <div class="photo-grid col3">
+      <div class="photo-item auto" style="min-height:260px;">
+        <img src="cao_backplate.png" alt="Backplate modifiée — Fusion 360">
+        <div class="photo-caption">Backplate modifiée</div>
       </div>
-      <div class="photo-item auto" style="min-height:300px;">
-        <img src="IMG_5227.jpg" alt="Bambu Lab impression pièces NightSight deuxième angle">
-        <div class="photo-caption">Plateau d'impression — premières couches</div>
+      <div class="photo-item auto" style="min-height:260px;">
+        <img src="IMG_5241.jpg" alt="Câblage de la charnière centrale">
+        <div class="photo-caption">Fils dans la charnière</div>
       </div>
-      <div class="photo-item auto" style="min-height:300px;">
-        <img src="IMG_2575.jpg" alt="Boîtiers imprimés vert olive et noir résultat">
-        <div class="photo-caption">Résultat — boîtiers vert olive &amp; noir sortis imprimante</div>
-      </div>
-    </div>
-    <div class="photo-grid col2">
-      <div class="photo-item auto" style="min-height:240px;">
-        <img src="IMG_2789.jpg" alt="Châssis central imprimé noir pièces de liaison">
-        <div class="photo-caption">Châssis central — liaison bi-tube + support fixation casque</div>
-      </div>
-      <div class="photo-item auto" style="min-height:240px;">
-        <img src="IMG_5177.jpg" alt="Setup atelier imprimante fer à souder alim de labo">
-        <div class="photo-caption">Setup atelier — Bambu Lab + alim de labo + station de soudure</div>
+      <div class="photo-item auto" style="min-height:260px; background:#0c0c0c;">
+        <img src="buck_converter.png" alt="Buck converter 5 V vers 4 V" style="object-fit:contain; padding:1.5rem;">
+        <div class="photo-caption">Buck 5 V → 4 V</div>
       </div>
     </div>
   </section>
 
-  <!-- SECTION 3 : CONSTRUCTION -->
-  <section class="section reveal" id="sec-build">
+  <!-- PHASE 3 -->
+  <section class="section reveal" id="sec-thermique">
     <div class="section-header">
       <span class="section-num">03</span>
-      <h2 class="section-title">Construction &amp; câblage</h2>
+      <h2 class="section-title">Ajouter un tube thermique</h2>
     </div>
-    <p class="section-sub">
-      L'assemblage électronique est simple — le vrai défi est mécanique : faire passer plusieurs fils (5V alim + signal CVBS vidéo) à travers l'axe creux des charnières sans créer de point de rupture ni de friction à la rotation.
-    </p>
-
-    <div class="perch-row" aria-hidden="true"><div class="perch wide"><img src="aigle_soudure.png" alt=""></div></div>
-    <div class="photo-grid featured" style="margin-bottom:2px;">
-      <div class="photo-item auto" style="min-height:360px;">
-        <img src="IMG_5241.jpg" alt="Lunettes ouvertes vue dessus câblage charnière fils rouges noirs">
-        <div class="photo-caption">Vue dessus — câblage charnière centrale avec fils alim rouge/noir</div>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:2px;">
-        <div class="photo-item auto" style="min-height:178px;">
-          <img src="IMG_2836.jpg" alt="Module vert câblage en cours">
-          <div class="photo-caption">Câblage interne d'un tube</div>
-        </div>
-        <div class="photo-item auto" style="min-height:178px;">
-          <img src="IMG_2790.jpg" alt="Module assemblé côté oculaire">
-          <div class="photo-caption">Intégration écran OLED + caméra</div>
-        </div>
-      </div>
-    </div>
-    <div class="photo-grid col3" style="margin-bottom:2px;">
-      <div class="photo-item square">
-        <img src="IMG_2629.jpg" alt="Oculaire avec eyecup caoutchouc">
-        <div class="photo-caption">Oculaire — eyecup + lentille grossissante</div>
-      </div>
-      <div class="photo-item square">
-        <img src="IMG_3687.jpg" alt="Câblage charnière détail">
-        <div class="photo-caption">Câblage charnière — vue extérieure</div>
-      </div>
-      <div class="photo-item square">
-        <img src="IMG_3686.jpg" alt="Fils colorés charnière pivot">
-        <div class="photo-caption">Axe pivot — fils 26AWG torsadés</div>
-      </div>
-    </div>
+    <p class="section-sub">La caméra starlight voit la lumière que les objets renvoient. Une caméra thermique voit la chaleur qu'ils émettent. Elle sort aussi un signal analogique, donc elle se branche sur le même écran. Il a fallu retravailler le tube pour loger son objectif.</p>
+    <div class="perch-row" aria-hidden="true"><div class="perch"><img src="aigle_precision.png" alt=""></div></div>
     <div class="photo-grid col3">
-      <div class="photo-item square">
-        <img src="IMG_2835.jpg" alt="Deux tubes assemblage côte à côte">
-        <div class="photo-caption">Deux tubes en parallèle</div>
+      <div class="photo-item auto" style="min-height:260px;">
+        <img src="camera_thermique_module.png" alt="Module caméra thermique">
+        <div class="photo-caption">Le module thermique</div>
       </div>
-      <div class="photo-item square">
-        <img src="IMG_2849.jpg" alt="Lunettes finales bi-tube">
-        <div class="photo-caption">Assemblage final bi-tube</div>
+      <div class="photo-item auto" style="min-height:260px;">
+        <img src="IMG_3166.jpg" alt="Tube thermique monté">
+        <div class="photo-caption">Le tube thermique</div>
       </div>
-      <div class="photo-item square">
-        <img src="IMG_2863.jpg" alt="Lunettes complètes avec batterie">
-        <div class="photo-caption">Système complet + batterie externe</div>
+      <div class="photo-item auto" style="min-height:260px;">
+        <img src="cao_render_final.jpg" alt="Rendu Fusion 360 des jumelles">
+        <div class="photo-caption">Rendu Fusion 360</div>
       </div>
     </div>
   </section>
 
-  <!-- SECTION 4 : TESTS -->
+  <!-- RÉSULTATS -->
   <section class="section reveal" id="sec-tests">
     <div class="section-header">
       <span class="section-num">04</span>
-      <h2 class="section-title">Tests &amp; résultats</h2>
+      <h2 class="section-title">À travers l'oculaire</h2>
     </div>
-    <p class="section-sub">
-      Photos prises directement à travers les oculaires — ce que l'œil perçoit via les micro-OLED 0.4". Les images noires autour sont normales : c'est l'eyecup qui masque l'environnement.
-    </p>
-
+    <p class="section-sub">Photos prises directement dans l'oculaire.</p>
     <div class="perch-row" aria-hidden="true"><div class="perch ledge"><img src="aigle_rebord.png" alt=""></div></div>
     <div class="pov-section">
-      <div class="pov-item">
-        <div class="scan"></div>
-        <img src="IMG_2855.jpg" alt="Vue POV vision nocturne lampe">
-        <span class="pov-label">NV — Test lampe</span>
-      </div>
-      <div class="pov-item">
-        <div class="scan"></div>
-        <img src="IMG_5147.jpg" alt="Vue POV NV v2 pièce sombre">
-        <span class="pov-label">NV — Pièce sombre</span>
-      </div>
-      <div class="pov-item">
-        <div class="scan"></div>
-        <img src="IMG_5148.jpg" alt="Vue POV NV v2 bureau">
-        <span class="pov-label">NV — Bureau nuit</span>
-      </div>
-      <div class="pov-item">
-        <div class="scan" style="animation-delay:1.5s;"></div>
-        <img src="IMG_3285.jpg" alt="Vue POV thermique bureau">
-        <span class="pov-label" style="color:rgba(245,166,35,0.7);border-left:2px solid rgba(245,166,35,0.4);">Thermique — Test int.</span>
-      </div>
-      <div class="pov-item">
-        <div class="scan" style="animation-delay:2s;"></div>
-        <img src="IMG_3287.jpg" alt="Vue POV thermique large">
-        <span class="pov-label" style="color:rgba(245,166,35,0.7);border-left:2px solid rgba(245,166,35,0.4);">Thermique — Large</span>
-      </div>
-      <div class="pov-item">
-        <div class="scan" style="animation-delay:2.5s;"></div>
-        <img src="IMG_3332.jpg" alt="Vue POV mono proto initial">
-        <span class="pov-label">Mono — Proto initial</span>
-      </div>
+      <div class="pov-item"><div class="scan"></div><img src="IMG_2855.jpg" alt="Vue NV, lampe"><span class="pov-label">NV — lampe</span></div>
+      <div class="pov-item"><div class="scan"></div><img src="IMG_5147.jpg" alt="Vue NV, pièce sombre"><span class="pov-label">NV — pièce sombre</span></div>
+      <div class="pov-item"><div class="scan"></div><img src="IMG_5148.jpg" alt="Vue NV, bureau la nuit"><span class="pov-label">NV — bureau la nuit</span></div>
+      <div class="pov-item"><div class="scan" style="animation-delay:1.5s;"></div><img src="IMG_3285.jpg" alt="Vue thermique, intérieur"><span class="pov-label" style="color:rgba(245,166,35,0.7);border-left:2px solid rgba(245,166,35,0.4);">Thermique — intérieur</span></div>
+      <div class="pov-item"><div class="scan" style="animation-delay:2s;"></div><img src="IMG_3287.jpg" alt="Vue thermique, large"><span class="pov-label" style="color:rgba(245,166,35,0.7);border-left:2px solid rgba(245,166,35,0.4);">Thermique — large</span></div>
+      <div class="pov-item"><div class="scan" style="animation-delay:2.5s;"></div><img src="IMG_3332.jpg" alt="Vue du premier prototype"><span class="pov-label">Premier prototype</span></div>
     </div>
   </section>
 
-  <!-- SECTION 5 : DEUX VERSIONS -->
-  <section class="section reveal" id="sec-versions">
-    <div class="section-header">
-      <span class="section-num">05</span>
-      <h2 class="section-title">Deux sous-versions</h2>
-    </div>
-
-    <div class="versions">
-      <div class="version-tab active" onclick="switchVersion(this)">
-        <div class="version-icon">🌑</div>
-        <h3>Vision nocturne</h3>
-        <p>Caméras Runcam Night Eagle 3 V2 (starlight) — fonctionnelles en quasi-obscurité totale. Image N&amp;B amplifiée sur micro-OLED. Boîtier vert olive.</p>
-        <div class="version-credit">Design boîtier inspiré de <a href="https://vonscherfarm.com" target="_blank">Vonscherfarm</a></div>
-      </div>
-      <div class="version-tab" onclick="switchVersion(this)">
-        <div class="version-icon" style="color:var(--accent2);">🌡</div>
-        <h3>Thermique</h3>
-        <p>Module caméra thermique intégré dans le même format de boîtier. Détecte les différences de température sans lumière. Boîtier entièrement conçu depuis le début.</p>
-        <div class="version-credit" style="color:var(--accent);opacity:0.5;">Design 100% original</div>
-      </div>
-    </div>
-
-    <div class="photo-grid col2" style="margin-bottom:2px;">
-      <div class="photo-item auto" style="min-height:300px;">
-        <img src="IMG_2863.jpg" alt="Lunettes NV finales">
-        <div class="photo-caption">Version NV — tubes vert olive + charnière centrale</div>
-      </div>
-      <div class="photo-item auto" style="min-height:300px;">
-        <img src="IMG_3166.jpg" alt="Module caméra thermique">
-        <div class="photo-caption">Module caméra thermique — design original</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- SECTION BOM -->
-  <section class="section reveal" id="sec-bom">
-    <div class="section-header">
-      <span class="section-num">06</span>
-      <h2 class="section-title">Bill of materials</h2>
-    </div>
-
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1px; background:var(--border); border:1px solid var(--border); margin-bottom:3rem;">
-
-      <!-- Version NV -->
-      <div style="background:var(--card); padding:2rem;">
-        <div style="font-size:10px; letter-spacing:.15em; text-transform:uppercase; color:var(--accent); margin-bottom:1.5rem;">Version nocturne</div>
-        <table style="width:100%; border-collapse:collapse; font-size:12px;">
-          <thead>
-            <tr style="border-bottom:1px solid var(--border);">
-              <th style="text-align:left; padding:.5rem 0; font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); font-weight:400;">Composant</th>
-              <th style="text-align:center; padding:.5rem 0; font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); font-weight:400;">Qté</th>
-              <th style="text-align:right; padding:.5rem 0; font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); font-weight:400;">Rôle</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr style="border-bottom:1px solid #1a1a1a;">
-              <td style="padding:.7rem 0; color:var(--text);">Runcam Night Eagle 3 V2</td>
-              <td style="text-align:center; color:var(--accent);">×2</td>
-              <td style="text-align:right; color:var(--muted);">Caméra starlight</td>
-            </tr>
-            <tr style="border-bottom:1px solid #1a1a1a;">
-              <td style="padding:.7rem 0; color:var(--text);">Micro OLED 0.4" combo optique</td>
-              <td style="text-align:center; color:var(--accent);">×2</td>
-              <td style="text-align:right; color:var(--muted);">Écran + optique</td>
-            </tr>
-            <tr style="border-bottom:1px solid #1a1a1a;">
-              <td style="padding:.7rem 0; color:var(--text);">Buck converter MP1584</td>
-              <td style="text-align:center; color:var(--accent);">×1</td>
-              <td style="text-align:right; color:var(--muted);">5V → 4V</td>
-            </tr>
-            <tr style="border-bottom:1px solid #1a1a1a;">
-              <td style="padding:.7rem 0; color:var(--text);">Batterie externe USB 5V</td>
-              <td style="text-align:center; color:var(--accent);">×1</td>
-              <td style="text-align:right; color:var(--muted);">Alimentation</td>
-            </tr>
-            <tr style="border-bottom:1px solid #1a1a1a;">
-              <td style="padding:.7rem 0; color:var(--text);">Câble coaxial spiralé</td>
-              <td style="text-align:center; color:var(--accent);">×1</td>
-              <td style="text-align:right; color:var(--muted);">Liaison batterie</td>
-            </tr>
-            <tr style="border-bottom:1px solid #1a1a1a;">
-              <td style="padding:.7rem 0; color:var(--text);">Fil 26AWG multi-brin</td>
-              <td style="text-align:center; color:var(--accent);">~1m</td>
-              <td style="text-align:right; color:var(--muted);">Câblage interne</td>
-            </tr>
-            <tr style="border-bottom:1px solid #1a1a1a;">
-              <td style="padding:.7rem 0; color:var(--text);">Visserie M2 / M3</td>
-              <td style="text-align:center; color:var(--accent);">×20</td>
-              <td style="text-align:right; color:var(--muted);">Assemblage</td>
-            </tr>
-            <tr style="border-bottom:1px solid #1a1a1a;">
-              <td style="padding:.7rem 0; color:var(--text);">Rondelles laiton M2</td>
-              <td style="text-align:center; color:var(--accent);">×4</td>
-              <td style="text-align:right; color:var(--muted);">Entretoise charnière</td>
-            </tr>
-            <tr>
-              <td style="padding:.7rem 0; color:var(--text);">Filament PETG / PLA</td>
-              <td style="text-align:center; color:var(--accent);">~200g</td>
-              <td style="text-align:right; color:var(--muted);">Boîtier imprimé</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Version thermique -->
-      <div style="background:var(--card); padding:2rem; border-left:1px solid var(--border);">
-        <div style="font-size:10px; letter-spacing:.15em; text-transform:uppercase; color:var(--accent2); margin-bottom:1.5rem;">Version thermique</div>
-        <table style="width:100%; border-collapse:collapse; font-size:12px;">
-          <thead>
-            <tr style="border-bottom:1px solid var(--border);">
-              <th style="text-align:left; padding:.5rem 0; font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); font-weight:400;">Composant</th>
-              <th style="text-align:center; padding:.5rem 0; font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); font-weight:400;">Qté</th>
-              <th style="text-align:right; padding:.5rem 0; font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); font-weight:400;">Rôle</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr style="border-bottom:1px solid #1a1a1a;">
-              <td style="padding:.7rem 0; color:var(--text);">Module caméra thermique</td>
-              <td style="text-align:center; color:var(--accent2);">×1</td>
-              <td style="text-align:right; color:var(--muted);">Détection thermique</td>
-            </tr>
-            <tr style="border-bottom:1px solid #1a1a1a;">
-              <td style="padding:.7rem 0; color:var(--text);">Micro OLED 0.4" combo optique</td>
-              <td style="text-align:center; color:var(--accent2);">×1</td>
-              <td style="text-align:right; color:var(--muted);">Écran + optique</td>
-            </tr>
-            <tr style="border-bottom:1px solid #1a1a1a;">
-              <td style="padding:.7rem 0; color:var(--text);">Buck converter MP1584</td>
-              <td style="text-align:center; color:var(--accent2);">×1</td>
-              <td style="text-align:right; color:var(--muted);">Régulation tension</td>
-            </tr>
-            <tr style="border-bottom:1px solid #1a1a1a;">
-              <td style="padding:.7rem 0; color:var(--text);">Batterie externe USB 5V</td>
-              <td style="text-align:center; color:var(--accent2);">×1</td>
-              <td style="text-align:right; color:var(--muted);">Alimentation</td>
-            </tr>
-            <tr style="border-bottom:1px solid #1a1a1a;">
-              <td style="padding:.7rem 0; color:var(--text);">Fil 26AWG multi-brin</td>
-              <td style="text-align:center; color:var(--accent2);">~0.5m</td>
-              <td style="text-align:right; color:var(--muted);">Câblage interne</td>
-            </tr>
-            <tr style="border-bottom:1px solid #1a1a1a;">
-              <td style="padding:.7rem 0; color:var(--text);">Visserie M2 / M3</td>
-              <td style="text-align:center; color:var(--accent2);">×12</td>
-              <td style="text-align:right; color:var(--muted);">Assemblage</td>
-            </tr>
-            <tr>
-              <td style="padding:.7rem 0; color:var(--text);">Filament PETG / PLA</td>
-              <td style="text-align:center; color:var(--accent2);">~120g</td>
-              <td style="text-align:right; color:var(--muted);">Boîtier imprimé</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- SECTION 7 (ex-6) : ARCHITECTURE -->
-  <section class="section reveal" id="sec-arch">
-    <div class="section-header">
-      <span class="section-num">07</span>
-      <h2 class="section-title">Architecture électronique</h2>
-    </div>
-
-    <div class="perch-row" aria-hidden="true"><div class="perch sm"><img src="aigle_precision.png" alt=""></div></div>
-    <div class="arch-diagram" style="margin-bottom:3rem;">
-      <div class="arch-block">
-        <div class="arch-box highlight">Batterie externe<br>5V USB</div>
-        <div class="arch-box-label">Alimentation</div>
-      </div>
-      <div class="arch-arrow"><span class="arch-label">5V</span></div>
-      <div class="arch-block">
-        <div class="arch-box">Buck converter<br>MP1584</div>
-        <div class="arch-box-label">Régulation</div>
-      </div>
-      <div class="arch-arrow"><span class="arch-label">4V</span></div>
-      <div class="arch-block">
-        <div class="arch-box">× 2 Caméras<br>starlight</div>
-        <div class="arch-box-label">Acquisition</div>
-      </div>
-      <div class="arch-arrow"><span class="arch-label">CVBS</span></div>
-      <div class="arch-block">
-        <div class="arch-box highlight">× 2 Micro OLED<br>0.4"</div>
-        <div class="arch-box-label">Affichage</div>
-      </div>
-      <div class="arch-arrow"></div>
-      <div class="arch-block">
-        <div class="arch-box">Lentilles<br>grossissantes</div>
-        <div class="arch-box-label">Optique</div>
-      </div>
-      <div class="arch-arrow"></div>
-      <div class="arch-block">
-        <div class="arch-box highlight">Œil</div>
-        <div class="arch-box-label">Utilisateur</div>
-      </div>
-    </div>
-
-    <div class="photo-grid col2" style="margin-bottom:3rem;">
-      <div class="photo-item auto" style="min-height:220px; background:#0c0c0c;">
-        <img src="buck_converter.png" alt="Schéma buck converter 5V vers 4V MP1584" style="object-fit:contain; padding:1.5rem;">
-        <div class="photo-caption">Buck converter — régulation 5V → 4V pour les caméras</div>
-      </div>
-      <div style="padding:1.5rem; background:var(--card); border:1px solid var(--border); display:flex; flex-direction:column; justify-content:center; gap:1rem;">
-        <p style="font-size:12px; color:var(--muted); line-height:1.9;">
-          Le 5V de la batterie externe est abaissé à 4V par un buck converter MP1584 avant d'alimenter les caméras. L'électronique en elle-même est simple — la vraie difficulté est de faire transiter tous ces câbles à travers les axes de rotation des charnières.
-        </p>
-        <p style="font-size:11px; color:#333; letter-spacing:0.06em;">
-          Alim → Buck → 2× Caméra → 2× OLED → Lentilles → Œil
-        </p>
-      </div>
-    </div>
-
-    <div class="specs-grid">
-      <div>
-        <div class="spec-row"><span class="spec-key">Alimentation entrée</span><span class="spec-val highlight">5V USB (batterie externe)</span></div>
-        <div class="spec-row"><span class="spec-key">Tension caméras</span><span class="spec-val">4V (buck MP1584)</span></div>
-        <div class="spec-row"><span class="spec-key">Caméras NV</span><span class="spec-val">Runcam Night Eagle 3 V2 — starlight</span></div>
-        <div class="spec-row"><span class="spec-key">Écrans</span><span class="spec-val highlight">2× Micro OLED 0.4" N&amp;B</span></div>
-      </div>
-      <div>
-        <div class="spec-row"><span class="spec-key">Optique</span><span class="spec-val">Module combo écran/optique tout-en-un</span></div>
-        <div class="spec-row"><span class="spec-key">Boîtier</span><span class="spec-val">PLA / PETG — FDM custom</span></div>
-        <div class="spec-row"><span class="spec-key">CAO</span><span class="spec-val">Fusion 360 — toutes pièces custom</span></div>
-        <div class="spec-row"><span class="spec-key">Câblage charnière</span><span class="spec-val highlight">Fils 26AWG dans l'axe pivot</span></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- SECTION 7 : DÉFIS -->
+  <!-- DIFFICULTÉS -->
   <section class="section reveal" id="sec-challenges">
     <div class="section-header">
-      <span class="section-num">08</span>
-      <h2 class="section-title">Défis techniques</h2>
+      <span class="section-num">05</span>
+      <h2 class="section-title">Ce qui a été dur</h2>
     </div>
-
     <div class="perch-row" aria-hidden="true"><div class="perch sm"><img src="aigle_bras_croises.png" alt=""></div></div>
     <div class="challenges">
       <div class="challenge-item">
         <div class="challenge-num">01</div>
-        <div class="challenge-title">Câblage dans les charnières</div>
-        <div class="challenge-desc">Faire passer alimentation + signal CVBS à travers l'axe de rotation sans friction ni rupture. Solution : fils 26AWG torsadés dans l'axe creux imprimé.</div>
+        <div class="challenge-title">Les fils dans les charnières</div>
+        <div class="challenge-desc">Faire tourner les tubes sans tirer sur les fils ni les casser.</div>
       </div>
       <div class="challenge-item">
         <div class="challenge-num">02</div>
-        <div class="challenge-title">Intégration optique</div>
-        <div class="challenge-desc">Le combo écran/optique est un module tout-en-un — le défi était d'imprimer le boîtier aux bonnes dimensions pour que l'image soit nette à distance d'œil confortable. Plusieurs itérations d'impression pour trouver la bonne cote.</div>
+        <div class="challenge-title">Une image nette</div>
+        <div class="challenge-desc">Le logement de l'écran doit être juste au dixième de millimètre. Plusieurs impressions avant la bonne cote.</div>
       </div>
       <div class="challenge-item">
         <div class="challenge-num">03</div>
-        <div class="challenge-title">Adapter le thermique</div>
-        <div class="challenge-desc">Intégrer le module thermique dans le même format de boîtier NV — géométrie d'objectif différente, résolution différente. Tout remodéliser sans repartir de zéro.</div>
+        <div class="challenge-title">Faire entrer le thermique</div>
+        <div class="challenge-desc">Objectif et résolution différents : il a fallu adapter le tube existant.</div>
       </div>
     </div>
   </section>
 
-  <!-- SECTION 8 : PERSPECTIVES -->
+  <!-- DANS LE TUBE (détail replié) -->
+  <section class="section reveal" id="sec-arch">
+    <div class="section-header">
+      <span class="section-num">06</span>
+      <h2 class="section-title">Dans un tube</h2>
+    </div>
+    <div class="arch-diagram" style="margin-bottom:2rem;">
+      <div class="arch-block"><div class="arch-box highlight">Batterie<br>5 V</div></div>
+      <div class="arch-arrow"><span class="arch-label">5V</span></div>
+      <div class="arch-block"><div class="arch-box">Buck<br>MP1584</div></div>
+      <div class="arch-arrow"><span class="arch-label">4V</span></div>
+      <div class="arch-block"><div class="arch-box">Caméra<br>NV ou thermique</div></div>
+      <div class="arch-arrow"><span class="arch-label">CVBS</span></div>
+      <div class="arch-block"><div class="arch-box highlight">Micro-OLED<br>0.4"</div></div>
+      <div class="arch-arrow"></div>
+      <div class="arch-block"><div class="arch-box highlight">Œil</div></div>
+    </div>
+    <details class="more">
+      <summary>Coupe CAO et liste des composants</summary>
+      <div class="photo-grid col2" style="margin:1.5rem 0 2px;">
+        <div class="photo-item auto" style="min-height:300px;">
+          <img src="cao_coupe_face.jpg" alt="Coupe transversale Fusion 360">
+          <div class="photo-caption">Coupe transversale</div>
+        </div>
+        <div class="photo-item auto" style="min-height:300px;">
+          <img src="IMG_2863.jpg" alt="Système complet avec batterie">
+          <div class="photo-caption">Système complet + batterie</div>
+        </div>
+      </div>
+      <div class="bom">
+        <div class="bom-row"><span>Runcam Night Eagle 3 V2</span><span>caméra starlight (tube NV)</span></div>
+        <div class="bom-row"><span>Module caméra thermique</span><span>tube thermique</span></div>
+        <div class="bom-row"><span>Micro-OLED 0.4" + optique</span><span>×2, écran et oculaire</span></div>
+        <div class="bom-row"><span>Buck MP1584</span><span>5 V → 4 V</span></div>
+        <div class="bom-row"><span>Batterie USB 5 V</span><span>câble coaxial spiralé</span></div>
+        <div class="bom-row"><span>Fil 26AWG multibrin</span><span>câblage interne</span></div>
+        <div class="bom-row"><span>Visserie M2 / M3, rondelles laiton</span><span>assemblage, charnières</span></div>
+        <div class="bom-row"><span>PETG / PLA</span><span>boîtiers imprimés</span></div>
+      </div>
+    </details>
+  </section>
+
+  <!-- SUITE -->
   <section class="section reveal" id="sec-next">
     <div class="section-header">
-      <span class="section-num">09</span>
-      <h2 class="section-title">Prochaines étapes</h2>
+      <span class="section-num">07</span>
+      <h2 class="section-title">La suite</h2>
     </div>
-
     <div class="perch-row" aria-hidden="true"><div class="perch sm"><img src="aigle_profil.png" alt=""></div></div>
     <div class="perspectives">
       <div class="persp-item">
-        <div class="persp-tag">Fusion sensorielle</div>
-        <div class="persp-title">NV + thermique combinés</div>
-        <div class="persp-desc">
-          Le thermique ne voit pas à travers les vitres, miroirs ou surfaces réfléchissantes — là où le NV excelle. L'idée : utiliser un Raspberry Pi pour superposer les deux flux et faire ressortir uniquement les hotspots thermiques sur l'image NV. Le meilleur des deux mondes.
-        </div>
-        <div class="persp-chips">
-          <span class="chip">Raspberry Pi</span>
-          <span class="chip">Fusion vidéo</span>
-          <span class="chip">Hotspot detection</span>
-          <span class="chip">OpenCV</span>
-        </div>
+        <div class="persp-tag">Fusion</div>
+        <div class="persp-title">NV + thermique sur une seule image</div>
+        <div class="persp-desc">Superposer les deux flux avec un Raspberry Pi pour ne faire ressortir que les points chauds sur l'image NV.</div>
       </div>
       <div class="persp-item">
-        <div class="persp-tag">Amélioration optique</div>
-        <div class="persp-title">Remplacement des objectifs caméra</div>
-        <div class="persp-desc">
-          Les Runcam Night Eagle 3 V2 ont de bons capteurs mais des objectifs d'origine limités. L'idée serait de les remplacer par des objectifs à plus large ouverture numérique pour gagner en sensibilité et en champ de vision — surtout en très basse lumière.
-        </div>
-        <div class="persp-chips">
-          <span class="chip">Runcam Night Eagle 3 V2</span>
-          <span class="chip">Optique custom</span>
-          <span class="chip">Low-light</span>
-        </div>
+        <div class="persp-tag">Optique</div>
+        <div class="persp-title">De meilleurs objectifs</div>
+        <div class="persp-desc">Remplacer les objectifs d'origine des caméras pour gagner en sensibilité et en champ de vision.</div>
       </div>
     </div>
   </section>
