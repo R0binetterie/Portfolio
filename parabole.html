@@ -426,18 +426,7 @@ nav{position:fixed;z-index:100}
  <section class="lp-hero">
   <div class="lp-label">Projet de prépa — optique &amp; systèmes embarqués</div>
   <h1 class="lp-title">Garder une parabole<br>pointée <span>sur le soleil.</span></h1>
-  <p class="lp-sub">Sans GPS, sans internet, même quand la structure se déforme.</p>
-  <div class="sc">
-   <canvas id="sc"></canvas>
-   <div class="sc-gauge"><i id="scGauge"></i></div>
-   <div class="sc-bar">
-    <div class="sc-seg" id="scMode"><button data-m="fixed" class="on">Parabole fixe</button><button data-m="track">Avec suivi</button></div>
-    <div class="sc-time"><button class="sc-play" id="scPlay" aria-label="Lecture / pause">❚❚</button><input type="range" id="scTime" min="6" max="18" step="0.01" value="6" aria-label="Heure de la journée"><span class="sc-clock" id="scClock">06:00</span></div>
-    <div class="sc-read"><span class="sc-temp" id="scTemp">25</span><span class="sc-unit">°C au foyer</span></div>
-   </div>
-   <div class="sc-msg" id="scMsg"></div>
-   <div class="sc-note">Schéma illustratif : la mesure réelle sur cible céramique a atteint 400 °C.</div>
-  </div>
+  <p class="lp-sub">Une parabole concentre le soleil en un point très chaud, mais seulement si elle reste pointée dessus. Or le soleil se déplace d'environ 15° par heure. J'ai construit un système qui le suit tout seul, en regardant où tombe la chaleur : sans GPS, sans internet.</p>
  </section>
 
  <section class="lp-block">
@@ -468,6 +457,21 @@ nav{position:fixed;z-index:100}
 </svg></div>
  </section>
 
+ <section class="lp-block">
+  <h2 class="lp-h2">Ce que change le suivi</h2>
+  <p class="lp-h2-sub">Lance la journée ou fais glisser l'heure, puis compare la parabole fixe et la parabole avec suivi. Le chiffre donne la température au foyer.</p>
+  <div class="sc" style="margin-top:0">
+   <canvas id="sc"></canvas>
+   <div class="sc-gauge"><i id="scGauge"></i></div>
+   <div class="sc-bar">
+    <div class="sc-seg" id="scMode"><button data-m="fixed" class="on">Parabole fixe</button><button data-m="track">Avec suivi</button></div>
+    <div class="sc-time"><button class="sc-play" id="scPlay" aria-label="Lecture / pause">▶</button><input type="range" id="scTime" min="6" max="18" step="0.01" value="6" aria-label="Heure de la journée"><span class="sc-clock" id="scClock">06:00</span></div>
+    <div class="sc-read"><span class="sc-temp" id="scTemp">25</span><span class="sc-unit">°C au foyer</span></div>
+   </div>
+   <div class="sc-msg" id="scMsg"></div>
+   <div class="sc-note">Schéma illustratif : la mesure réelle sur cible céramique a atteint 400 °C.</div>
+  </div>
+ </section>
  <section class="lp-block">
   <h2 class="lp-h2">Le chemin, étape par étape</h2>
   <p class="lp-h2-sub">Du général au particulier, de la théorie vers la pratique.</p>
@@ -513,7 +517,7 @@ nav{position:fixed;z-index:100}
  const cv=document.getElementById('sc'); if(!cv) return;
  const ctx=cv.getContext('2d');
  const slider=document.getElementById('scTime'),clock=document.getElementById('scClock'),tempEl=document.getElementById('scTemp'),gauge=document.getElementById('scGauge'),msg=document.getElementById('scMsg'),play=document.getElementById('scPlay');
- let W=0,H=0,mode='fixed',playing=true,hour=6,axis=-Math.PI/2,vis=true;
+ let W=0,H=0,mode='fixed',playing=false,hour=6,axis=-Math.PI/2,vis=true;
  function size(){const r=cv.getBoundingClientRect(),d=window.devicePixelRatio||1;cv.width=Math.round(r.width*d);cv.height=Math.round(r.height*d);ctx.setTransform(d,0,0,d,0,0);W=r.width;H=r.height}
  window.addEventListener('resize',size); size();
  new IntersectionObserver(e=>{vis=e[0].isIntersecting}).observe(cv);
