@@ -361,6 +361,14 @@ nav{position:fixed;z-index:100}
 @media(max-width:900px){.step-hero{padding:110px 1.5rem 2rem}.step-nav a{padding:1.5rem}}
 
 
+
+  /* blocs repliés */
+  details.more { border-top: 1px solid var(--border); margin: 1.5rem 0 2rem; }
+  details.more > summary { cursor: pointer; list-style: none; padding: 1rem 0; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  details.more > summary::-webkit-details-marker { display: none; }
+  details.more > summary::before { content: '+ '; color: var(--accent); }
+  details.more[open] > summary::before { content: '− '; }
+  details.more > summary:hover { color: var(--text); }
 </style>
 </head>
 <body>
@@ -389,13 +397,7 @@ nav{position:fixed;z-index:100}
       <span class="section-num">03</span>
       <h2 class="section-title">Étude du récepteur thermique</h2>
     </div>
-    <p class="section-sub">La parabole concentre le rayonnement solaire en un point — le foyer. Pour que le système de suivi fonctionne, une cible placée à ce foyer doit absorber l'énergie et former un point chaud détectable par la caméra thermique. Le choix du matériau de cette cible est donc critique.</p>
-
-    <!-- Pourquoi étudier les matériaux -->
-    <div style="background:var(--bg);border:1px solid var(--border);border-left:3px solid var(--accent);padding:1.5rem 2rem;margin-bottom:3rem">
-      <p style="font-size:13px;color:var(--muted);line-height:1.9;margin-bottom:.75rem">Tous les matériaux ne se comportent pas de la même façon face à un flux thermique concentré. Certains vont <strong style="color:var(--text)">diffuser rapidement la chaleur</strong> dans toute leur masse — le point chaud disparaît et la caméra ne voit plus rien. D'autres vont <strong style="color:var(--text)">concentrer la chaleur localement</strong> — le point chaud reste bien défini, précis, facilement détectable.</p>
-      <p style="font-size:13px;color:var(--muted);line-height:1.9">L'objectif de cette étude est de <strong style="color:var(--text)">simuler numériquement</strong> le comportement thermique de plusieurs matériaux candidats, puis de <strong style="color:var(--text)">valider expérimentalement</strong> le matériau retenu par mesure directe au foyer.</p>
-    </div>
+    <p class="section-sub">Une cible au foyer doit absorber l'énergie et former un point chaud net, que la caméra thermique peut repérer. Tout se joue sur le choix du matériau.</p>
 
     <!-- Critères cible -->
     <div style="background:var(--card);border:1px solid var(--border);padding:2rem;margin-bottom:3rem">
@@ -423,17 +425,18 @@ nav{position:fixed;z-index:100}
         <h3 style="font-family:'IBM Plex Sans',sans-serif;font-weight:700;font-size:18px;letter-spacing:-.01em">Étude théorique — simulation numérique</h3>
       </div>
 
-      <p style="font-size:13px;color:var(--muted);line-height:1.9;margin-bottom:1.5rem">Pour prédire le comportement thermique d'une plaque soumise à un flux concentré, on modélise mathématiquement la diffusion de la chaleur dans le matériau. L'équation qui gouverne ce phénomène est l'<strong style="color:var(--text)">équation de la chaleur 2D</strong>, qui relie la variation de température dans le temps à la conduction dans le plan, aux pertes thermiques vers l'air ambiant, et à la source d'énergie.</p>
+      <p style="font-size:13px;color:var(--muted);line-height:1.9;margin-bottom:1.5rem">On modélise la diffusion de la chaleur dans une plaque soumise au flux concentré : conduction, pertes vers l'air, rayonnement et source solaire.</p>
 
       <!-- Intro équation -->
       <div style="background:var(--card);border:1px solid var(--border);border-left:3px solid var(--accent);padding:1.5rem 2rem;margin-bottom:1.5rem">
-        <p style="font-size:12px;color:var(--muted);line-height:1.9;margin-bottom:1rem">En appliquant un bilan d'énergie sur chaque petit élément de volume de la plaque, quatre contributions apparaissent : la <strong style="color:var(--text)">conduction</strong> dans le plan (loi de Fourier), les <strong style="color:var(--text)">pertes convectives</strong> vers l'air sur les deux faces (loi de Newton), le <strong style="color:var(--text)">rayonnement thermique</strong> (loi de Stefan-Boltzmann), et la <strong style="color:var(--text)">source solaire</strong> concentrée au centre :</p>
         $$\frac{\partial T}{\partial t} = \underbrace{D\left(\frac{\partial^2 T}{\partial x^2}+\frac{\partial^2 T}{\partial y^2}\right)}_{\text{conduction}} + \underbrace{\frac{h}{c\mu e}(T_\infty - T)}_{\text{Newton}} + \underbrace{\frac{\sigma\alpha}{c\mu e}(T_\infty^4 - T^4)}_{\text{Stefan-Boltzmann}} + S_{i,j}$$
         <p style="font-size:11px;color:var(--muted);margin-top:.75rem">$D = K/(c\mu)$ est la diffusivité thermique du matériau — c'est elle qui gouverne la vitesse de propagation de la chaleur. Plus $D$ est grand, plus la chaleur se répand vite.</p>
       </div>
 
-      <p style="font-size:13px;color:var(--muted);line-height:1.9;margin-bottom:2rem">Cette équation est résolue numériquement par la <strong style="color:var(--text)">méthode d'Euler explicite</strong> sur une grille de 50×50 nœuds. On laisse le système évoluer jusqu'à ce que la température ne change plus — c'est le régime permanent, c'est-à-dire l'état thermique atteint après un temps suffisamment long sous flux constant.</p>
+      <p style="font-size:13px;color:var(--muted);line-height:1.9;margin-bottom:2rem">Résolution numérique par la <strong style="color:var(--text)">méthode d'Euler explicite</strong> sur une grille 50×50, jusqu'au régime permanent.</p>
 
+      <details class="more">
+      <summary>Voir la dérivation complète (discrétisation, Taylor, Euler, stabilité)</summary>
       <!-- Dérivation mathématique -->
       <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:1.5rem">Modèle numérique — dérivation de l'équation de la chaleur 2D</div>
 
@@ -521,18 +524,20 @@ nav{position:fixed;z-index:100}
         </div>
       </div>
 
+      </details>
+
       <!-- Simulations Python — vraie sortie matplotlib -->
       <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:1rem">Résultats de simulation — régime permanent pour 3 matériaux</div>
       <div style="background:#080808;border:1px solid var(--border);overflow:hidden;margin-bottom:1rem">
         <img src="1783111293546_image.png" alt="Colormaps simulation thermique — Aluminium, Aérogel, Brique réfractaire" style="width:100%;display:block">
       </div>
-      <p style="font-size:12px;color:var(--muted);line-height:1.9;margin-bottom:1rem">Sortie directe du programme Python — même colormap et même échelle pour les trois matériaux, permettant une comparaison directe.</p>
+      <p style="font-size:12px;color:var(--muted);line-height:1.9;margin-bottom:1rem">Même échelle de couleurs pour les trois matériaux.</p>
 
       <!-- Conclusion théorique -->
       <div style="background:var(--card);border:1px solid var(--border);padding:1.5rem 2rem;margin-top:2rem">
         <div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem">Conclusion — étude théorique</div>
-        <p style="font-size:12px;color:var(--muted);line-height:1.9;margin-bottom:.75rem">L'aluminium diffuse la chaleur si vite que le point chaud disparaît — inutilisable pour la détection. L'aérogel concentre très bien mais c'est un matériau fragile et inadapté.</p>
-        <p style="font-size:12px;color:var(--muted);line-height:1.9">La <strong style="color:var(--text)">brique réfractaire céramique</strong> offre le meilleur compromis : diffusivité modérée, point chaud localisé (~5 cm de diamètre), résistance thermique éprouvée. C'est le matériau retenu.</p>
+        <p style="font-size:12px;color:var(--muted);line-height:1.9;margin-bottom:.75rem">L'aluminium diffuse trop vite : le point chaud disparaît. L'aérogel concentre bien mais il est fragile.</p>
+        <p style="font-size:12px;color:var(--muted);line-height:1.9">La <strong style="color:var(--text)">brique réfractaire</strong> est le meilleur compromis : point chaud d'environ 5 cm, bonne tenue en température. C'est le matériau retenu.</p>
       </div>
 
       <!-- Bouton téléchargement -->
@@ -552,14 +557,14 @@ nav{position:fixed;z-index:100}
         <h3 style="font-family:'IBM Plex Sans',sans-serif;font-weight:700;font-size:18px;letter-spacing:-.01em">Étude pratique — mesure expérimentale</h3>
       </div>
 
-      <p style="font-size:13px;color:var(--muted);line-height:1.9;margin-bottom:2rem">Pour valider les prédictions de la simulation, une expérience indépendante a été menée en parallèle : mesurer comment la chaleur se propage dans différents matériaux soumis à une source concentrée, afin de choisir le matériau de la cible au bout du bras. Cette expérience est distincte du système de suivi — c'est une étude thermique à part entière.</p>
+      <p style="font-size:13px;color:var(--muted);line-height:1.9;margin-bottom:2rem">Pour vérifier la simulation, j'ai mesuré la chaleur dans les matériaux avec des sondes PT100, autour d'une source concentrée.</p>
 
       <!-- Montage expérimental -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:2px">
         <div style="background:var(--card);padding:2rem">
           <div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem">Principe — sonde PT100</div>
-          <p style="font-size:12px;color:var(--muted);line-height:1.9;margin-bottom:1rem">Une sonde PT100 est une résistance de platine de 100 Ω à 0°C dont la valeur augmente linéairement avec la température. En l'intégrant dans un <strong style="color:var(--text)">pont diviseur de tension</strong> alimenté par l'Arduino, on mesure une tension qui dépend de la résistance — et donc de la température.</p>
-          <p style="font-size:12px;color:var(--muted);line-height:1.9;margin-bottom:1rem">Bien que le fabricant fournisse normalement la caractéristique résistance/température, j'ai préféré la vérifier expérimentalement avec un thermostat calibré.</p>
+          <p style="font-size:12px;color:var(--muted);line-height:1.9;margin-bottom:1rem">Une PT100 est une résistance de platine (100 Ω à 0 °C) qui varie linéairement avec la température. Montée en pont diviseur sur l'Arduino, elle donne une tension, donc une température.</p>
+          <p style="font-size:12px;color:var(--muted);line-height:1.9;margin-bottom:1rem">J'ai vérifié sa caractéristique moi-même avec un thermostat calibré plutôt que de me fier au fabricant.</p>
           <div style="background:#080808;border:1px solid var(--border);overflow:hidden;margin-bottom:.75rem">
             <img src="1783111510355_image.png" alt="Schéma montage calibration PT100 — thermostat + ohmmètre" style="width:100%;display:block">
           </div>
@@ -619,15 +624,14 @@ nav{position:fixed;z-index:100}
       <!-- Conclusion pratique -->
       <div style="background:var(--card);border:1px solid var(--border);padding:1.5rem 2rem;margin-top:2rem;margin-bottom:2rem">
         <div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem">Conclusion — étude pratique</div>
-        <p style="font-size:12px;color:var(--muted);line-height:1.9;margin-bottom:.75rem">La mesure expérimentale confirme la formation d'un point chaud très localisé sur la céramique, avec un gradient thermique radial prononcé — exactement ce que prédisait la simulation. La valeur maximale mesurée est de <strong style="color:var(--text)">400°C au centre</strong>.</p>
-        <p style="font-size:12px;color:var(--muted);line-height:1.9">L'écart avec les 740°C du modèle s'explique par une hypothèse simplificatrice : dans le modèle simple, on supposait la chaleur confinée à la tache visible. En réalité, la conduction dans la céramique étale la chaleur au-delà de la tache, augmentant l'aire effective de rayonnement et abaissant la température d'équilibre. La simulation 2D prédit bien ce gradient.</p>
+        <p style="font-size:12px;color:var(--muted);line-height:1.9;margin-bottom:.75rem">Point chaud bien localisé sur la céramique, comme prévu par la simulation : <strong style="color:var(--text)">400 °C au centre</strong>.</p>
+        <p style="font-size:12px;color:var(--muted);line-height:1.9">Le modèle simple prévoyait 740 °C : il supposait la chaleur confinée à la tache, alors que la conduction l'étale et abaisse la température d'équilibre.</p>
       </div>
 
       <!-- Synthèse -->
       <div style="background:var(--bg);border:1px solid var(--border);border-left:3px solid var(--accent2);padding:1.5rem 2rem;margin-bottom:3rem">
         <div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent2);margin-bottom:1rem">Synthèse — théorie et pratique</div>
-        <p style="font-size:12px;color:var(--muted);line-height:1.9;margin-bottom:.75rem">La simulation numérique et l'expérience convergent vers la même conclusion : la céramique réfractaire est le matériau le plus adapté. Elle forme un point chaud <strong style="color:var(--text)">localisé, stable, et détectable</strong> par la caméra thermique — condition nécessaire pour que l'algorithme de suivi fonctionne.</p>
-        <p style="font-size:12px;color:var(--muted);line-height:1.9">Les écarts quantitatifs entre modèle et mesure sont expliqués et cohérents. Le modèle simple surestime la température maximale d'un facteur ~1,8 mais prédit correctement la <em>forme</em> du champ thermique — ce qui est l'information utile pour ce projet.</p>
+        <p style="font-size:12px;color:var(--muted);line-height:1.9;margin-bottom:.75rem">Simulation et mesure disent la même chose : la céramique réfractaire forme un point chaud stable et détectable. Le modèle surestime la température d'un facteur ~1,8 mais prédit bien la forme du champ, ce qui compte ici.</p>
       </div>
     </div>
   </section>

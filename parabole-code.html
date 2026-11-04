@@ -391,7 +391,6 @@ nav{position:fixed;z-index:100}
       <span class="section-num">05</span>
       <h2 class="section-title">Code &amp; développement</h2>
     </div>
-    <p class="section-sub">Développement itératif — chaque sous-système a posé ses propres problèmes. Le homing, les fins de course, et la boucle de suivi ont chacun nécessité des ajustements matériels et logiciels.</p>
 
     <!-- ── 6.1 Homing & fins de course ── -->
     <div id="sec-code-homing" style="margin-bottom:4rem">
@@ -400,7 +399,7 @@ nav{position:fixed;z-index:100}
         <h3 style="font-family:'IBM Plex Sans',sans-serif;font-weight:700;font-size:18px;letter-spacing:-.01em">Homing &amp; fins de course</h3>
       </div>
 
-      <p style="font-size:13px;color:var(--muted);line-height:1.9;margin-bottom:1.5rem">Les moteurs pas à pas fonctionnent en comptant des impulsions — chaque pas correspond à un angle de rotation précis. En comptant les pas depuis une position connue, on sait exactement où on se trouve. Mais au démarrage, cette position de référence est inconnue. C'est exactement le même principe qu'une <strong style="color:var(--text)">centrale inertielle de sous-marin</strong> : on peut intégrer des déplacements avec précision, mais il faut d'abord initialiser la position absolue. C'est le rôle du <strong style="color:var(--text)">homing</strong> — trouver un point de référence physique connu (la butée mécanique) pour ancrer le repère.</p>
+      <p style="font-size:13px;color:var(--muted);line-height:1.9;margin-bottom:1.5rem">Un moteur pas à pas sait de combien il a tourné, pas où il se trouve. Au démarrage, il lui faut une référence physique : c'est le <em>homing</em>, qui va chercher les butées de fin de course.</p>
 
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:3rem">
         <div style="background:var(--card);padding:2rem">
@@ -439,12 +438,12 @@ nav{position:fixed;z-index:100}
         <!-- Problème + solution -->
         <div style="background:var(--card);padding:2rem">
           <div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent2);margin-bottom:1rem">Le problème — ligne flottante</div>
-          <p style="font-size:12px;color:var(--muted);line-height:1.9;margin-bottom:1rem">Sans résistance, les fins de course se déclenchaient <strong style="color:var(--text)">de façon aléatoire</strong> même sans contact physique. La cause : une entrée GPIO non connectée est dans un état <strong style="color:var(--accent2)">indéfini</strong> — elle "flotte" entre 0 et 1 selon le bruit électromagnétique ambiant des moteurs et de l'alimentation switching.</p>
+          <p style="font-size:12px;color:var(--muted);line-height:1.9;margin-bottom:1rem">Sans résistance, les fins de course se déclenchaient tout seuls : une entrée GPIO non reliée « flotte » et capte le bruit des moteurs et de l'alimentation.</p>
           <div style="padding:1rem;background:var(--bg);border:1px solid var(--accent2);font-size:11px;color:var(--accent2);letter-spacing:.04em;margin-bottom:1.5rem">
             GPIO flottant → bruit EM capté → lecture aléatoire HIGH/LOW → fin de course fantôme
           </div>
           <div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem">La solution — résistance pull-down 10 kΩ</div>
-          <p style="font-size:12px;color:var(--muted);line-height:1.9;margin-bottom:1rem">Une résistance de <strong style="color:var(--text)">10 kΩ entre la broche GPIO et GND</strong> force l'état de repos à LOW. Quand le fin de course se ferme, il relie la broche à +5V → passage à HIGH détecté comme déclenchement. C'est une solution <strong style="color:var(--text)">purement hardware</strong> — zéro modification du code.</p>
+          <p style="font-size:12px;color:var(--muted);line-height:1.9;margin-bottom:1rem">Une résistance de 10 kΩ entre la broche GPIO et GND force l'état de repos à LOW. Le fin de course, relié au +5 V, fait passer la broche à HIGH. Aucune modification du code.</p>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border)">
             <div style="background:var(--bg);padding:1rem;text-align:center">
               <div style="font-size:10px;color:var(--muted);margin-bottom:.25rem">Repos — interrupteur ouvert</div>
@@ -472,7 +471,7 @@ nav{position:fixed;z-index:100}
         <span style="font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)">6.3</span>
         <h3 style="font-family:'IBM Plex Sans',sans-serif;font-weight:700;font-size:18px;letter-spacing:-.01em">Détection thermique — barycentre pondéré</h3>
       </div>
-      <p style="font-size:13px;color:var(--muted);line-height:1.9;margin-bottom:1.5rem">La caméra thermique produit une image en niveaux de gris où la luminosité est un proxy de la température. Pour trouver le centre du point chaud, on calcule un <strong style="color:var(--text)">barycentre thermique pondéré</strong> — chaque pixel contribue proportionnellement à son intensité, exactement comme un centre de masse en physique.</p>
+      <p style="font-size:13px;color:var(--muted);line-height:1.9;margin-bottom:1.5rem">Sur l'image thermique, plus un pixel est clair, plus il est chaud. Le centre du point chaud est un barycentre pondéré par l'intensité, comme un centre de masse.</p>
 
       <!-- Seuillage -->
       <div style="background:var(--bg);border:1px solid var(--border);border-left:3px solid var(--accent2);padding:1.25rem 1.5rem;margin-bottom:1.5rem">
@@ -543,7 +542,7 @@ nav{position:fixed;z-index:100}
         <span style="font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)">6.4</span>
         <h3 style="font-family:'IBM Plex Sans',sans-serif;font-weight:700;font-size:18px;letter-spacing:-.01em">Code source complet</h3>
       </div>
-      <p style="font-size:13px;color:var(--muted);line-height:1.9;margin-bottom:1.5rem">L'ensemble — homing, détection thermique, barycentre, boucle de correction et gestion des fins de course — est intégré dans un seul programme Python tournant sur le Raspberry Pi 2B.</p>
+      <p style="font-size:13px;color:var(--muted);line-height:1.9;margin-bottom:1.5rem">Tout tourne dans un seul programme Python sur le Raspberry Pi 2B.</p>
       <div style="background:var(--card);border:1px solid var(--border);padding:1.5rem 2rem;display:flex;align-items:center;justify-content:space-between;gap:2rem">
         <div>
           <div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:.4rem">Code source complet — suivi solaire Raspberry Pi</div>

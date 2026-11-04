@@ -388,7 +388,6 @@ nav{position:fixed;z-index:100}
       <span class="section-num">02</span>
       <h2 class="section-title">Modélisation 3D — Fusion 360</h2>
     </div>
-    <p class="section-sub">Tout le système a été modélisé depuis le début sur Fusion 360 avant la moindre impression. Trois itérations successives — les deux premières n'ont jamais été imprimées, mais elles ont permis de comprendre les objectifs du projet, d'identifier les erreurs de conception et de repartir sur des bases solides pour le prototype final.</p>
 
     <!-- Protos CAO -->
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:2px">
@@ -398,7 +397,7 @@ nav{position:fixed;z-index:100}
         <div style="background:#080808;border:1px solid var(--border);overflow:hidden;margin-bottom:1rem">
           <img src="CAO_proto1.png" alt="Proto 1 Fusion 360 — couronne simple" style="width:100%;display:block;filter:brightness(.85)">
         </div>
-        <p style="font-size:12px;color:var(--muted);line-height:1.8">Première approche : structure simple avec couronne de rotation azimut et bras altitude basique. Ce prototype n'a jamais été imprimé — les calculs de couple ont rapidement montré que la motorisation était sous-dimensionnée et que la structure manquait de rigidité.</p>
+        <p style="font-size:12px;color:var(--muted);line-height:1.8">Structure simple : couronne azimut et bras altitude. Jamais imprimé, les calculs de couple ont montré une motorisation sous-dimensionnée et une structure trop souple.</p>
       </div>
       <div style="background:var(--card);padding:2rem">
         <div style="font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:.75rem">Prototype 2 — CAO uniquement</div>
@@ -406,7 +405,7 @@ nav{position:fixed;z-index:100}
         <div style="background:#080808;border:1px solid var(--border);overflow:hidden;margin-bottom:1rem">
           <img src="CAO_proto2.png" alt="Proto 2 Fusion 360 — réducteur épicycloïdal" style="width:100%;display:block;filter:brightness(.85)">
         </div>
-        <p style="font-size:12px;color:var(--muted);line-height:1.8">Deuxième itération : introduction d'un train épicycloïdal pour multiplier le couple disponible. La structure est plus aboutie mais l'intégration de l'électronique n'était pas encore pensée. Là aussi, jamais imprimé — ce modèle a posé les bases du proto final.</p>
+        <p style="font-size:12px;color:var(--muted);line-height:1.8">Ajout d'un train épicycloïdal pour multiplier le couple. L'électronique n'était pas encore intégrée. Jamais imprimé non plus.</p>
       </div>
     </div>
 
@@ -417,16 +416,16 @@ nav{position:fixed;z-index:100}
       <div style="background:#080808;border:1px solid var(--border);overflow:hidden;margin-bottom:1rem">
         <img src="CAO_final.png" alt="Proto final Fusion 360 — système complet" style="width:100%;display:block;filter:brightness(.85)">
       </div>
-      <p style="font-size:12px;color:var(--muted);line-height:1.8">Le prototype final repart des enseignements des deux itérations précédentes. Tout est repensé : le train épicycloïdal est intégré dans un boîtier compact, le Raspberry Pi 2B est logé dans la base, le bras foyer est rigidifié, et la couronne azimut est dimensionnée pour le couple réel. Ce modèle a été entièrement imprimé et assemblé.</p>
+      <p style="font-size:12px;color:var(--muted);line-height:1.8">Tout est repensé : réducteur dans un boîtier compact, Raspberry Pi logé dans la base, bras foyer rigidifié, couronne dimensionnée pour le couple réel. Imprimé et assemblé.</p>
     </div>
 
     <!-- Photos proto physique -->
     <!-- Intro dimensionnement -->
     <div style="margin-top:3rem;margin-bottom:2rem">
       <div style="font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);margin-bottom:1.5rem">Pourquoi un réducteur ?</div>
-      <p style="font-size:13px;color:var(--muted);line-height:1.9;margin-bottom:1rem">La parabole TV est en aluminium — elle est légère. C'est l'ensemble du système monté sur la base motorisée — bras foyer, caméra, cible, boîtier électronique — qui crée un bras de levier important par rapport aux axes de rotation. Le centre de gravité de cet ensemble se trouve à une distance significative des axes, ce qui génère un <strong style="color:var(--text)">couple résistant</strong> que les moteurs doivent vaincre pour orienter le système.</p>
-      <p style="font-size:13px;color:var(--muted);line-height:1.9;margin-bottom:1rem">Les moteurs pas à pas NEMA 17, choisis pour leur précision et leur faible coût, ne fournissent que 0,5 N·m. On aurait pu utiliser un moteur à très fort couple — mais ce serait bien plus cher, lourd et complexe. Le soleil se déplace très lentement (~15°/heure), donc aller lentement n'est pas un problème. Un <strong style="color:var(--text)">petit moteur + gros réducteur</strong> permet d'obtenir le couple nécessaire avec un composant standard et accessible.</p>
-      <p style="font-size:13px;color:var(--muted);line-height:1.9;margin-bottom:2rem">Par ailleurs, un <strong style="color:var(--text)">facteur de sécurité de 3</strong> a été appliqué sur le couple calculé : l'étude statique ne prend pas en compte le <strong style="color:var(--text)">vent</strong> qui peut exercer une pression significative sur la surface de la parabole, ni les frottements dans les roulements, ni les vibrations.</p>
+      <p style="font-size:13px;color:var(--muted);line-height:1.9;margin-bottom:1rem">La parabole est légère, mais tout ce qui est monté dessus (bras foyer, caméra, cible, électronique) crée un bras de levier important : environ 10 N·m de couple résistant.</p>
+      <p style="font-size:13px;color:var(--muted);line-height:1.9;margin-bottom:1rem">Un NEMA 17 ne donne que 0,5 N·m. Plutôt qu'un gros moteur cher et lourd, un petit moteur avec un réducteur ×80 suffit : le soleil avance lentement (~15°/h), donc aller lentement n'est pas un problème.</p>
+      <p style="font-size:13px;color:var(--muted);line-height:1.9;margin-bottom:2rem">Facteur de sécurité de 3, pour couvrir le vent, les frottements et les vibrations.</p>
 
       <!-- Image profil + tableau côte à côte -->
       <div style="display:grid;grid-template-columns:1fr 2fr;gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:3rem">
