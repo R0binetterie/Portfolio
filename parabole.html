@@ -6,10 +6,9 @@
 <title>Suivi solaire — Suivi solaire — Robin Bonfill</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+<link rel="stylesheet" href="vendor/katex/katex.min.css">
+<script defer src="vendor/katex/katex.min.js"></script>
+<script defer src="vendor/katex/auto-render.min.js"
   onload="renderMathInElement(document.body, {
     delimiters: [
       {left:'$$', right:'$$', display:true},
@@ -413,6 +412,18 @@ nav{position:fixed;z-index:100}
 .facts div span{font-size:15px}
 @media(max-width:900px){.lp{padding:0 1.5rem}.why,.path{grid-template-columns:1fr}.facts{grid-template-columns:1fr 1fr}.sc canvas{height:340px}}
 
+
+  /* garde-fous : photos portrait trop hautes, grilles en ligne sur mobile */
+  img { max-width: 100%; }
+  img:not(.lp-logo):not([src$=".svg"]) { max-height: 640px; object-fit: contain; }
+  @media (max-width: 700px) {
+    [style*="grid-template-columns"] { grid-template-columns: 1fr !important; }
+    img:not(.lp-logo):not([src$=".svg"]) { max-height: 520px; }
+  }
+  .katex-display { overflow-x: auto; overflow-y: hidden; padding: .25rem 0; }
+  .page-wrap > * { min-width: 0; }
+  .process-steps > *, [style*="display:grid"] > * { min-width: 0; }
+  .stencil-wrap { max-width: 100%; overflow-x: auto; }  /* la colonne de contenu ne doit pas s'élargir au-delà de l'écran */
 </style>
 </head>
 <body>
