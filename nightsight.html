@@ -530,12 +530,14 @@
   }
 
   /* ── PAGE RESSERRÉE ── */
+  .perspectives.three { grid-template-columns: repeat(3, 1fr); }
   .process-steps.three { grid-template-columns: repeat(3, 1fr); margin-bottom: 0; }
   a.step-card { display: block; text-decoration: none; color: inherit; }
   .key-list { list-style: none; padding: 0; margin: -1rem 0 2.5rem; max-width: 640px; display: flex; flex-direction: column; gap: .6rem; }
   .key-list li { font-size: 13px; color: var(--muted); line-height: 1.7; padding-left: 1.1rem; position: relative; }
   .key-list li::before { content: ''; position: absolute; left: 0; top: .7em; width: 6px; height: 1px; background: var(--accent); }
   .key-list b { color: var(--text); font-weight: 500; }
+  .section-sub + .section-sub { margin-top: -1.5rem; }
   details.more { border-top: 1px solid var(--border); }
   details.more summary { cursor: pointer; list-style: none; padding: 1rem 0; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
   details.more summary::-webkit-details-marker { display: none; }
@@ -549,7 +551,7 @@
   .bom-row:last-child { border-bottom: 0; }
   .bom-row span:first-child { color: var(--text); }
   .bom-row span:last-child { color: var(--muted); }
-  @media (max-width: 900px) { .process-steps.three { grid-template-columns: 1fr; } }
+  @media (max-width: 900px) { .process-steps.three, .perspectives.three { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
@@ -641,7 +643,8 @@
       <span class="section-num">01</span>
       <h2 class="section-title">Reproduire un modèle open-source</h2>
     </div>
-    <p class="section-sub">Point de départ : les plans <a href="https://vonscherfarms.com/PVS-69-ALPHA-1-2-file-packs-p513898898" target="_blank" style="color:inherit;text-decoration:underline">PVS-69 Alpha 1/2</a>. Un modèle exigeant en tolérances, idéal pour vraiment prendre en main l'imprimante 3D.</p>
+    <p class="section-sub">Point de départ : les plans <a href="https://vonscherfarms.com/PVS-69-ALPHA-1-2-file-packs-p513898898" target="_blank" style="color:inherit;text-decoration:underline">PVS-69 Alpha 1/2</a> de Vonscherfarm. Le principe est simple : dans chaque tube, une caméra starlight (Runcam Night Eagle 3) filme dans le noir, et son image s'affiche sur un micro-écran OLED de 0,4" placé juste devant l'œil, derrière une optique grossissante.</p>
+    <p class="section-sub">Reconstruire ce modèle pièce par pièce a surtout servi à prendre en main mon imprimante 3D sur un vrai projet. Les tolérances sont serrées : plusieurs passes sur la Bambu Lab, en PLA pour les essais puis en PETG pour les pièces finales.</p>
     <div class="perch-row" aria-hidden="true"><div class="perch"><img src="aigle_meca.png" alt=""></div></div>
     <div class="photo-grid col3">
       <div class="photo-item auto" style="min-height:280px;">
@@ -665,10 +668,11 @@
       <span class="section-num">02</span>
       <h2 class="section-title">Améliorer</h2>
     </div>
+    <p class="section-sub">Une fois les jumelles montées, j'ai commencé à corriger ce qui me gênait à l'usage.</p>
     <ul class="key-list">
-      <li><b>Backplate</b> redessinée : la première pièce vraiment à moi.</li>
-      <li><b>Charnières</b> : l'alimentation et la vidéo passent dans l'axe creux, en fils 26AWG torsadés.</li>
-      <li><b>Alimentation</b> : batterie USB 5 V abaissée à 4 V par un buck MP1584.</li>
+      <li><b>Backplate</b> redessinée : la première pièce vraiment à moi, à la place de celle d'origine.</li>
+      <li><b>Charnières</b> : pour régler l'écart entre les yeux, chaque tube pivote. L'alimentation et la vidéo passent dans l'axe creux, en fils 26AWG torsadés, pour suivre la rotation sans se plier.</li>
+      <li><b>Alimentation</b> : au début, il n'y avait pas de régulation. Les écrans recevaient directement le 5 V de la batterie, soit leur tension maximale : le montage tournait en permanence à la limite. J'ai ajouté un buck MP1584 qui abaisse à 4 V et garde une marge.</li>
     </ul>
     <div class="perch-row" aria-hidden="true"><div class="perch wide"><img src="aigle_soudure.png" alt=""></div></div>
     <div class="photo-grid col3">
@@ -693,7 +697,8 @@
       <span class="section-num">03</span>
       <h2 class="section-title">Ajouter un tube thermique</h2>
     </div>
-    <p class="section-sub">La caméra starlight voit la lumière que les objets renvoient. Une caméra thermique voit la chaleur qu'ils émettent. Elle sort aussi un signal analogique, donc elle se branche sur le même écran. Il a fallu retravailler le tube pour loger son objectif.</p>
+    <p class="section-sub">L'idée est venue une fois les jumelles finies. La caméra starlight voit la lumière que les objets renvoient, il lui en faut donc un peu. Une caméra thermique voit la chaleur qu'ils émettent eux-mêmes, même dans le noir complet.</p>
+    <p class="section-sub">Elle sort elle aussi un signal vidéo analogique, donc elle se branche sur le même écran que la caméra NV. Elle consomme plus, mais ça reste gérable. Le vrai travail a été mécanique : retravailler le tube pour loger son objectif, plus gros. Résultat : un tube NV et un tube thermique, côte à côte.</p>
     <div class="perch-row" aria-hidden="true"><div class="perch"><img src="aigle_precision.png" alt=""></div></div>
     <div class="photo-grid col3">
       <div class="photo-item auto" style="min-height:260px;">
@@ -804,7 +809,7 @@
       <h2 class="section-title">La suite</h2>
     </div>
     <div class="perch-row" aria-hidden="true"><div class="perch sm"><img src="aigle_profil.png" alt=""></div></div>
-    <div class="perspectives">
+    <div class="perspectives three">
       <div class="persp-item">
         <div class="persp-tag">Fusion</div>
         <div class="persp-title">NV + thermique sur une seule image</div>
@@ -814,6 +819,11 @@
         <div class="persp-tag">Optique</div>
         <div class="persp-title">De meilleurs objectifs</div>
         <div class="persp-desc">Remplacer les objectifs d'origine des caméras pour gagner en sensibilité et en champ de vision.</div>
+      </div>
+      <div class="persp-item">
+        <div class="persp-tag">Électronique</div>
+        <div class="persp-title">Un PCB pour protéger le montage</div>
+        <div class="persp-desc">Remplacer le module buck et les fils volants par une petite carte dédiée, pour protéger les écrans et les caméras.</div>
       </div>
     </div>
   </section>
