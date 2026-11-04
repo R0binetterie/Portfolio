@@ -472,6 +472,62 @@
     footer { flex-direction: column; gap: 0.5rem; text-align: center; padding: 1.5rem; }
     .hero-deco { display: none; }
   }
+
+  /* ── AIGLES ── */
+  /* Grand aigle qui sort du bord droit de l'écran (conteneur qui coupe ce qui dépasse) */
+  .eagle-clip { position: absolute; top: 0; left: 0; right: 0; height: 900px; overflow: hidden; pointer-events: none; z-index: 3; }
+  .eagle-hero {
+    position: absolute; top: 84px; right: 0; z-index: 3;
+    width: clamp(240px, 24vw, 430px); pointer-events: none;
+    animation: eagleIn 1s cubic-bezier(.2,.85,.25,1.15) .5s both;
+  }
+  .eagle-hero img {
+    display: block; width: 100%; height: auto;
+    transform-origin: 90% 60%;
+    animation: eagleLook 7s ease-in-out 2.2s infinite;
+    filter: drop-shadow(-10px 14px 18px rgba(0,0,0,.45));
+  }
+  @keyframes eagleIn {
+    from { transform: translateX(105%) rotate(8deg); }
+    to   { transform: translateX(14%) rotate(0); }
+  }
+  /* de temps en temps il tourne la tête, puis revient */
+  @keyframes eagleLook {
+    0%, 72%, 100% { transform: rotate(0) translateX(0); }
+    78%, 86% { transform: rotate(-4deg) translateX(-6px); }
+    92% { transform: rotate(1deg) translateX(2px); }
+  }
+  @media (min-width: 1101px) {
+    .hero { padding-right: clamp(3rem, calc(270px - (100vw - 1400px) / 2), 270px); }
+  }
+  /* Aigles posés sur le bord haut du bloc qui suit le titre de section */
+  .perch-row { position: relative; height: 0; }
+  .perch {
+    position: absolute; right: 1.5rem; bottom: 0; z-index: 6;
+    width: 160px; overflow: hidden; pointer-events: none;
+  }
+  .perch.wide { width: 200px; }
+  .perch.sm { width: 128px; }  /* sections sans sous-titre : moins de place au-dessus */
+  .perch.ledge { bottom: -10px; width: 200px; }
+  .perch img {
+    display: block; width: 100%; height: auto;
+    transform: translateY(100%);
+    transition: transform .8s cubic-bezier(.2,.85,.25,1.1) .3s;
+  }
+  .section.visible .perch img { transform: none; }
+  @media (max-width: 900px) {
+    .hero { padding-top: 190px; }
+    .eagle-hero { top: 64px; width: 140px; }
+    .perch { width: 100px; right: .5rem; }
+    .perch.wide, .perch.ledge { width: 124px; }
+    .perch.sm { width: 90px; }
+    .perch.ledge { bottom: -6px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .eagle-hero, .eagle-hero img { animation: none; }
+    .eagle-hero { transform: translateX(14%); }
+    .perch img { transition: none; transform: none; }
+  }
 </style>
 </head>
 <body>
@@ -488,6 +544,7 @@
 </nav>
 
 <!-- HERO -->
+<div class="eagle-clip" aria-hidden="true"><div class="eagle-hero"><img src="aigle_hero.png" alt=""></div></div>
 <section class="hero" id="hero" style="position:relative;">
   <div class="hero-deco">NV</div>
   <div class="fade-in">
@@ -637,6 +694,7 @@
       Plusieurs passes d'impression sur Bambu Lab pour affiner les tolérances — PLA pour les prototypes rapides, PETG pour les pièces finales. Le défi principal : les logements du combo écran/optique doivent être précis au dixième pour que l'image soit nette à distance d'œil confortable. Chaque itération de charnière implique de réimprimer et re-câbler.
     </p>
 
+    <div class="perch-row" aria-hidden="true"><div class="perch"><img src="aigle_meca.png" alt=""></div></div>
     <div class="photo-grid col3" style="margin-bottom:2px;">
       <div class="photo-item auto" style="min-height:300px;">
         <img src="print_bambu_1.jpg" alt="Bambu Lab en cours d'impression pièces NightSight">
@@ -673,6 +731,7 @@
       L'assemblage électronique est simple — le vrai défi est mécanique : faire passer plusieurs fils (5V alim + signal CVBS vidéo) à travers l'axe creux des charnières sans créer de point de rupture ni de friction à la rotation.
     </p>
 
+    <div class="perch-row" aria-hidden="true"><div class="perch wide"><img src="aigle_soudure.png" alt=""></div></div>
     <div class="photo-grid featured" style="margin-bottom:2px;">
       <div class="photo-item auto" style="min-height:360px;">
         <img src="IMG_5241.jpg" alt="Lunettes ouvertes vue dessus câblage charnière fils rouges noirs">
@@ -729,6 +788,7 @@
       Photos prises directement à travers les oculaires — ce que l'œil perçoit via les micro-OLED 0.4". Les images noires autour sont normales : c'est l'eyecup qui masque l'environnement.
     </p>
 
+    <div class="perch-row" aria-hidden="true"><div class="perch ledge"><img src="aigle_rebord.png" alt=""></div></div>
     <div class="pov-section">
       <div class="pov-item">
         <div class="scan"></div>
@@ -928,6 +988,7 @@
       <h2 class="section-title">Architecture électronique</h2>
     </div>
 
+    <div class="perch-row" aria-hidden="true"><div class="perch sm"><img src="aigle_precision.png" alt=""></div></div>
     <div class="arch-diagram" style="margin-bottom:3rem;">
       <div class="arch-block">
         <div class="arch-box highlight">Batterie externe<br>5V USB</div>
@@ -998,6 +1059,7 @@
       <h2 class="section-title">Défis techniques</h2>
     </div>
 
+    <div class="perch-row" aria-hidden="true"><div class="perch sm"><img src="aigle_bras_croises.png" alt=""></div></div>
     <div class="challenges">
       <div class="challenge-item">
         <div class="challenge-num">01</div>
@@ -1024,6 +1086,7 @@
       <h2 class="section-title">Prochaines étapes</h2>
     </div>
 
+    <div class="perch-row" aria-hidden="true"><div class="perch sm"><img src="aigle_profil.png" alt=""></div></div>
     <div class="perspectives">
       <div class="persp-item">
         <div class="persp-tag">Fusion sensorielle</div>

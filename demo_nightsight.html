@@ -1,0 +1,246 @@
+<title>NightSight Démos</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+/* Layout : colonne unique, 3 modules empilés, même langage que nightsight.html (single-dark volontaire) */
+:root{
+  --bg:#0a0a0a; --bg2:#111111; --border:#222222; --card:#131313;
+  --accent:#c8f542; --accent2:#f5a623; --text:#e8e8e0; --muted:#77776f; --dim:#3a3a36;
+  --tag-vsf:#7a8cff; --tag-mod:#c8f542; --tag-orig:#f5a623;
+  --f-display:'Syne',system-ui,sans-serif; --f-mono:'DM Mono',ui-monospace,Menlo,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:var(--f-mono);font-size:14px;line-height:1.7;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:3rem 5rem}
+.wrap{max-width:1100px;margin:0 auto;display:flex;flex-direction:column;gap:5rem}
+header h1{font-family:var(--f-display);font-weight:800;font-size:clamp(2rem,5vw,3.2rem);line-height:1;margin:0 0 .6rem}
+header h1 span{color:var(--accent)}
+header p{color:var(--muted);max-width:62ch;margin:0;font-size:13px}
+.mod-head{display:flex;align-items:baseline;gap:1rem;margin-bottom:.4rem;flex-wrap:wrap}
+.mod-num{font-size:11px;color:var(--accent);letter-spacing:.15em}
+.mod-head h2{font-family:var(--f-display);font-weight:700;font-size:1.6rem;margin:0;text-wrap:balance}
+.mod-sub{color:var(--muted);font-size:13px;max-width:70ch;margin:0 0 1.5rem}
+.note{font-size:11px;color:var(--muted);border-left:2px solid var(--accent2);padding:.4rem .8rem;margin-top:1rem;max-width:80ch}
+button{font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;background:transparent;color:var(--muted);
+  border:1px solid var(--border);padding:.45rem .8rem;cursor:pointer;transition:color .2s,border-color .2s}
+button:hover{color:var(--text);border-color:var(--muted)}
+button[aria-pressed="true"]{color:var(--bg);background:var(--accent);border-color:var(--accent)}
+button:focus-visible,input:focus-visible{outline:1px solid var(--accent);outline-offset:2px}
+
+/* ---------- 1. Slider backplate ---------- */
+.ba{position:relative;aspect-ratio:1200/700;max-width:100%;background:var(--bg2);border:1px solid var(--border);overflow:hidden;user-select:none;touch-action:pan-y;cursor:ew-resize}
+.ba img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;pointer-events:none}
+.ba .after{clip-path:inset(0 0 0 var(--pos,50%))}
+.ba .bar{position:absolute;top:0;bottom:0;left:var(--pos,50%);width:1px;background:var(--accent);pointer-events:none}
+.ba .knob{position:absolute;top:50%;left:var(--pos,50%);transform:translate(-50%,-50%);width:34px;height:34px;border:1px solid var(--accent);
+  background:var(--bg);display:grid;place-items:center;color:var(--accent);font-size:12px;pointer-events:none}
+.ba .lbl{position:absolute;top:.8rem;font-size:10px;letter-spacing:.14em;text-transform:uppercase;padding:.25rem .6rem;background:rgba(10,10,10,.8)}
+.ba .lbl.l{left:.8rem;color:var(--tag-vsf);border-left:2px solid var(--tag-vsf)}
+.ba .lbl.r{right:.8rem;color:var(--tag-mod);border-right:2px solid var(--tag-mod)}
+.ba input{position:absolute;inset:0;width:100%;opacity:0;cursor:ew-resize;margin:0}
+
+/* ---------- 2. Spectre ---------- */
+.spec{border:1px solid var(--border);background:var(--card);padding:1.25rem}
+.spec canvas{width:100%;height:300px;display:block}
+.spec-ctrl{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;margin-bottom:1rem}
+.spec-row{display:grid;grid-template-columns:auto 1fr auto;gap:1rem;align-items:center;margin:1rem 0 0}
+.spec-row label{font-size:11px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
+input[type=range]{accent-color:var(--accent);width:100%}
+.tval{font-family:var(--f-display);font-weight:700;font-size:1.3rem;color:var(--text);min-width:7ch;text-align:right;font-variant-numeric:tabular-nums}
+.readout{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--border);border:1px solid var(--border);margin-top:1.25rem}
+.readout div{background:var(--bg2);padding:.8rem 1rem;min-width:0}
+.readout .k{font-size:10px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;display:block}
+.readout .v{font-size:1.05rem;font-variant-numeric:tabular-nums}
+.readout .v.nv{color:var(--accent)} .readout .v.th{color:var(--accent2)}
+.verdict{font-size:12px;color:var(--muted);margin-top:1rem;min-height:3.4em;max-width:80ch}
+.verdict b{color:var(--text);font-weight:500}
+@media (max-width:640px){.readout{grid-template-columns:repeat(2,minmax(0,1fr))}.spec canvas{height:240px}}
+
+/* ---------- 3. Coupe cliquable ---------- */
+.xs{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:1px;background:var(--border);border:1px solid var(--border)}
+.xs-img{position:relative;background:var(--bg2)}
+.xs-img img{display:block;width:100%;height:auto}
+.hs{position:absolute;transform:translate(-50%,-50%);width:26px;height:26px;border-radius:50%;padding:0;
+  background:rgba(10,10,10,.75);border:1px solid var(--c,var(--accent));color:var(--c,var(--accent));font-size:11px;letter-spacing:0;
+  display:grid;place-items:center;text-transform:none}
+.hs::after{content:"";position:absolute;inset:-6px;border-radius:50%;border:1px solid var(--c,var(--accent));opacity:.0;animation:ping 2.4s infinite}
+.hs[aria-pressed="true"]{background:var(--c,var(--accent));color:var(--bg)}
+@keyframes ping{0%{opacity:.6;transform:scale(.8)}80%,100%{opacity:0;transform:scale(1.5)}}
+@media (prefers-reduced-motion:reduce){.hs::after{animation:none}}
+.xs-panel{background:var(--card);padding:1.5rem;display:flex;flex-direction:column;gap:.9rem;min-width:0}
+.xs-panel .tag{align-self:flex-start;font-size:10px;letter-spacing:.14em;text-transform:uppercase;padding:.2rem .55rem;border:1px solid currentColor}
+.xs-panel h3{font-family:var(--f-display);font-weight:700;font-size:1.25rem;margin:0}
+.xs-panel p{margin:0;color:var(--muted);font-size:12.5px}
+.xs-panel .spec-l{display:flex;justify-content:space-between;gap:1rem;border-top:1px solid var(--border);padding-top:.5rem;font-size:12px}
+.xs-panel .spec-l span:first-child{color:var(--muted)}
+.todo{color:var(--accent2);font-size:11px}
+.legend{display:flex;flex-wrap:wrap;gap:1.2rem;margin-top:.9rem;font-size:11px;color:var(--muted)}
+.legend i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:.45rem;vertical-align:middle}
+.edit-bar{display:flex;gap:.6rem;align-items:center;margin-top:.9rem;flex-wrap:wrap}
+.edit-bar code{font-size:11px;color:var(--accent);background:var(--bg2);padding:.3rem .6rem;border:1px solid var(--border)}
+.xs-img.editing{cursor:crosshair}
+@media (max-width:760px){.xs{grid-template-columns:1fr}}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Night<span>Sight</span> — démos</h1>
+    <p>Trois modules interactifs à tester avant intégration dans la page. Les textes sont provisoires ; tout ce qui est marqué « à confirmer » attend ta validation.</p>
+  </header>
+
+  <!-- ================= 1. SLIDER BACKPLATE ================= -->
+  <section>
+    <div class="mod-head"><span class="mod-num">PHASE ① → ②</span><h2>De la reproduction à la modification</h2></div>
+    <p class="mod-sub">Glisse pour passer du modèle de référence Vonscherfarm à ta backplate.</p>
+    <div class="ba" id="ba" style="--pos:50%">
+      <img src="vonscherfarm_pvs69.png" alt="PVS-69 Alpha 1/2 — modèle de référence Vonscherfarm">
+      <img class="after" src="cao_backplate.png" alt="Backplate modifiée — render Fusion 360">
+      <div class="bar"></div><div class="knob">⇔</div>
+      <span class="lbl l">Vonscherfarm</span><span class="lbl r">Ma backplate</span>
+      <input id="ba-range" type="range" min="0" max="100" value="50" aria-label="Comparer original et version modifiée">
+    </div>
+    <p class="note">Les deux images n'ont ni le même cadrage ni le même fond. L'effet ne marchera vraiment qu'avec deux captures Fusion prises sous la même vue : la backplate d'origine (importée depuis les fichiers Vonscherfarm) et la tienne, même caméra, même fond.</p>
+  </section>
+
+  <!-- ================= 2. SPECTRE ================= -->
+  <section>
+    <div class="mod-head"><span class="mod-num">PHASE ③</span><h2>Réfléchi ou émis</h2></div>
+    <p class="mod-sub">Tout corps émet un rayonnement qui dépend de sa température (loi de Planck). Choisis une source et regarde où tombe son émission par rapport à ce que voient les deux tubes.</p>
+    <div class="spec">
+      <div class="spec-ctrl" id="presets"></div>
+      <canvas id="cv" aria-label="Spectre d'émission du corps noir et bandes des capteurs"></canvas>
+      <div class="spec-row">
+        <label for="T">Température</label>
+        <input id="T" type="range" min="0" max="1000" step="1">
+        <span class="tval" id="Tval">310 K</span>
+      </div>
+      <div class="readout">
+        <div><span class="k">T</span><span class="v" id="r-tc">37 °C</span></div>
+        <div><span class="k">λ<sub>max</sub> (Wien)</span><span class="v" id="r-wien">9,35 µm</span></div>
+        <div><span class="k">Part vue par tube NV</span><span class="v nv" id="r-nv">0 %</span></div>
+        <div><span class="k">Part vue par tube thermique</span><span class="v th" id="r-th">0 %</span></div>
+      </div>
+      <p class="verdict" id="verdict"></p>
+    </div>
+    <p class="note">Bandes supposées : capteur CMOS silicium ≈ 0,4–1,0 µm pour la Night Eagle 3, microbolomètre ≈ 8–14 µm pour le thermique (valeur typique des modules FPV non refroidis). À vérifier sur la fiche de ton module thermique. Corps supposés noirs (émissivité 1).</p>
+  </section>
+
+  <!-- ================= 3. COUPE CLIQUABLE ================= -->
+  <section>
+    <div class="mod-head"><span class="mod-num">ANATOMIE</span><h2>Coupe transversale</h2></div>
+    <p class="mod-sub">Clique sur un point pour voir la pièce, son origine et son rôle.</p>
+    <div class="xs">
+      <div class="xs-img" id="xsImg">
+        <img src="cao_coupe_face.jpg" alt="Coupe transversale Fusion 360 des deux tubes NightSight" id="xsPic">
+      </div>
+      <div class="xs-panel" id="xsPanel" aria-live="polite"></div>
+    </div>
+    <div class="legend">
+      <span><i style="background:var(--tag-vsf)"></i>Vonscherfarm</span>
+      <span><i style="background:var(--tag-mod)"></i>Modifié</span>
+      <span><i style="background:var(--tag-orig)"></i>Original</span>
+    </div>
+    <div class="edit-bar">
+      <button id="editBtn" aria-pressed="false">Mode placement</button>
+      <code id="editOut">Active le mode puis clique sur l'image : les coordonnées s'affichent ici.</code>
+    </div>
+  </section>
+</div>
+
+<script>
+/* ---------- 1. Slider ---------- */
+(()=>{
+  const ba=document.getElementById('ba'), r=document.getElementById('ba-range');
+  r.addEventListener('input',()=>ba.style.setProperty('--pos',r.value+'%'));
+})();
+
+/* ---------- 2. Spectre ---------- */
+(()=>{
+  const h=6.62607015e-34,c=2.99792458e8,k=1.380649e-23,b=2897.771955; // b en µm·K
+  const planck=(lum,T)=>{const l=lum*1e-6;const x=h*c/(l*k*T);if(x>700)return 0;return (2*h*c*c)/(l**5)/(Math.expm1(x));};
+  const Lmin=0.2,Lmax=30, Tmin=200,Tmax=6000;
+  const bands=[
+    {a:0.38,b:0.75,name:'Visible',col:'rgba(232,232,224,.10)',txt:'#77776f'},
+    {a:0.40,b:1.00,name:'Tube NV',col:'rgba(200,245,66,.16)',txt:'#c8f542',key:'nv'},
+    {a:8,b:14,name:'Tube thermique',col:'rgba(245,166,35,.16)',txt:'#f5a623',key:'th'}
+  ];
+  const presets=[['Glace',273],['Corps humain',310],['Café chaud',333],['Fer à souder',620],['Filament halogène',3000],['Soleil',5778]];
+  const cv=document.getElementById('cv'),ctx=cv.getContext('2d'),T=document.getElementById('T');
+  const toS=t=>Math.round(1000*Math.log(t/Tmin)/Math.log(Tmax/Tmin)), toT=s=>Tmin*Math.pow(Tmax/Tmin,s/1000);
+  const pc=document.getElementById('presets');
+  presets.forEach(([n,t])=>{const bt=document.createElement('button');bt.textContent=n;bt.dataset.t=t;bt.setAttribute('aria-pressed','false');
+    bt.onclick=()=>{T.value=toS(t);cur=t;draw();};pc.appendChild(bt);});
+  let cur=310; T.value=toS(cur);
+  T.addEventListener('input',()=>{cur=toT(+T.value);draw();});
+  // intégration log-espacée
+  const integ=(a,bb,t,n=600)=>{let s=0;const la=Math.log(a),lb=Math.log(bb),d=(lb-la)/n;for(let i=0;i<n;i++){const l=Math.exp(la+(i+.5)*d);s+=planck(l,t)*l*d;}return s;};
+  const fmt=(v)=>{if(v>=0.1)return (v*100).toFixed(1).replace('.',',')+' %';if(v<1e-12)return '≈ 0 %';const e=Math.floor(Math.log10(v*100));return (v*100/10**e).toFixed(1).replace('.',',')+'·10'+sup(e)+' %';};
+  const sup=n=>String(n).split('').map(ch=>'⁰¹²³⁴⁵⁶⁷⁸⁹'['0123456789'.indexOf(ch)]||'⁻').join('');
+  function draw(){
+    const dpr=window.devicePixelRatio||1,W=cv.clientWidth,H=cv.clientHeight;cv.width=W*dpr;cv.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);
+    const padL=8,padR=8,padT=22,padB=28,w=W-padL-padR,hh=H-padT-padB;
+    const X=l=>padL+w*Math.log(l/Lmin)/Math.log(Lmax/Lmin);
+    ctx.clearRect(0,0,W,H);
+    ctx.font='10px "DM Mono", monospace';
+    bands.forEach((bd,i)=>{const x0=X(bd.a),x1=X(bd.b);const y0=padT+(bd.key?0:0);ctx.fillStyle=bd.col;
+      if(bd.key==='nv'){ctx.fillRect(x0,padT+hh*0.5,x1-x0,hh*0.5);}else ctx.fillRect(x0,padT,x1-x0,hh);
+      ctx.fillStyle=bd.txt;ctx.textAlign='left';ctx.fillText(bd.name,x0+4,bd.key==='nv'?padT+hh*0.5+13:padT+13);});
+    // grille
+    ctx.strokeStyle='#222222';ctx.fillStyle='#77776f';ctx.lineWidth=1;ctx.textAlign='center';
+    [0.2,0.5,1,2,5,10,20,30].forEach(l=>{const x=X(l);ctx.beginPath();ctx.moveTo(x,padT);ctx.lineTo(x,padT+hh);ctx.stroke();ctx.fillText(String(l).replace('.',',')+' µm',Math.min(Math.max(x,22),W-24),H-8);});
+    ctx.beginPath();ctx.moveTo(padL,padT+hh);ctx.lineTo(padL+w,padT+hh);ctx.stroke();
+    // courbe normalisée
+    const N=500;const ys=[];let mx=0;for(let i=0;i<=N;i++){const l=Lmin*Math.pow(Lmax/Lmin,i/N);const v=planck(l,cur);ys.push([l,v]);if(v>mx)mx=v;}
+    const lw=b/cur, pk=planck(lw,cur); if(pk>mx)mx=pk;
+    ctx.beginPath();ys.forEach(([l,v],i)=>{const x=X(l),y=padT+hh-(v/mx)*hh*0.92;i?ctx.lineTo(x,y):ctx.moveTo(x,y);});
+    ctx.lineTo(X(Lmax),padT+hh);ctx.lineTo(X(Lmin),padT+hh);ctx.closePath();ctx.fillStyle='rgba(232,232,224,.06)';ctx.fill();
+    ctx.beginPath();ys.forEach(([l,v],i)=>{const x=X(l),y=padT+hh-(v/mx)*hh*0.92;i?ctx.lineTo(x,y):ctx.moveTo(x,y);});
+    ctx.strokeStyle='#e8e8e0';ctx.lineWidth=1.6;ctx.stroke();
+    // Wien
+    if(lw>=Lmin&&lw<=Lmax){const x=X(lw);ctx.setLineDash([3,4]);ctx.strokeStyle='#e8e8e0';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x,padT+hh*0.08-4);ctx.lineTo(x,padT+hh);ctx.stroke();ctx.setLineDash([]);
+      ctx.fillStyle='#e8e8e0';ctx.textAlign=x>W-120?'right':'left';ctx.fillText('λmax = '+lw.toFixed(2).replace('.',',')+' µm',x+(x>W-120?-6:6),padT+hh*0.08+26);}
+    // chiffres
+    const tot=integ(0.05,2000,cur,3000), fnv=integ(0.4,1.0,cur)/tot, fth=integ(8,14,cur)/tot;
+    document.getElementById('Tval').textContent=Math.round(cur)+' K';
+    document.getElementById('r-tc').textContent=Math.round(cur-273.15)+' °C';
+    document.getElementById('r-wien').textContent=(lw).toFixed(2).replace('.',',')+' µm';
+    document.getElementById('r-nv').textContent=fmt(fnv);
+    document.getElementById('r-th').textContent=fmt(fth);
+    const v=document.getElementById('verdict');
+    if(fnv<1e-6) v.innerHTML='<b>Invisible pour le tube NV par émission propre.</b> À cette température, l\'objet n\'émet quasiment rien entre 0,4 et 1 µm : la caméra starlight ne le voit que grâce à la lumière (lune, étoiles, éclairage IR) qu\'il <em>réfléchit</em>. Le tube thermique capte directement son émission.';
+    else if(fth>fnv) v.innerHTML='<b>Vu par les deux tubes.</b> L\'objet commence à émettre dans le proche IR : la caméra starlight le voit briller par lui-même, mais le gros de l\'émission reste dans l\'infrarouge lointain.';
+    else v.innerHTML='<b>L\'émission bascule vers le visible.</b> Le maximum se déplace vers les courtes longueurs d\'onde (λ<sub>max</sub> = b/T) : la source éclaire et le tube NV la voit comme une lumière vive.';
+    pc.querySelectorAll('button').forEach(bt=>bt.setAttribute('aria-pressed',Math.abs(+bt.dataset.t-cur)<1?'true':'false'));
+  }
+  document.fonts&&document.fonts.ready.then(draw); window.addEventListener('resize',draw); draw();
+})();
+
+/* ---------- 3. Coupe cliquable ---------- */
+(()=>{
+  // x,y en % de l'image. "src" : vsf | mod | orig. todo = texte à confirmer par Robin.
+  const parts=[
+    {x:48,y:11.5,src:'mod',title:'Backplate',desc:'Pont central qui relie les deux bras de charnière et reçoit la fixation casque. Première pièce redessinée par rapport au modèle Vonscherfarm.',specs:[['Matière','PETG / PLA'],['Phase','② amélioration']],todo:'Préciser ce qui a changé par rapport à l\'original.'},
+    {x:23,y:24.6,src:'mod',title:'Axe de charnière',desc:'Pivot de chaque tube. Les fils 5 V et le signal CVBS passent dans l\'axe creux pour suivre la rotation sans se plier.',specs:[['Câblage','26AWG torsadé'],['Phase','② amélioration']]},
+    {x:74,y:36,src:'vsf',title:'Bras de charnière',desc:'Relie le tube à la backplate et porte l\'axe de pivot.',specs:[['Phase','① reproduction']],todo:'Pièce d\'origine ou modifiée ?'},
+    {x:32.4,y:41,src:'vsf',title:'Vis de fixation',desc:'Fixent le bras de charnière sur le corps du tube.',specs:[['Visserie','M2 / M3']],todo:'Diamètre exact à confirmer.'},
+    {x:8,y:74,src:'vsf',title:'Corps du tube',desc:'Boîtier imprimé qui loge la caméra et le combo écran/optique. Base mécanique reprise du design Vonscherfarm ; c\'est ce corps qui a été retravaillé pour le tube thermique.',specs:[['Matière','PETG / PLA'],['Phase','① reproduction']]},
+    {x:19.5,y:61,src:'vsf',title:'Module électronique',desc:'Carte visible dans la coupe, avec son connecteur.',specs:[],todo:'Caméra Night Eagle 3 ou micro-OLED ? À confirmer.'}
+  ];
+  const colors={vsf:'var(--tag-vsf)',mod:'var(--tag-mod)',orig:'var(--tag-orig)'};
+  const names={vsf:'Vonscherfarm',mod:'Modifié',orig:'Original'};
+  const box=document.getElementById('xsImg'),panel=document.getElementById('xsPanel');
+  const btns=parts.map((p,i)=>{const b=document.createElement('button');b.className='hs';b.textContent=i+1;b.style.left=p.x+'%';b.style.top=p.y+'%';
+    b.style.setProperty('--c',colors[p.src]);b.setAttribute('aria-label',p.title);b.setAttribute('aria-pressed','false');b.onclick=e=>{e.stopPropagation();show(i)};box.appendChild(b);return b;});
+  function show(i){const p=parts[i];btns.forEach((b,j)=>b.setAttribute('aria-pressed',j===i?'true':'false'));
+    panel.innerHTML=`<span class="tag" style="color:${colors[p.src]}">${names[p.src]}</span><h3>${p.title}</h3><p>${p.desc}</p>`+
+      p.specs.map(s=>`<div class="spec-l"><span>${s[0]}</span><span>${s[1]}</span></div>`).join('')+(p.todo?`<p class="todo">À confirmer : ${p.todo}</p>`:'');}
+  show(0);
+  // mode placement
+  const eb=document.getElementById('editBtn'),out=document.getElementById('editOut');let editing=false;
+  eb.onclick=()=>{editing=!editing;eb.setAttribute('aria-pressed',editing);box.classList.toggle('editing',editing);};
+  box.addEventListener('click',e=>{if(!editing)return;const r=document.getElementById('xsPic').getBoundingClientRect();
+    const x=((e.clientX-r.left)/r.width*100).toFixed(1),y=((e.clientY-r.top)/r.height*100).toFixed(1);out.textContent=`{x:${x}, y:${y}}`;});
+})();
+</script>
