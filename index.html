@@ -432,6 +432,35 @@
     .contact-section { flex-direction: column; gap: 2rem; padding: 3rem 1.5rem; }
     footer { flex-direction: column; gap: 0.5rem; padding: 1.5rem; }
   }
+
+  /* Carte avec photo en tête (NightSight) */
+  .project-card.has-banner { padding-top: 0; }
+  .card-banner {
+    position: relative; margin: 0 -2.5rem 2rem; height: 230px;
+    border-bottom: 1px solid var(--border);
+  }
+  .card-banner > img:first-child {
+    width: 100%; height: 100%; object-fit: cover; object-position: 50% 72%;
+    filter: brightness(0.72) saturate(0.85);
+    transition: filter 0.4s, transform 0.6s;
+  }
+  .card-banner { overflow: hidden; }
+  .project-card:hover .card-banner > img:first-child { filter: brightness(0.9) saturate(1); transform: scale(1.03); }
+  /* l'aigle accoudé au bas de la photo */
+  .banner-eagle {
+    position: absolute; right: 1.75rem; bottom: -12px; width: 190px; height: auto;
+    transform: translateY(0);
+    transition: transform 0.45s cubic-bezier(.2,.85,.25,1.2);
+    filter: drop-shadow(0 -4px 10px rgba(0,0,0,.35));
+  }
+  .project-card:hover .banner-eagle { transform: translateY(-8px) rotate(-2deg); }
+  @media (max-width: 900px) {
+    .card-banner { height: 190px; }
+    .banner-eagle { width: 140px; right: 1rem; bottom: -9px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .card-banner > img:first-child, .banner-eagle { transition: none; }
+  }
 </style>
 </head>
 <body>
@@ -609,13 +638,17 @@
     </a>
 
     <!-- NIGHTSIGHT — #2 -->
-    <a href="nightsight.html" class="project-card">
+    <a href="nightsight.html" class="project-card has-banner">
+      <div class="card-banner">
+        <img src="card_nightsight.jpg" alt="Jumelles NightSight imprimées en 3D">
+        <img class="banner-eagle" src="aigle_rebord.png" alt="" aria-hidden="true">
+      </div>
       <div class="card-meta">
         <span class="card-status paused">En pause</span>
       </div>
       <h2 class="card-title">NightSight</h2>
       <p class="card-desc">
-        Lunettes binoculaires de vision nocturne et thermique — boîtier entièrement imprimé en 3D, caméras starlight Runcam Night Eagle 3 V2, micro-écrans OLED 0.4" avec combo optique intégré.
+        Jumelles de vision nocturne imprimées en 3D : reconstruites à partir d'un modèle open-source, modifiées, puis équipées d'un tube thermique. Caméras starlight et micro-écrans OLED 0.4".
       </p>
       <div class="card-tags">
         <span class="card-tag lit">Vision nocturne</span>
