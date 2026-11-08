@@ -448,15 +448,16 @@
   .project-card:hover .card-banner > img:first-child { filter: brightness(0.9) saturate(1); transform: scale(1.03); }
   /* l'aigle accoudé au bas de la photo */
   .banner-eagle {
-    position: absolute; right: 1.75rem; bottom: -12px; width: 190px; height: auto;
+    position: absolute; left: 0; bottom: -12px; width: 190px; height: auto;
     transform: translateY(0);
     transition: transform 0.45s cubic-bezier(.2,.85,.25,1.2);
     filter: drop-shadow(0 -4px 10px rgba(0,0,0,.35));
+    transform-origin: 30% 100%;
   }
-  .project-card:hover .banner-eagle { transform: translateY(-8px) rotate(-2deg); }
+  .project-card:hover .banner-eagle { transform: translateY(-8px) rotate(2deg); }
   @media (max-width: 900px) {
     .card-banner { height: 190px; }
-    .banner-eagle { width: 140px; right: 1rem; bottom: -9px; }
+    .banner-eagle { width: 140px; bottom: -9px; }
   }
   @media (prefers-reduced-motion: reduce) {
     .card-banner > img:first-child, .banner-eagle { transition: none; }
