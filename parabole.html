@@ -367,23 +367,6 @@ nav{position:fixed;z-index:100}
 .lp-title{font-family:'IBM Plex Sans',sans-serif;font-weight:600;font-size:clamp(40px,5.6vw,76px);line-height:1;letter-spacing:-.025em;margin-bottom:1.25rem}
 .lp-title span{color:var(--accent)}
 .lp-sub{font-size:20px;color:#b3bcc4;max-width:620px;line-height:1.5}
-.sc{margin-top:1.5rem;border:1px solid var(--border);background:rgba(18,23,29,.55);border-radius:4px;overflow:hidden}
-.sc canvas{width:100%;height:380px;display:block}
-.sc-bar{display:flex;gap:2rem;align-items:center;flex-wrap:wrap;padding:1rem 1.5rem;border-top:1px solid var(--border)}
-.sc-seg{display:flex;background:#0b0f13;border:1px solid var(--border);border-radius:4px;padding:3px}
-.sc-seg button{font:500 14px 'DM Sans',sans-serif;color:var(--muted);background:none;border:0;padding:.45rem 1rem;border-radius:3px;cursor:pointer;transition:all .2s}
-.sc-seg button.on{background:rgba(143,211,255,.14);color:var(--text)}
-.sc-time{display:flex;align-items:center;gap:.9rem;flex:1;min-width:260px}
-.sc-play{width:34px;height:34px;border-radius:50%;border:1px solid var(--border);background:none;color:var(--text);cursor:pointer;font-size:12px}
-.sc-time input{flex:1;accent-color:#8fd3ff}
-.sc-clock{font:500 14px 'DM Mono',monospace;color:var(--muted);min-width:5ch}
-.sc-read{display:flex;align-items:baseline;gap:.75rem;min-width:200px}
-.sc-temp{font-family:'IBM Plex Sans',sans-serif;font-weight:600;font-size:34px;letter-spacing:-.02em;color:var(--text);min-width:4.5ch;text-align:right}
-.sc-unit{font-size:13px;color:var(--muted)}
-.sc-gauge{height:4px;background:#1b222a;border-radius:2px;margin:0 1.5rem 0;overflow:hidden}
-.sc-gauge i{display:block;height:100%;width:0;background:linear-gradient(90deg,#e8c27a,#ff6a3d);transition:width .08s linear}
-.sc-msg{padding:.9rem 1.5rem 1.1rem;font-size:15px;color:#b3bcc4;min-height:3.2em}
-.sc-note{font-size:12px;color:#56616c;padding:0 1.5rem 1rem}
 
 .lp-block{padding:4.5rem 0 0}
 .lp-h2{font-family:'IBM Plex Sans',sans-serif;font-weight:600;font-size:clamp(26px,3vw,36px);letter-spacing:-.015em;margin-bottom:.5rem}
@@ -437,22 +420,21 @@ nav{position:fixed;z-index:100}
  <section class="lp-hero">
   <div class="lp-label">Projet de prépa — optique &amp; systèmes embarqués</div>
   <h1 class="lp-title">Garder une parabole<br>pointée <span>sur le soleil.</span></h1>
-  <p class="lp-sub">Une parabole concentre le soleil en un point très chaud, mais seulement si elle reste pointée dessus. Or le soleil se déplace d'environ 15° par heure. J'ai construit un système qui le suit tout seul, en regardant où tombe la chaleur : sans GPS, sans internet.</p>
+  <p class="lp-sub">Une parabole ne chauffe que si elle vise le soleil, qui se déplace de 15° par heure. Ce système le suit seul, en regardant le point chaud avec une caméra thermique.</p>
  </section>
 
  <section class="lp-block">
   <h2 class="lp-h2">Pourquoi c'est difficile</h2>
-  <p class="lp-h2-sub">Les centrales solaires à sels fondus, en plein désert, orientent des milliers de miroirs vers une tour.</p>
+  <p class="lp-h2-sub">Le cas réel : les centrales solaires à sels fondus, en plein désert.</p>
   <div class="why">
-   <div class="why-card"><svg viewBox="0 0 44 44" fill="none" stroke="#8fd3ff" stroke-width="2" stroke-linecap="round"><path d="M8 20a20 20 0 0 1 28 0M13 26a13 13 0 0 1 18 0M18 32a6 6 0 0 1 8 0"/><circle cx="22" cy="37" r="1.5" fill="#8fd3ff"/><path d="M6 6l32 32" stroke="#e8c27a"/></svg><strong>Pas de GPS fiable</strong><p>Ni internet, ni réseau : impossible de se reposer sur un calcul externe.</p></div>
-   <div class="why-card"><svg viewBox="0 0 44 44" fill="none" stroke="#8fd3ff" stroke-width="2" stroke-linecap="round"><path d="M4 30h14l4 4h18"/><path d="M8 24l22-8M26 12l8 3"/><path d="M22 34l-2 6M30 34l1 5" stroke="#e8c27a"/></svg><strong>Le sol bouge</strong><p>Tassement, dilatation : une position calculée à l'avance finit toujours par être fausse.</p></div>
-   <div class="why-card"><svg viewBox="0 0 44 44" fill="none" stroke="#8fd3ff" stroke-width="2" stroke-linecap="round"><circle cx="22" cy="22" r="9"/><circle cx="22" cy="22" r="2.5" fill="#e8c27a" stroke="none"/><path d="M22 4v8M22 32v8M4 22h8M32 22h8"/></svg><strong>Donc : mesurer</strong><p>Ne pas prédire où est le soleil, mais voir où tombe la chaleur.</p></div>
+   <div class="why-card"><svg viewBox="0 0 44 44" fill="none" stroke="#8fd3ff" stroke-width="2" stroke-linecap="round"><path d="M8 20a20 20 0 0 1 28 0M13 26a13 13 0 0 1 18 0M18 32a6 6 0 0 1 8 0"/><circle cx="22" cy="37" r="1.5" fill="#8fd3ff"/><path d="M6 6l32 32" stroke="#e8c27a"/></svg><strong>Pas de GPS fiable</strong><p>Ni internet, ni réseau.</p></div>
+   <div class="why-card"><svg viewBox="0 0 44 44" fill="none" stroke="#8fd3ff" stroke-width="2" stroke-linecap="round"><path d="M4 30h14l4 4h18"/><path d="M8 24l22-8M26 12l8 3"/><path d="M22 34l-2 6M30 34l1 5" stroke="#e8c27a"/></svg><strong>Le sol bouge</strong><p>Une position calculée à l'avance finit par être fausse.</p></div>
+   <div class="why-card"><svg viewBox="0 0 44 44" fill="none" stroke="#8fd3ff" stroke-width="2" stroke-linecap="round"><circle cx="22" cy="22" r="9"/><circle cx="22" cy="22" r="2.5" fill="#e8c27a" stroke="none"/><path d="M22 4v8M22 32v8M4 22h8M32 22h8"/></svg><strong>Donc : mesurer</strong><p>Voir où tombe la chaleur plutôt que prédire.</p></div>
   </div>
  </section>
 
  <section class="lp-block">
   <h2 class="lp-h2">Ma réponse : une boucle fermée</h2>
-  <p class="lp-h2-sub">Une caméra thermique regarde le foyer, le Raspberry Pi corrige l'orientation en continu.</p>
   <div class="loop"><svg viewBox="0 0 900 190" fill="none" font-family="DM Sans, sans-serif">
  <defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#8fd3ff"/></marker></defs>
  <g stroke="#2c3743" stroke-width="1.5" fill="#0f1318">
@@ -469,23 +451,7 @@ nav{position:fixed;z-index:100}
  </section>
 
  <section class="lp-block">
-  <h2 class="lp-h2">Ce que change le suivi</h2>
-  <p class="lp-h2-sub">Lance la journée ou fais glisser l'heure, puis compare la parabole fixe et la parabole avec suivi. Le chiffre donne la température au foyer.</p>
-  <div class="sc" style="margin-top:0">
-   <canvas id="sc"></canvas>
-   <div class="sc-gauge"><i id="scGauge"></i></div>
-   <div class="sc-bar">
-    <div class="sc-seg" id="scMode"><button data-m="fixed" class="on">Parabole fixe</button><button data-m="track">Avec suivi</button></div>
-    <div class="sc-time"><button class="sc-play" id="scPlay" aria-label="Lecture / pause">▶</button><input type="range" id="scTime" min="6" max="18" step="0.01" value="6" aria-label="Heure de la journée"><span class="sc-clock" id="scClock">06:00</span></div>
-    <div class="sc-read"><span class="sc-temp" id="scTemp">25</span><span class="sc-unit">°C au foyer</span></div>
-   </div>
-   <div class="sc-msg" id="scMsg"></div>
-   <div class="sc-note">Schéma illustratif : la mesure réelle sur cible céramique a atteint 400 °C.</div>
-  </div>
- </section>
- <section class="lp-block">
   <h2 class="lp-h2">Le chemin, étape par étape</h2>
-  <p class="lp-h2-sub">Du général au particulier, de la théorie vers la pratique.</p>
   <div class="path-rail">Théorie<div></div>Pratique</div>
   <div class="path"><a class="path-card" href="parabole-principe.html"><span class="path-n">Étape 1</span><strong>Principe physique</strong><p>Pourquoi une parabole concentre la lumière.</p><span class="path-tag th">Théorie</span></a>
 <a class="path-card" href="parabole-3d.html"><span class="path-n">Étape 2</span><strong>Modèle 3D</strong><p>Du système complet aux pièces, sur Fusion 360.</p><span class="path-tag mx">Conception</span></a>
@@ -522,85 +488,6 @@ nav{position:fixed;z-index:100}
   const cntObs=new IntersectionObserver(es=>{es.forEach(e=>{if(!e.isIntersecting)return;const el=e.target,target=+el.dataset.target,suf=el.dataset.suffix||'',pre=el.dataset.prefix||'',st=performance.now();
     (function step(now){const t=Math.min((now-st)/1400,1),v=Math.round((1-Math.pow(1-t,3))*target);el.textContent=pre+v+suf;if(t<1)requestAnimationFrame(step);else el.textContent=pre+target+suf})(st);cntObs.unobserve(el)})},{threshold:.5});
   document.querySelectorAll('.stat-val[data-target]').forEach(el=>cntObs.observe(el));
-</script>
-<script>
-(function(){
- const cv=document.getElementById('sc'); if(!cv) return;
- const ctx=cv.getContext('2d');
- const slider=document.getElementById('scTime'),clock=document.getElementById('scClock'),tempEl=document.getElementById('scTemp'),gauge=document.getElementById('scGauge'),msg=document.getElementById('scMsg'),play=document.getElementById('scPlay');
- let W=0,H=0,mode='fixed',playing=false,hour=6,axis=-Math.PI/2,vis=true;
- function size(){const r=cv.getBoundingClientRect(),d=window.devicePixelRatio||1;cv.width=Math.round(r.width*d);cv.height=Math.round(r.height*d);ctx.setTransform(d,0,0,d,0,0);W=r.width;H=r.height}
- window.addEventListener('resize',size); size();
- new IntersectionObserver(e=>{vis=e[0].isIntersecting}).observe(cv);
- const wrap=a=>{while(a>Math.PI)a-=2*Math.PI;while(a<-Math.PI)a+=2*Math.PI;return a};
- document.querySelectorAll('#scMode button').forEach(b=>b.addEventListener('click',()=>{
-  mode=b.dataset.m;document.querySelectorAll('#scMode button').forEach(x=>x.classList.toggle('on',x===b));
-  if(mode==='fixed')axis=-Math.PI/2;}));
- play.addEventListener('click',()=>{playing=!playing;play.textContent=playing?'❚❚':'▶'});
- slider.addEventListener('input',()=>{hour=+slider.value;playing=false;play.textContent='▶'});
- function frame(){
-  requestAnimationFrame(frame); if(!vis||!W) return;
-  if(playing){hour+=0.012;if(hour>18)hour=6;slider.value=hour}
-  const f=(hour-6)/12;
-  const sx=W*(0.10+0.80*f), sy=H*(0.62-0.50*(1-4*(f-0.5)*(f-0.5)));
-  const cx=W*0.5, cy=H*0.76;
-  const S=Math.atan2(sy-cy,sx-cx);
-  if(mode==='track') axis+=wrap(S-axis)*0.07; else axis=-Math.PI/2;
-  const delta=wrap(S-axis), deg=Math.abs(delta)*180/Math.PI;
-  const eta=Math.exp(-Math.pow(deg/6,2));
-  ctx.clearRect(0,0,W,H);
-  // sol
-  ctx.strokeStyle='#222a33';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(0,H*0.9);ctx.lineTo(W,H*0.9);ctx.stroke();
-  // trajectoire
-  ctx.setLineDash([3,7]);ctx.strokeStyle='rgba(232,194,122,.25)';ctx.beginPath();
-  for(let t=0;t<=1.001;t+=0.01){const x=W*(0.10+0.80*t),y=H*(0.62-0.50*(1-4*(t-0.5)*(t-0.5)));t===0?ctx.moveTo(x,y):ctx.lineTo(x,y)}
-  ctx.stroke();ctx.setLineDash([]);
-  // géométrie parabole
-  const R=Math.min(H*0.2,84),fl=R*0.5;
-  const ua=[Math.cos(axis),Math.sin(axis)],va=[-Math.sin(axis),Math.cos(axis)];
-  const P=(u,v)=>[cx+ua[0]*u+va[0]*v,cy+ua[1]*u+va[1]*v];
-  const D=[-Math.cos(S),-Math.sin(S)];
-  // pied
-  ctx.strokeStyle='#33404c';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx,H*0.9);ctx.moveTo(cx-34,H*0.9);ctx.lineTo(cx+34,H*0.9);ctx.stroke();
-  // rayons
-  const N=9;
-  for(let i=0;i<N;i++){
-   const v=(-0.88+1.76*i/(N-1))*R,u=v*v/(4*fl),p=P(u,v);
-   let n=[ua[0]-va[0]*v/(2*fl),ua[1]-va[1]*v/(2*fl)];const nl=Math.hypot(n[0],n[1]);n=[n[0]/nl,n[1]/nl];
-   const dn=D[0]*n[0]+D[1]*n[1]; if(dn>=0) continue;
-   ctx.strokeStyle='rgba(232,194,122,.35)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(p[0]-D[0]*260,p[1]-D[1]*260);ctx.lineTo(p[0],p[1]);ctx.stroke();
-   const r=[D[0]-2*dn*n[0],D[1]-2*dn*n[1]];
-   ctx.strokeStyle='rgba(255,196,120,'+(0.25+0.6*eta)+')';ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(p[0],p[1]);ctx.lineTo(p[0]+r[0]*fl*3.2,p[1]+r[1]*fl*3.2);ctx.stroke();
-  }
-  // bras + récepteur
-  const F=P(fl,0);
-  ctx.setLineDash([2,3]);ctx.strokeStyle='#4a5866';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(F[0],F[1]);ctx.stroke();ctx.setLineDash([]);
-  const g=ctx.createRadialGradient(F[0],F[1],0,F[0],F[1],10+34*eta);
-  g.addColorStop(0,'rgba(255,120,60,'+(0.15+0.85*eta)+')');g.addColorStop(1,'rgba(255,120,60,0)');
-  ctx.fillStyle=g;ctx.beginPath();ctx.arc(F[0],F[1],10+34*eta,0,7);ctx.fill();
-  ctx.fillStyle='#e8ecef';ctx.beginPath();ctx.arc(F[0],F[1],3.2,0,7);ctx.fill();
-  // parabole
-  ctx.strokeStyle='#8fd3ff';ctx.lineWidth=3;ctx.lineCap='round';ctx.beginPath();
-  for(let i=-30;i<=30;i++){const v=i/30*R,p=P(v*v/(4*fl),v);i===-30?ctx.moveTo(p[0],p[1]):ctx.lineTo(p[0],p[1])}
-  ctx.stroke();
-  // soleil
-  const gs=ctx.createRadialGradient(sx,sy,0,sx,sy,40);gs.addColorStop(0,'rgba(232,194,122,.35)');gs.addColorStop(1,'rgba(232,194,122,0)');
-  ctx.fillStyle=gs;ctx.beginPath();ctx.arc(sx,sy,40,0,7);ctx.fill();
-  ctx.fillStyle='#e8c27a';ctx.beginPath();ctx.arc(sx,sy,10,0,7);ctx.fill();
-  ctx.strokeStyle='#e8c27a';ctx.lineWidth=1.5;
-  for(let i=0;i<8;i++){const a=i*Math.PI/4+hour;ctx.beginPath();ctx.moveTo(sx+15*Math.cos(a),sy+15*Math.sin(a));ctx.lineTo(sx+23*Math.cos(a),sy+23*Math.sin(a));ctx.stroke()}
-  // lecture
-  const hh=Math.floor(hour),mm=Math.floor((hour-hh)*60);
-  clock.textContent=String(hh).padStart(2,'0')+':'+String(mm).padStart(2,'0');
-  tempEl.textContent=Math.round(25+375*eta);
-  gauge.style.width=(eta*100)+'%';
-  msg.textContent = mode==='fixed'
-   ? (eta>0.6?'Bien aligné… mais le soleil continue de bouger.':'Le soleil a bougé : la chaleur ne tombe plus sur la cible.')
-   : (eta>0.6?'Le système mesure l\'écart et garde le foyer sur la cible.':'Le système rattrape le soleil…');
- }
- frame();
-})();
-
 </script>
 </body>
 </html>
