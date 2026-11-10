@@ -188,6 +188,23 @@
   .t-table span:first-child { color: var(--text); }
   .t-table span:last-child { color: var(--muted); }
   @media (max-width: 900px) { .t-wrap { padding: 0 1.5rem 3rem; } }
+
+  /* ── Tableau des départs (split-flap) ── */
+  .fboard { align-self: end; background: #0b0b0b; border: 1px solid #262626; padding: 1rem 1rem .9rem; font-family: 'DM Mono', ui-monospace, monospace; max-width: 560px; width: 100%; justify-self: end; box-shadow: 0 20px 40px rgba(0,0,0,.35); }
+  .fb-head { display: flex; justify-content: space-between; font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: #f5c542; padding-bottom: .7rem; border-bottom: 1px solid #222; margin-bottom: .5rem; }
+  .fb-cols, .fb-row, .fb-best { display: grid; grid-template-columns: 1fr auto auto; gap: 1rem; align-items: center; }
+  .fb-cols { font-size: 9px; letter-spacing: .16em; text-transform: uppercase; color: #555; padding: .2rem 0 .4rem; }
+  .fb-row { padding: 3px 0; }
+  .r { justify-self: end; text-align: right; }
+  .fb { display: inline-flex; gap: 2px; }
+  .fb i { font-style: normal; display: inline-block; width: 1.05em; text-align: center; background: #161616; color: #e9e4d4; font-size: 13px; line-height: 1.55; border-radius: 2px; position: relative; }
+  .fb i::after { content: ''; position: absolute; left: 0; right: 0; top: 50%; border-top: 1px solid #0b0b0b; }
+  .fb-row.best i { color: #f5c542; }
+  .fb-best { margin-top: .6rem; padding-top: .6rem; border-top: 1px dashed #2a2a2a; grid-template-columns: 1fr auto; }
+  .fb-best i { background: transparent; font-size: 11px; color: #f5c542; width: .72em; }
+  .fb-best i::after { display: none; }
+  .fb.g i { color: #7fc26a; font-size: 13px; width: .8em; }
+  @media (max-width: 900px) { .fboard { justify-self: stretch; max-width: none; padding: .9rem .75rem; } .fb { gap: 1px; } .fb i { font-size: 10px; width: .95em; } .fb-cols, .fb-row { gap: .6rem; } .fb-best .fb:first-child { display: none; } }
 </style>
 </head>
 <body>
@@ -217,23 +234,21 @@
       <span class="tag">GitHub Pages</span>
     </div>
   </div>
-  <div class="hero-meta fade-in">
-    <div class="meta-item">
-      <span class="meta-label">Statut</span>
-      <span class="status-badge"><span class="status-dot"></span>En ligne — actif</span>
-    </div>
-    <div class="meta-item">
-      <span class="meta-label">Lien</span>
-      <span class="meta-value"><a href="https://r0binetterie.github.io/" target="_blank">r0binetterie.github.io ↗</a></span>
-    </div>
-    <div class="meta-item">
-      <span class="meta-label">Stack</span>
-      <span class="meta-value">HTML / CSS / JS — zéro dépendance</span>
-    </div>
-    <div class="meta-item">
-      <span class="meta-label">Données</span>
-      <span class="meta-value">API YATA (stocks) + API Torn (prix)</span>
-    </div>
+  <div class="fboard fade-in" aria-label="Tableau des départs : destinations, durée de vol et prix du billet">
+    <div class="fb-head"><span>Départs · Torn City</span><span id="fbClock">--:--</span></div>
+    <div class="fb-cols"><span>Destination</span><span>Vol</span><span class="r">Billet</span></div>
+      <div class="fb-row"><span class="fb" data-t="MEXIQUE" data-w="11"></span><span class="fb" data-t="20 MIN" data-w="6"></span><span class="fb r" data-t="$5 000" data-w="7"></span></div>
+      <div class="fb-row"><span class="fb" data-t="CANADA" data-w="11"></span><span class="fb" data-t="37 MIN" data-w="6"></span><span class="fb r" data-t="$7 500" data-w="7"></span></div>
+      <div class="fb-row"><span class="fb" data-t="CAÏMANS" data-w="11"></span><span class="fb" data-t="57 MIN" data-w="6"></span><span class="fb r" data-t="$10 000" data-w="7"></span></div>
+      <div class="fb-row"><span class="fb" data-t="HAWAÏ" data-w="11"></span><span class="fb" data-t="2H01" data-w="6"></span><span class="fb r" data-t="$12 000" data-w="7"></span></div>
+      <div class="fb-row"><span class="fb" data-t="ROYAUME-UNI" data-w="11"></span><span class="fb" data-t="2H39" data-w="6"></span><span class="fb r" data-t="$18 000" data-w="7"></span></div>
+      <div class="fb-row best"><span class="fb" data-t="SUISSE" data-w="11"></span><span class="fb" data-t="2H49" data-w="6"></span><span class="fb r" data-t="$20 000" data-w="7"></span></div>
+      <div class="fb-row"><span class="fb" data-t="ARGENTINE" data-w="11"></span><span class="fb" data-t="3H09" data-w="6"></span><span class="fb r" data-t="$22 000" data-w="7"></span></div>
+      <div class="fb-row"><span class="fb" data-t="JAPON" data-w="11"></span><span class="fb" data-t="3H23" data-w="6"></span><span class="fb r" data-t="$25 000" data-w="7"></span></div>
+      <div class="fb-row"><span class="fb" data-t="CHINE" data-w="11"></span><span class="fb" data-t="4H02" data-w="6"></span><span class="fb r" data-t="$35 000" data-w="7"></span></div>
+      <div class="fb-row"><span class="fb" data-t="ÉMIRATS" data-w="11"></span><span class="fb" data-t="4H31" data-w="6"></span><span class="fb r" data-t="$32 000" data-w="7"></span></div>
+      <div class="fb-row"><span class="fb" data-t="AFR. DU SUD" data-w="11"></span><span class="fb" data-t="5H11" data-w="6"></span><span class="fb r" data-t="$40 000" data-w="7"></span></div>
+    <div class="fb-best"><span class="fb" data-t="MEILLEUR RUN · ×19 XANAX" data-w="24"></span><span class="fb g r" data-t="+$7 082 625" data-w="11"></span></div>
   </div>
 </section>
 
@@ -335,6 +350,31 @@
   },{rootMargin:'-20% 0px -60% 0px'});
   sections.forEach(s=>tocObs.observe(s));
 
+
+  // Tableau des départs : chaque case défile puis se fige
+  (function(){
+    const CH='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$+·';
+    const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const cells=[];
+    document.querySelectorAll('.fboard .fb').forEach(el=>{
+      const ri=[...el.closest('.fboard').querySelectorAll('.fb-row,.fb-best')].indexOf(el.parentElement);
+      const t=el.dataset.t, w=+el.dataset.w, txt=el.classList.contains('r')?t.padStart(w,' '):t.padEnd(w,' ');
+      [...txt].forEach((c,ci)=>{const i=document.createElement('i');i.textContent=reduce?c:' ';el.appendChild(i);cells.push({i,c,end:8+ri*3+ci*0.6+Math.random()*4});});
+    });
+    const clock=document.getElementById('fbClock');
+    const tick=()=>{const d=new Date();clock.textContent=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');};
+    tick(); setInterval(tick,20000);
+    if(reduce) return;
+    let f=0;
+    (function step(){
+      f++; let done=true;
+      for(const k of cells){
+        if(f>=k.end){ if(k.i.textContent!==k.c) k.i.textContent=k.c; }
+        else { done=false; if(k.c!==' '&&f%2===0) k.i.textContent=CH[Math.random()*CH.length|0]; }
+      }
+      if(!done) setTimeout(step,45);
+    })();
+  })();
 </script>
 </body>
 </html>
