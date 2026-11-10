@@ -6,8 +6,6 @@
 <title>Torn Travel Optimizer — Robin Bonfill</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
 <style>
   :root {
     --bg:#0f0f0f;--bg2:#161616;--border:#2a2a2a;
@@ -166,6 +164,30 @@
     nav{padding:1rem 1.5rem}
     footer{flex-direction:column;gap:.5rem;padding:1.5rem}
   }
+
+  /* ── page courte ── */
+  .t-wrap { max-width: 1000px; margin: 0 auto; padding: 0 3rem 4rem; }
+  .t-wrap .section { padding-left: 0; padding-right: 0; }
+  .t-actions { display: flex; gap: 1.5rem; align-items: center; margin-top: 1.75rem; flex-wrap: wrap; }
+  .t-actions .contribute-btn { margin-top: 0; }
+  .t-link { color: var(--muted); font-size: 13px; text-decoration: none; }
+  .t-link:hover { color: var(--text); }
+  .t-shot { margin: 0 0 1rem; }
+  .t-list { list-style: none; padding: 0; margin: 0 0 1.5rem; display: flex; flex-direction: column; gap: .7rem; max-width: 720px; }
+  .t-list li { font-size: 14px; color: var(--muted); line-height: 1.7; padding-left: 1.1rem; position: relative; }
+  .t-list li::before { content: ''; position: absolute; left: 0; top: .75em; width: 6px; height: 1px; background: var(--accent); }
+  .t-list b { color: var(--text); font-weight: 500; }
+  details.more { border-top: 1px solid var(--border); margin-top: 1rem; }
+  details.more > summary { cursor: pointer; list-style: none; padding: 1rem 0; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  details.more > summary::-webkit-details-marker { display: none; }
+  details.more > summary::before { content: '+ '; color: var(--accent); }
+  details.more[open] > summary::before { content: '− '; }
+  .t-table { border: 1px solid var(--border); margin-bottom: 1rem; }
+  .t-table div { display: flex; justify-content: space-between; gap: 1rem; padding: .6rem 1rem; border-bottom: 1px solid var(--border); font-size: 13px; flex-wrap: wrap; }
+  .t-table div:last-child { border-bottom: 0; }
+  .t-table span:first-child { color: var(--text); }
+  .t-table span:last-child { color: var(--muted); }
+  @media (max-width: 900px) { .t-wrap { padding: 0 1.5rem 3rem; } }
 </style>
 </head>
 <body>
@@ -179,11 +201,14 @@
 
 <!-- HERO -->
 <section class="hero" id="hero">
-  <canvas id="heroCanvas" class="hero-canvas"></canvas>
   <div class="fade-in">
     <div class="hero-label">Projet — Outil web &amp; jeu en ligne</div>
     <h1 class="hero-title">Torn Travel<br><span>Optimizer</span></h1>
-    <p class="hero-desc">Un outil web qui calcule les meilleurs voyages à l'étranger sur le jeu en ligne Torn City : quoi acheter, où, et combien de fois, en fonction de ta session de jeu, ton mode de transport et tes bonus. Prix et stocks en temps réel via API.</p>
+    <p class="hero-desc">Dans Torn City, on peut acheter des objets à l'étranger et les revendre plus cher. L'outil dit où aller, quoi acheter et combien d'allers-retours faire sur une session.</p>
+    <div class="t-actions">
+      <a href="https://r0binetterie.github.io/" target="_blank" class="contribute-btn">Ouvrir l'outil ↗</a>
+      <a href="https://github.com/r0binetterie/r0binetterie.github.io" target="_blank" class="t-link">Code ↗</a>
+    </div>
     <div class="hero-tags">
       <span class="tag accent">Optimisation</span>
       <span class="tag accent">JavaScript vanilla</span>
@@ -212,358 +237,75 @@
   </div>
 </section>
 
-<div class="page-wrap">
+<div class="t-wrap">
 
-  <!-- SOMMAIRE -->
-  <aside class="toc">
-    <div class="toc-label">Sommaire</div>
-    <ul class="toc-list">
-      <li class="toc-cat">Contexte</li>
-      <li class="toc-item"><a href="#sec-jeu"><span class="toc-num">01</span>Le jeu &amp; le problème</a></li>
-      <li class="toc-item"><a href="#sec-outil"><span class="toc-num">02</span>Ce que calcule l'outil</a></li>
-      <li class="toc-cat">Données &amp; modèle</li>
-      <li class="toc-item"><a href="#sec-data"><span class="toc-num">03</span>Sources de données</a></li>
-      <li class="toc-item"><a href="#sec-stock"><span class="toc-num">04</span>Modèle de stock</a></li>
-      <li class="toc-item"><a href="#sec-algo"><span class="toc-num">05</span>Algorithme d'optimisation</a></li>
-      <li class="toc-cat">Interface</li>
-      <li class="toc-item"><a href="#sec-ui"><span class="toc-num">06</span>Paramètres &amp; réglages</a></li>
-      <li class="toc-cat">Bilan</li>
-      <li class="toc-item"><a href="#sec-limits"><span class="toc-num">07</span>Limites &amp; pistes</a></li>
-      <li class="toc-item"><a href="#sec-stack"><span class="toc-num">08</span>Stack technique</a></li>
-      <li class="toc-item"><a href="#sec-contribute"><span class="toc-num">09</span>Contribuer</a></li>
-    </ul>
-  </aside>
+  <figure class="t-shot reveal">
+    <div class="screenshot-frame"><img src="torn_screenshot_ui.png" alt="Interface du Torn Travel Optimizer"></div>
+    <figcaption class="screenshot-caption">Réglages à gauche, meilleur run en haut avec sa timeline, puis les autres destinations classées par profit.</figcaption>
+  </figure>
 
-  <div>
-
-  <!-- 01 LE JEU -->
-  <section class="section reveal" id="sec-jeu" style="padding-top:4rem">
+  <section class="section reveal" id="sec-jeu">
     <div class="section-header">
       <span class="section-num">01</span>
-      <h2 class="section-title">Le jeu &amp; le problème</h2>
+      <h2 class="section-title">Le problème</h2>
     </div>
-    <p class="section-sub">Torn City est un jeu en ligne dans lequel on peut voyager à l'étranger pour acheter des objets propres à chaque pays — peluches, fleurs, drogues — et les revendre bien plus cher sur le marché domestique.</p>
-
-    <p style="font-size:13px;color:var(--muted);line-height:1.9;margin-bottom:2rem;max-width:700px">
-      Le voyage se débloque au <b style="color:var(--text)">niveau 15</b>. À partir de là, chaque destination a un temps de vol et un coût propres, et la quantité d'objets qu'on peut ramener dépend d'un ensemble de bonus cumulables — c'est cette capacité qui détermine combien un aller-retour peut rapporter.
-    </p>
-
-    <table class="data-table reveal">
-      <thead><tr><th>Source de capacité</th><th>Effet</th><th>Portée</th></tr></thead>
-      <tbody>
-        <tr><td>Mode de vol</td><td class="hl">+10 (Standard) ou +15 (Airstrip / WLT / Business)</td><td class="muted">Capacité de base</td></tr>
-        <tr><td>Valise (Small/Medium/Large)</td><td>+2 / +3 / +4</td><td class="muted">Générale</td></tr>
-        <tr><td>Upgrade de faction — Excursion</td><td>jusqu'à +10</td><td class="muted">Générale</td></tr>
-        <tr><td>Toy Shop (7★)</td><td>+5</td><td class="muted">Peluches uniquement</td></tr>
-        <tr><td>Flower Shop (7★)</td><td>+5</td><td class="muted">Fleurs uniquement</td></tr>
-        <tr><td>Lingerie Store (3★)</td><td>+2</td><td class="muted">Générale</td></tr>
-        <tr><td>Cruise Line (3★ / +10★)</td><td>+2 / +5</td><td class="muted">Générale</td></tr>
-        <tr><td>World Travel Day</td><td class="hl2">Capacité totale ×2</td><td class="muted">Événement ponctuel, tous joueurs</td></tr>
-      </tbody>
-    </table>
-
-    <div class="inspo-grid reveal">
-      <div class="inspo-item">
-        <div class="inspo-tag">Contrainte 1</div>
-        <div class="inspo-title">Le stock à l'étranger</div>
-        <div class="inspo-desc">Chaque pays a un stock limité par objet, qui se vide progressivement puis se reconstitue après un délai. Arriver au mauvais moment veut dire repartir les mains vides.</div>
+    <p class="section-sub">Un aller-retour rapporte plus ou moins selon trois choses, qui tirent dans des sens différents :</p>
+    <ul class="t-list">
+      <li><b>Le stock sur place</b> est limité et se vide. Arriver au mauvais moment, c'est repartir les mains vides.</li>
+      <li><b>La place dans la valise</b> dépend du mode de vol, de la valise et de bonus de faction ou de job : il faut choisir quoi ramener.</li>
+      <li><b>La durée de la session</b> : les pays proches permettent plusieurs allers-retours, les pays lointains un seul.</li>
+    </ul>
+    <p class="section-sub">En pratique, deux stratégies s'opposent : peu d'objets à très forte marge (drogues), ou beaucoup d'objets à marge plus faible mais au stock plus généreux (peluches, fleurs). L'outil chiffre les deux pour chaque pays.</p>
+    <details class="more">
+      <summary>Détail des bonus de capacité</summary>
+      <div class="t-table">
+        <div><span>Mode de vol</span><span>+10 (Standard) ou +15 (Airstrip, WLT, Business)</span></div>
+        <div><span>Valise S / M / L</span><span>+2 / +3 / +4</span></div>
+        <div><span>Faction — Excursion</span><span>jusqu'à +10</span></div>
+        <div><span>Toy Shop 7★</span><span>+5, peluches uniquement</span></div>
+        <div><span>Flower Shop 7★</span><span>+5, fleurs uniquement</span></div>
+        <div><span>Lingerie Store 3★</span><span>+2</span></div>
+        <div><span>Cruise Line 3★ / 10★</span><span>+2 / +5</span></div>
+        <div><span>World Travel Day</span><span>capacité ×2, événement ponctuel</span></div>
       </div>
-      <div class="inspo-item">
-        <div class="inspo-tag">Contrainte 2</div>
-        <div class="inspo-title">Le nombre d'objets ramenables</div>
-        <div class="inspo-desc">Le nombre d'objets ramenables cumule mode de vol, valise, upgrades de faction et bonus de job — impossible de tout acheter, il faut prioriser.</div>
-      </div>
-      <div class="inspo-item">
-        <div class="inspo-tag">Contrainte 3</div>
-        <div class="inspo-title">Le temps de session</div>
-        <div class="inspo-desc">Chaque pays a un temps de vol différent. Sur une session de jeu donnée, certaines destinations permettent plusieurs allers-retours, d'autres un seul.</div>
-      </div>
-    </div>
-
-    <p style="font-size:13px;color:var(--muted);line-height:1.9;margin:2.5rem 0 1.5rem;max-width:700px">
-      Selon les objets ciblés, deux grandes stratégies s'opposent : viser peu d'objets à très forte marge, ou beaucoup d'objets à marge plus modeste mais au stock plus généreux.
-    </p>
-
-    <div class="inspo-grid reveal">
-      <div class="inspo-item">
-        <div class="inspo-tag">Stratégie — valeur</div>
-        <div class="inspo-title">Miser sur les drogues (ex. Xanax)</div>
-        <div class="inspo-desc">Marge énorme par unité, mais stock de restock faible et très lent à se vider — un run peut suffire à rentabiliser toute la session, à condition d'arriver au bon moment.</div>
-      </div>
-      <div class="inspo-item">
-        <div class="inspo-tag">Stratégie — volume</div>
-        <div class="inspo-title">Miser sur peluches &amp; fleurs</div>
-        <div class="inspo-desc">Marge plus faible par unité, mais restock plus généreux et plus rapide — plus tolérant aux erreurs de timing, et compatible avec plusieurs allers-retours sur les pays courts (Mexique, Canada).</div>
-      </div>
-      <div class="inspo-item">
-        <div class="inspo-tag">Rôle de l'outil</div>
-        <div class="inspo-title">Comparer automatiquement</div>
-        <div class="inspo-desc">Plutôt que de trancher à l'instinct, l'outil chiffre les deux approches pour chaque pays et retient celle qui maximise le profit sur la session donnée.</div>
-      </div>
-    </div>
+    </details>
   </section>
 
-  <!-- 02 CE QUE CALCULE L'OUTIL -->
-  <section class="section reveal" id="sec-outil">
-    <div class="section-header">
-      <span class="section-num">02</span>
-      <h2 class="section-title">Ce que calcule l'outil</h2>
-    </div>
-    <p class="section-sub">À partir de ta session disponible et de tes bonus, l'outil croise ces trois contraintes et classe les destinations par profit estimé — plutôt que de refaire ce calcul à la main à chaque session.</p>
-
-    <div class="specs-grid reveal">
-      <div>
-        <div class="spec-row"><span class="spec-key">Entrée</span><span class="spec-val">Durée de session, mode de vol, valise</span></div>
-        <div class="spec-row"><span class="spec-key">Entrée</span><span class="spec-val">Bonus faction &amp; jobs</span></div>
-        <div class="spec-row"><span class="spec-key">Entrée</span><span class="spec-val">Clé API Torn (optionnelle)</span></div>
-      </div>
-      <div>
-        <div class="spec-row"><span class="spec-key">Sortie</span><span class="spec-val hl">Classement des pays par profit</span></div>
-        <div class="spec-row"><span class="spec-key">Sortie</span><span class="spec-val">Détail des objets à acheter par run</span></div>
-        <div class="spec-row"><span class="spec-key">Sortie</span><span class="spec-val">Timeline des allers-retours</span></div>
-      </div>
-    </div>
-  </section>
-
-  <div class="cat-sep reveal"><div class="cat-sep-line"></div><div class="cat-sep-label">Données &amp; modèle</div></div>
-
-  <!-- 03 SOURCES DE DONNÉES -->
-  <section class="section reveal" id="sec-data">
-    <div class="section-header">
-      <span class="section-num">03</span>
-      <h2 class="section-title">Sources de données</h2>
-    </div>
-    <p class="section-sub">Deux API externes, combinées à une base statique de secours si l'une d'elles est indisponible.</p>
-
-    <table class="data-table reveal">
-      <thead><tr><th>Donnée</th><th>Source</th><th>Fraîcheur</th></tr></thead>
-      <tbody>
-        <tr><td>Stocks étrangers</td><td class="hl">API YATA</td><td class="muted">Crowd-sourced, variable</td></tr>
-        <tr><td>Prix du marché</td><td class="hl">API Torn (clé publique perso)</td><td class="muted">Quotidien</td></tr>
-        <tr><td>Prix de base / temps de vol</td><td class="muted">Base statique (data.js)</td><td class="muted">Mise à jour manuelle</td></tr>
-      </tbody>
-    </table>
-
-    <div class="inspo-grid reveal" style="grid-template-columns:1fr 1fr">
-      <div class="inspo-item">
-        <div class="inspo-tag">Confidentialité</div>
-        <div class="inspo-title">Clé API jamais stockée côté serveur</div>
-        <div class="inspo-desc">La clé Torn est gardée uniquement dans le <code>sessionStorage</code> du navigateur — jamais envoyée ailleurs qu'aux API officielles de Torn. Niveau d'accès "Public Only", donc sans risque.</div>
-      </div>
-      <div class="inspo-item">
-        <div class="inspo-tag">Limite connue</div>
-        <div class="inspo-title">CORS côté YATA</div>
-        <div class="inspo-desc">L'API YATA peut bloquer les requêtes depuis GitHub Pages selon sa politique CORS. Si les stocks ne se chargent pas, l'outil retombe sur les prix historiques en cache.</div>
-      </div>
-    </div>
-
-    <div class="country-grid reveal">
-      <div class="country-item"><span class="country-name">Mexique</span><span class="country-meta"><b>20 min</b> · $5 000</span></div>
-      <div class="country-item"><span class="country-name">Canada</span><span class="country-meta"><b>37 min</b> · $7 500</span></div>
-      <div class="country-item"><span class="country-name">Caïmans</span><span class="country-meta"><b>57 min</b> · $10 000</span></div>
-      <div class="country-item"><span class="country-name">Hawaï</span><span class="country-meta"><b>2h01</b> · $12 000</span></div>
-      <div class="country-item"><span class="country-name">Royaume-Uni</span><span class="country-meta"><b>2h39</b> · $18 000</span></div>
-      <div class="country-item"><span class="country-name">Suisse</span><span class="country-meta"><b>2h49</b> · $20 000</span></div>
-      <div class="country-item"><span class="country-name">Argentine</span><span class="country-meta"><b>3h09</b> · $22 000</span></div>
-      <div class="country-item"><span class="country-name">Japon</span><span class="country-meta"><b>3h23</b> · $25 000</span></div>
-      <div class="country-item"><span class="country-name">Émirats</span><span class="country-meta"><b>4h31</b> · $32 000</span></div>
-      <div class="country-item"><span class="country-name">Chine</span><span class="country-meta"><b>4h02</b> · $35 000</span></div>
-      <div class="country-item"><span class="country-name">Afrique du Sud</span><span class="country-meta"><b>5h11</b> · $40 000</span></div>
-    </div>
-  </section>
-
-  <!-- 04 MODÈLE DE STOCK -->
   <section class="section reveal" id="sec-stock">
     <div class="section-header">
-      <span class="section-num">04</span>
-      <h2 class="section-title">Modèle de stock</h2>
+      <span class="section-num">02</span>
+      <h2 class="section-title">Prévoir le stock à l'arrivée</h2>
     </div>
-    <p class="section-sub">Le stock YATA n'est pas mis à jour en continu — il faut donc estimer où en sera le stock au moment réel de l'arrivée, pas au moment de la requête.</p>
-
-    <p style="font-size:13px;color:var(--muted);line-height:1.9;margin-bottom:1.5rem;max-width:700px">
-      À partir du dernier relevé YATA, le stock est simulé minute par minute jusqu'à l'heure d'arrivée estimée : il se vide à un rythme propre à chaque objet, puis se reconstitue après un délai s'il atteint zéro.
-    </p>
-
-    <div class="math-block reveal" id="stockFormula"></div>
-
-    <div class="screenshot-frame reveal">
-      <img src="torn_screenshot_stock.png" alt="Détail du modèle de stock — Xanax en Suisse">
-    </div>
-    <p class="screenshot-caption reveal">Détail d'un run : évolution du stock estimé entre le départ et l'arrivée, et décomposition du calcul de profit (<b>profit brut → profit ajusté par la probabilité de stock → profit net</b>).</p>
-
-    <div class="specs-grid reveal">
-      <div>
-        <div class="spec-row"><span class="spec-key">Vidage</span><span class="spec-val">Rythme propre à chaque objet</span></div>
-        <div class="spec-row"><span class="spec-key">Restock</span><span class="spec-val">Délai = moitié du temps de vidage</span></div>
-      </div>
-      <div>
-        <div class="spec-row"><span class="spec-key">Sortie</span><span class="spec-val hl">Probabilité de disponibilité</span></div>
-        <div class="spec-row"><span class="spec-key">Sortie</span><span class="spec-val">Label lisible ("stock faible", "restock probable"...)</span></div>
-      </div>
-    </div>
+    <p class="section-sub">C'est le cœur de l'outil. L'API YATA donne le stock au moment du dernier relevé, pas au moment où on atterrit. L'outil simule donc le stock minute par minute jusqu'à l'arrivée : il se vide à un rythme propre à chaque objet, puis se reconstitue par ticks de 15 minutes. Le modèle est calibré sur de vrais relevés YATA, une centaine sur une dizaine d'heures.</p>
+    <figure class="t-shot">
+      <div class="screenshot-frame"><img src="torn_screenshot_stock.png" alt="Stock estimé du Xanax en Suisse et calcul du profit"></div>
+      <figcaption class="screenshot-caption">Le profit brut est pondéré par la probabilité de trouver du stock, puis on retire le prix des vols.</figcaption>
+    </figure>
   </section>
 
-  <!-- 05 ALGORITHME D'OPTIMISATION -->
   <section class="section reveal" id="sec-algo">
     <div class="section-header">
-      <span class="section-num">05</span>
-      <h2 class="section-title">Algorithme d'optimisation</h2>
+      <span class="section-num">03</span>
+      <h2 class="section-title">Le calcul</h2>
     </div>
-    <p class="section-sub">Pour chaque pays non exclu, l'outil calcule combien d'allers-retours tiennent dans la session, puis répartit la capacité de valise sur les objets les plus rentables.</p>
-
-    <div class="param-list reveal">
-      <div class="param-row">
-        <div class="param-name">1. Trips possibles</div>
-        <div class="param-desc">Temps de vol aller-retour + marge, divisé dans la durée de session. Option "finir le voyage à l'étranger" pour ne pas décompter le dernier retour.</div>
-      </div>
-      <div class="param-row">
-        <div class="param-name">2. Tri par rentabilité</div>
-        <div class="param-desc">Les objets disponibles dans le pays sont triés par profit unitaire (prix de revente − prix d'achat), prix de marché temps réel si la clé API est fournie.</div>
-      </div>
-      <div class="param-row">
-        <div class="param-name">3. Allocation de la valise</div>
-        <div class="param-desc">La capacité de base va à l'objet le plus rentable ; les bonus de job (Toy Shop, Flower Shop) s'ajoutent uniquement sur leur catégorie d'objet correspondante.</div>
-      </div>
-      <div class="param-row">
-        <div class="param-name">4. Profit ajusté</div>
-        <div class="param-desc">Le profit brut est pondéré par la probabilité de disponibilité du stock à l'arrivée, puis multiplié par le nombre de trips, moins le coût total des vols.</div>
-      </div>
-      <div class="param-row">
-        <div class="param-name">5. Classement final</div>
-        <div class="param-desc">Les pays sont classés par profit total sur la session, avec le détail de chaque run et une timeline des départs/arrivées.</div>
-      </div>
-    </div>
+    <p class="section-sub">Pour chaque pays : combien d'allers-retours tiennent dans la session, quels objets ont la meilleure marge, comment remplir la valise. Les bonus de job ne s'appliquent qu'à leur catégorie (Toy Shop aux peluches, Flower Shop aux fleurs). Avec une clé API Torn, les prix de revente sont ceux du marché du jour. La clé reste dans le navigateur.</p>
   </section>
 
-  <div class="cat-sep reveal"><div class="cat-sep-line"></div><div class="cat-sep-label">Interface</div></div>
-
-  <!-- 06 PARAMÈTRES -->
-  <section class="section reveal" id="sec-ui">
+  <section class="section reveal" id="sec-limits" style="border-bottom:none">
     <div class="section-header">
-      <span class="section-num">06</span>
-      <h2 class="section-title">Paramètres &amp; réglages</h2>
+      <span class="section-num">04</span>
+      <h2 class="section-title">Limites</h2>
     </div>
-    <p class="section-sub">Une sidebar de paramètres à gauche, les résultats classés à droite — pensé pour être réglé une fois par session puis rafraîchi au fil du jeu.</p>
-
-    <div class="screenshot-frame reveal">
-      <img src="torn_screenshot_ui.png" alt="Interface complète du Torn Travel Optimizer">
-    </div>
-    <p class="screenshot-caption reveal">Vue d'ensemble : paramètres de session à gauche, meilleur run mis en avant avec sa timeline, puis le classement des autres destinations par profit.</p>
-
-    <div class="inspo-grid reveal">
-      <div class="inspo-item">
-        <div class="inspo-tag">Session</div>
-        <div class="inspo-title">Départ, durée, budget</div>
-        <div class="inspo-desc">Départ immédiat ou programmé, durée de session (1 à 24h), budget maximum par aller-retour.</div>
-      </div>
-      <div class="inspo-item">
-        <div class="inspo-tag">Voyage</div>
-        <div class="inspo-title">Mode, valise, bonus</div>
-        <div class="inspo-desc">Standard / Airstrip / WLT / Business Class, taille de valise, bonus faction (Excursion +10) et bonus de job (Toy Shop, Flower Shop, Lingerie Store, Cruise Line).</div>
-      </div>
-      <div class="inspo-item">
-        <div class="inspo-tag">Filtres</div>
-        <div class="inspo-title">Pays, objets, fraîcheur</div>
-        <div class="inspo-desc">Exclusion de pays au clic, filtre par type d'objet (peluches/fleurs/drogues), durée mini de vol, nombre max de trips, fraîcheur maximale des données YATA acceptée.</div>
-      </div>
-    </div>
+    <ul class="t-list">
+      <li><b>C'est une estimation.</b> Le stock réel peut différer de la simulation.</li>
+      <li><b>YATA peut bloquer les requêtes</b> venant de GitHub Pages (CORS). L'outil se rabat alors sur les dernières données en cache.</li>
+      <li><b>Sans clé API</b>, les prix viennent d'une base mise à jour à la main et peuvent dériver.</li>
+      <li><b>World Travel Day</b> n'est pas encore géré automatiquement.</li>
+    </ul>
+    <p class="section-sub">Le code est ouvert : retours, corrections et relevés de restock sont les bienvenus.</p>
   </section>
 
-  <div class="cat-sep reveal"><div class="cat-sep-line"></div><div class="cat-sep-label">Bilan</div></div>
-
-  <!-- 07 LIMITES -->
-  <section class="section reveal" id="sec-limits">
-    <div class="section-header">
-      <span class="section-num">07</span>
-      <h2 class="section-title">Limites &amp; pistes</h2>
-    </div>
-    <p class="section-sub">Un outil utile mais qui reste une estimation — pas un accès temps réel garanti à l'état du jeu.</p>
-
-    <div class="limit-list reveal">
-      <div class="limit-item">
-        <span class="limit-icon">Limite</span>
-        <div class="limit-body">
-          <div class="limit-title">Estimation, pas certitude</div>
-          <div class="limit-desc">Le modèle de stock est une simulation probabiliste basée sur le dernier relevé YATA — pas un accès temps réel à l'état exact du stock à l'étranger.</div>
-        </div>
-      </div>
-      <div class="limit-item">
-        <span class="limit-icon">Limite</span>
-        <div class="limit-body">
-          <div class="limit-title">Prix de base manuels</div>
-          <div class="limit-desc">Sans clé API, les prix de revente viennent d'une base statique mise à jour à la main — ils peuvent dériver du marché réel avec le temps.</div>
-        </div>
-      </div>
-      <div class="limit-item">
-        <span class="limit-icon">Piste</span>
-        <div class="limit-body">
-          <div class="limit-title">World Travel Day non automatisé</div>
-          <div class="limit-desc">Le doublement de capacité pendant l'événement World Travel Day n'est pas encore pris en compte dans le calcul — à ajuster manuellement pour l'instant.</div>
-        </div>
-      </div>
-      <div class="limit-item">
-        <span class="limit-icon">Piste</span>
-        <div class="limit-body">
-          <div class="limit-title">Historique des runs</div>
-          <div class="limit-desc">Garder une trace des sessions passées pour comparer le profit estimé au profit réellement obtenu, et affiner le modèle de stock avec le temps.</div>
-        </div>
-      </div>
-      <div class="limit-item">
-        <span class="limit-icon">Piste</span>
-        <div class="limit-body">
-          <div class="limit-title">Rafraîchissement automatique</div>
-          <div class="limit-desc">Notification ou rafraîchissement périodique des stocks YATA en arrière-plan, sans action manuelle.</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 08 STACK TECHNIQUE -->
-  <section class="section reveal" id="sec-stack">
-    <div class="section-header">
-      <span class="section-num">08</span>
-      <h2 class="section-title">Stack technique</h2>
-    </div>
-
-    <div class="specs-grid reveal">
-      <div>
-        <div class="spec-row"><span class="spec-key">Frontend</span><span class="spec-val">HTML / CSS / JS vanilla</span></div>
-        <div class="spec-row"><span class="spec-key">Dépendances</span><span class="spec-val hl">Aucune</span></div>
-        <div class="spec-row"><span class="spec-key">Hébergement</span><span class="spec-val">GitHub Pages</span></div>
-      </div>
-      <div>
-        <div class="spec-row"><span class="spec-key">Stockage clé API</span><span class="spec-val">sessionStorage</span></div>
-        <div class="spec-row"><span class="spec-key">Cache stocks</span><span class="spec-val">localStorage</span></div>
-        <div class="spec-row"><span class="spec-key">Dépôt</span><span class="spec-val"><a href="https://github.com/r0binetterie/r0binetterie.github.io" target="_blank" style="color:var(--accent);text-decoration:none">r0binetterie/r0binetterie.github.io ↗</a></span></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 09 CONTRIBUER -->
-  <section class="section reveal" id="sec-contribute" style="border-bottom:none">
-    <div class="section-header">
-      <span class="section-num">09</span>
-      <h2 class="section-title">Contribuer</h2>
-    </div>
-    <p class="section-sub">Le projet est ouvert — code, données et idées bienvenus.</p>
-
-    <div class="contribute-box reveal">
-      <h3>Envie de participer ?</h3>
-      <p>
-        Que ce soit pour aider au développement (nouvelles fonctionnalités, corrections, refonte de l'algorithme d'allocation) ou pour contribuer des données — par exemple des statistiques réelles de restock par pays et par objet pour affiner le modèle de stock — toute contribution est la bienvenue.
-      </p>
-      <div class="contribute-list">
-        <span>Développement</span>
-        <span>Statistiques de restock</span>
-        <span>Données de prix</span>
-        <span>Retours d'usage</span>
-      </div>
-      <a href="https://github.com/r0binetterie/r0binetterie.github.io" target="_blank" class="contribute-btn">Voir le dépôt ↗</a>
-    </div>
-  </section>
-
-  </div><!-- fin colonne principale -->
-</div><!-- fin page-wrap -->
+</div>
 
 <footer>
   <span>Robin Bonfill — Torn Travel Optimizer</span>
@@ -593,93 +335,6 @@
   },{rootMargin:'-20% 0px -60% 0px'});
   sections.forEach(s=>tocObs.observe(s));
 
-  // KaTeX — formule du modèle de vidage/restock
-  if(window.katex){
-    katex.render(
-      "\\text{stock}(t+\\Delta t) = \\max\\left(0,\\ \\text{stock}(t) - \\delta \\cdot \\Delta t\\right), \\qquad \\delta = \\frac{Q_{restock}}{T_{vidage}}",
-      document.getElementById('stockFormula'),
-      { throwOnError:false, displayMode:true }
-    );
-  }
-
-  // Animation canvas hero — avion qui traverse en pointillés
-  (function(){
-    const cv=document.getElementById('heroCanvas');
-    if(!cv)return;
-    if(window.getComputedStyle(cv).display==='none')return;
-    function resize(){
-      const r=cv.getBoundingClientRect();
-      if(r.width===0||r.height===0)return;
-      cv.width=r.width;cv.height=r.height;
-    }
-    requestAnimationFrame(()=>{resize();loop();});
-    window.addEventListener('resize',resize);
-    const ctx=cv.getContext('2d');
-    let t=0,running=true;
-    const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{running=e.isIntersecting;});},{threshold:.01});
-    obs.observe(cv.parentElement);
-
-    function draw(){
-      if(cv.width===0||cv.height===0){resize();return;}
-      const W=cv.width,H=cv.height;
-      ctx.clearRect(0,0,W,H);
-
-      // Grille façon plan de vol
-      ctx.strokeStyle='#1a1a1a';ctx.lineWidth=.5;
-      const s=40;
-      for(let x=0;x<W;x+=s){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
-      for(let y=0;y<H;y+=s){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
-
-      // Trajectoire en arc (départ bas-gauche, arrivée bas-droite)
-      const x0=W*.12,y0=H*.78,x1=W*.88,y1=H*.78,apexY=H*.22;
-      function bez(t){
-        const cx=W*.5,cy=apexY;
-        const x=(1-t)*(1-t)*x0+2*(1-t)*t*cx+t*t*x1;
-        const y=(1-t)*(1-t)*y0+2*(1-t)*t*cy+t*t*y1;
-        return{x,y};
-      }
-
-      ctx.setLineDash([4,7]);
-      ctx.strokeStyle='rgba(200,245,66,.25)';
-      ctx.lineWidth=1.5;
-      ctx.beginPath();
-      for(let i=0;i<=40;i++){const p=bez(i/40); if(i===0)ctx.moveTo(p.x,p.y); else ctx.lineTo(p.x,p.y);}
-      ctx.stroke();
-      ctx.setLineDash([]);
-
-      // Points de départ / arrivée
-      function dot(x,y,r,col){ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fillStyle=col;ctx.fill();}
-      dot(x0,y0,4,'rgba(200,245,66,.6)');
-      dot(x1,y1,4,'rgba(245,166,35,.7)');
-
-      // Avion qui avance en boucle le long de la courbe
-      const progress=(t%240)/240;
-      const p=bez(progress);
-      const p2=bez(Math.min(progress+0.01,1));
-      const angle=Math.atan2(p2.y-p.y,p2.x-p.x);
-
-      ctx.save();
-      ctx.translate(p.x,p.y);
-      ctx.rotate(angle);
-      ctx.fillStyle='#c8f542';
-      ctx.beginPath();
-      ctx.moveTo(10,0);
-      ctx.lineTo(-8,-5);
-      ctx.lineTo(-4,0);
-      ctx.lineTo(-8,5);
-      ctx.closePath();
-      ctx.fill();
-      ctx.restore();
-
-      ctx.font='9px DM Mono,monospace';
-      ctx.fillStyle='rgba(200,245,66,.25)';
-      ctx.fillText('FLIGHT PLANNER',x0-10,y0+22);
-
-      t++;
-      if(running)requestAnimationFrame(draw);
-    }
-    function loop(){requestAnimationFrame(draw);}
-  })();
 </script>
 </body>
 </html>
